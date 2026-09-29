@@ -33,10 +33,15 @@
             --font-en: 'Montserrat', sans-serif;
         }
 
-        * {
+        *, *::before, *::after {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+        }
+
+        html, body {
+            overflow-x: hidden; /* スマホでの不要な横スクロールを防止 */
+            width: 100%;
         }
 
         body {
@@ -51,7 +56,7 @@
         .site-header {
             background-color: var(--primary-dark);
             color: #FFFFFF;
-            padding: 15px 30px;
+            padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -61,7 +66,8 @@
         .site-header .logo {
             display: flex;
             align-items: center;
-            gap: 12px;
+            flex-wrap: wrap; /* スマホ画面で要素があふれた場合自動改行 */
+            gap: 8px 12px;
             text-decoration: none;
             color: #FFFFFF;
         }
@@ -85,23 +91,23 @@
             font-size: 0.75rem;
             padding: 3px 10px;
             border-radius: 12px;
-            margin-left: 8px;
-            vertical-align: middle;
             color: #FFFFFF;
+            white-space: nowrap;
         }
 
         /* コンテナ */
         .container {
+            width: 100%;
             max-width: 1100px;
-            margin: 30px auto;
-            padding: 0 20px;
+            margin: 20px auto;
+            padding: 0 15px;
         }
 
         /* ダッシュボード（集計カード） */
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
+            gap: 15px;
             margin-bottom: 25px;
         }
 
@@ -133,6 +139,7 @@
             font-size: 1.8rem;
             font-weight: 600;
             color: var(--primary-dark);
+            word-break: break-all;
         }
 
         /* グラフカード */
@@ -142,13 +149,14 @@
             border-radius: 8px;
             padding: 20px;
             box-shadow: var(--card-shadow);
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .chart-container {
             position: relative;
             height: 220px;
             margin-top: 10px;
+            width: 100%;
         }
 
         /* メインレイアウト */
@@ -158,20 +166,16 @@
             gap: 25px;
         }
 
-        @media (max-width: 850px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
         /* セクションカード */
         .card {
             background: var(--bg-white);
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            padding: 25px;
+            padding: 20px;
             box-shadow: var(--card-shadow);
-            margin-bottom: 25px;
+            margin-bottom: 20px;
+            width: 100%;
+            overflow: hidden; /* カード内要素のはみ出しを防ぐ */
         }
 
         .section-title {
@@ -183,6 +187,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .section-en {
@@ -197,6 +203,7 @@
         /* フォーム */
         .form-group {
             margin-bottom: 16px;
+            width: 100%;
         }
 
         .form-group label {
@@ -217,6 +224,16 @@
             background-color: var(--bg-sand);
             color: var(--text-main);
             transition: border-color 0.3s ease;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        select.form-control {
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%3c2C3E50' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 1em;
+            padding-right: 30px;
         }
 
         .form-control:focus {
@@ -227,7 +244,7 @@
 
         /* ボタン */
         .btn {
-            display: inline-block;
+            display: block;
             width: 100%;
             padding: 12px 20px;
             background-color: var(--accent-gold);
@@ -244,7 +261,6 @@
 
         .btn:hover {
             background-color: var(--accent-gold-hover);
-            transform: translateY(-1px);
         }
 
         .btn-outline {
@@ -260,13 +276,16 @@
 
         /* テーブル */
         .table-responsive {
+            width: 100%;
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.9rem;
+            min-width: 500px; /* テーブルが縮みすぎないように横スクロールを許可 */
         }
 
         th, td {
@@ -286,6 +305,7 @@
             font-family: var(--font-en);
             font-weight: 500;
             text-align: right;
+            white-space: nowrap;
         }
 
         .type-badge {
@@ -294,6 +314,7 @@
             border-radius: 12px;
             font-size: 0.75rem;
             font-weight: 500;
+            white-space: nowrap;
         }
 
         .type-badge.income {
@@ -313,6 +334,22 @@
             color: var(--text-sub);
             font-family: var(--font-en);
             margin-top: 40px;
+        }
+
+        /* モバイル対応レスポンシブブレイクポイント */
+        @media (max-width: 850px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 0 12px;
+                margin: 15px auto;
+            }
+
+            .card {
+                padding: 16px;
+            }
         }
     </style>
 </head>
