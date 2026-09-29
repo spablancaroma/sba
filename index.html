@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spa Blanc Aroma | 会計管理システム</title>
+    
+    <!-- ファビコン設定 -->
+    <link rel="icon" href="logo.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="logo.png">
+
+    <!-- Google Fonts（SBA公式採用フォント） -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- グラフ用ライブラリ (Chart.js) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* === Spa Blanc Aroma ブランドデザイン設定 === */
+        :root {
+            --bg-sand: #FAF9F6;
+            --bg-white: #FFFFFF;
+            --primary-dark: #2C3E50;
+            --accent-gold: #B39B7D;
+            --accent-gold-hover: #9E8569;
+            --text-main: #3B3530;
+            --text-sub: #666666;
+            --border-color: #E0DCD5;
+            --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+            --font-jp: 'Shippori Mincho', serif;
+            --font-en: 'Montserrat', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-jp);
+            background-color: var(--bg-sand);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding-bottom: 60px;
+        }
+
+        /* ヘッダー */
+        .site-header {
+            background-color: var(--primary-dark);
+            color: #FFFFFF;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .site-header .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: #FFFFFF;
+        }
+
+        .header-logo-img {
+            height: 38px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .site-header .logo-text {
+            font-family: var(--font-en);
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+
+        .header-badge {
+            background: var(--accent-gold);
+            font-family: var(--font-jp);
+            font-size: 0.75rem;
+            padding: 3px 10px;
+            border-radius: 12px;
+            margin-left: 8px;
+            vertical-align: middle;
+            color: #FFFFFF;
+        }
+
+        /* コンテナ */
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* ダッシュボード（集計カード） */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .dash-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            border-top: 4px solid var(--accent-gold);
+        }
+
+        .dash-card.expense {
+            border-top-color: #E74C3C;
+        }
+
+        .dash-card.balance {
+            border-top-color: var(--primary-dark);
+        }
+
+        .dash-label {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            margin-bottom: 5px;
+        }
+
+        .dash-value {
+            font-family: var(--font-en);
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        /* グラフカード */
+        .chart-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 30px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 220px;
+            margin-top: 10px;
+        }
+
+        /* メインレイアウト */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 850px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* セクションカード */
+        .card {
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 1.15rem;
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--accent-gold);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-en {
+            font-family: var(--font-en);
+            font-size: 0.75rem;
+            color: var(--accent-gold);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            display: block;
+        }
+
+        /* フォーム */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--primary-dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            background-color: var(--bg-sand);
+            color: var(--text-main);
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+            background-color: #FFFFFF;
+        }
+
+        /* ボタン */
+        .btn {
+            display: inline-block;
+            width: 100%;
+            padding: 12px 20px;
+            background-color: var(--accent-gold);
+            color: #FFFFFF;
+            border: none;
+            border-radius: 6px;
+            font-family: var(--font-jp);
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-gold-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--accent-gold);
+            border: 1px solid var(--accent-gold);
+        }
+
+        .btn-outline:hover {
+            background: var(--accent-gold);
+            color: #FFFFFF;
+        }
+
+        /* テーブル */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 12px 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--bg-sand);
+            color: var(--primary-dark);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        td.amount {
+            font-family: var(--font-en);
+            font-weight: 500;
+            text-align: right;
+        }
+
+        .type-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .type-badge.income {
+            background: #E8F8F5;
+            color: #16A085;
+        }
+
+        .type-badge.expense {
+            background: #FDEDEC;
+            color: #E74C3C;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.8rem;
+            color: var(--text-sub);
+            font-family: var(--font-en);
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ヘッダー -->
+    <header class="site-header">
+        <a href="#" class="logo">
+            <img src="logo.png" alt="Spa Blanc Aroma ロゴ" class="header-logo-img" onerror="this.style.display='none'">
+            <span class="logo-text">Spa Blanc Aroma</span>
+            <span class="header-badge">会計システム</span>
+        </a>
+    </header>
+
+    <div class="container">
+
+        <!-- 収支サマリーダッシュボード -->
+        <div class="dashboard-grid">
+            <div class="dash-card">
+                <div class="dash-label">今期の総売上 (収入)</div>
+                <div class="dash-value" id="total-income">¥0</div>
+            </div>
+            <div class="dash-card expense">
+                <div class="dash-label">今期の経費 (按分後支出)</div>
+                <div class="dash-value" id="total-expense">¥0</div>
+            </div>
+            <div class="dash-card balance">
+                <div class="dash-label">差引純利益</div>
+                <div class="dash-value" id="net-profit">¥0</div>
+            </div>
+        </div>
+
+        <!-- 内訳グラフ -->
+        <div class="chart-card">
+            <span class="section-en">Analytics</span>
+            <h2 class="section-title" style="margin-bottom: 10px; border: none;">経費費目別の割合</h2>
+            <div class="chart-container">
+                <canvas id="expenseChart"></canvas>
+            </div>
+        </div>
+
+        <!-- メイン入力・履歴エリア -->
+        <div class="main-grid">
+
+            <!-- 左側：伝票入力フォーム -->
+            <div class="card">
+                <span class="section-en">Entry Form</span>
+                <h2 class="section-title">取引の登録</h2>
+
+                <form id="accounting-form">
+                    <div class="form-group">
+                        <label for="entry-date">日付</label>
+                        <input type="date" id="entry-date" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="entry-type">区分</label>
+                        <select id="entry-type" class="form-control" onchange="updateCategories()">
+                            <option value="経費" selected>支出（経費）</option>
+                            <option value="売上">収入（売上）</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="entry-category">勘定科目 / メニュー</label>
+                        <select id="entry-category" class="form-control" required></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="entry-amount">金額 (円)</label>
+                        <input type="number" id="entry-amount" class="form-control" placeholder="例: 12000" min="0" required>
+                    </div>
+
+                    <div class="form-group" id="ratio-group">
+                        <label for="entry-ratio">事業割合（家事按分）</label>
+                        <select id="entry-ratio" class="form-control">
+                            <option value="1.0">100%（全額事業用）</option>
+                            <option value="0.5">50%（自宅・通信など半分）</option>
+                            <option value="0.3">30%（自宅家賃など3割）</option>
+                            <option value="0.2">20%</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="entry-memo">摘要・メモ</label>
+                        <input type="text" id="entry-memo" class="form-control" placeholder="例: 90分コース（PayPay決済）">
+                    </div>
+
+                    <button type="submit" id="submit-btn" class="btn">登録する</button>
+                </form>
+            </div>
+
+            <!-- 右側：明細一覧テーブル -->
+            <div class="card">
+                <span class="section-en">Journal History</span>
+                <h2 class="section-title">
+                    仕訳帳明細
+                    <button class="btn btn-outline" onclick="exportCSV()" style="width: auto; padding: 4px 12px; font-size: 0.8rem;">CSV出力</button>
+                </h2>
+
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>日付</th>
+                                <th>区分</th>
+                                <th>科目 / 内容</th>
+                                <th>摘要</th>
+                                <th style="text-align: right;">経費計上額</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transaction-list">
+                            <!-- 取得データがここに描画されます -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <footer>
+        &copy; Spa Blanc Aroma Accounting Module.
+    </footer>
+
+    <script>
+        // === 設定項目 ===
+        // デプロイしたGASのWeb API URLに置き換えてください
+        const GAS_API_URL = "https://script.google.com/macros/s/YOUR_GAS_DEPLOYMENT_ID/exec";
+        // 簡易暗号キー（GAS側のキーと一致させてください）
+        const API_PASSWORD = "blanc2025_sec_key";
+
+        // SBA専用勘定科目定義
+        const categories = {
+            "売上": ["60分コース", "90分コース", "120分コース", "出張料金オプション", "売上高（その他）"],
+            "経費": ["地代家賃", "消耗品費", "水道光熱費", "通信費", "広告宣伝費", "旅費交通費", "接待交際費", "新聞図書費", "雑費"]
+        };
+
+        let myChart = null;
+        let currentData = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('entry-date').valueAsDate = new Date();
+            updateCategories();
+            fetchTransactions();
+        });
+
+        // 区分切り替え制御
+        function updateCategories() {
+            const type = document.getElementById('entry-type').value;
+            const categorySelect = document.getElementById('entry-category');
+            const ratioGroup = document.getElementById('ratio-group');
+            
+            categorySelect.innerHTML = '';
+            categories[type].forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.textContent = cat;
+                categorySelect.appendChild(opt);
+            });
+
+            if (type === "売上") {
+                ratioGroup.style.display = 'none';
+                document.getElementById('entry-ratio').value = '1.0';
+            } else {
+                ratioGroup.style.display = 'block';
+            }
+        }
+
+        // GASから最新データの取得
+        async function fetchTransactions() {
+            try {
+                const url = `${GAS_API_URL}?password=${encodeURIComponent(API_PASSWORD)}`;
+                const response = await fetch(url);
+                const result = await response.json();
+
+                if (result.status === 'error') {
+                    alert('認証エラー: ' + result.message);
+                    return;
+                }
+
+                currentData = result.data || [];
+                renderUI(currentData);
+            } catch (error) {
+                console.error('通信エラー:', error);
+            }
+        }
+
+        // フォーム送信（登録）
+        document.getElementById('accounting-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '送信中...';
+
+            const payload = {
+                password: API_PASSWORD,
+                date: document.getElementById('entry-date').value,
+                type: document.getElementById('entry-type').value,
+                category: document.getElementById('entry-category').value,
+                amount: document.getElementById('entry-amount').value,
+                ratio: document.getElementById('entry-ratio').value,
+                memo: document.getElementById('entry-memo').value
+            };
+
+            try {
+                const response = await fetch(GAS_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    alert('登録が完了しました');
+                    document.getElementById('entry-amount').value = '';
+                    document.getElementById('entry-memo').value = '';
+                    fetchTransactions();
+                } else {
+                    alert('登録エラー: ' + result.message);
+                }
+            } catch (error) {
+                alert('通信エラーが発生しました');
+                console.error(error);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '登録する';
+            }
+        });
+
+        // 画面およびグラフの描画更新
+        function renderUI(data) {
+            const tbody = document.getElementById('transaction-list');
+            tbody.innerHTML = '';
+
+            let totalIncome = 0;
+            let totalExpense = 0;
+            const breakdown = {};
+
+            data.forEach(t => {
+                const actualAmount = Number(t.actualAmount);
+                if (t.type === '売上') {
+                    totalIncome += Number(t.amount);
+                } else {
+                    totalExpense += actualAmount;
+                    breakdown[t.category] = (breakdown[t.category] || 0) + actualAmount;
+                }
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-family: var(--font-en);">${t.date}</td>
+                    <td>
+                        <span class="type-badge ${t.type === '売上' ? 'income' : 'expense'}">
+                            ${t.type}
+                        </span>
+                    </td>
+                    <td><strong>${t.category}</strong></td>
+                    <td style="color: var(--text-sub); font-size: 0.85rem;">${t.memo || '-'}</td>
+                    <td class="amount">¥${actualAmount.toLocaleString()}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // ダッシュボード反映
+            document.getElementById('total-income').textContent = '¥' + totalIncome.toLocaleString();
+            document.getElementById('total-expense').textContent = '¥' + totalExpense.toLocaleString();
+            document.getElementById('net-profit').textContent = '¥' + (totalIncome - totalExpense).toLocaleString();
+
+            // グラフ描画
+            renderChart(breakdown);
+        }
+
+        function renderChart(breakdown) {
+            const ctx = document.getElementById('expenseChart').getContext('2d');
+            const labels = Object.keys(breakdown);
+            const values = Object.values(breakdown);
+
+            if (myChart) myChart.destroy();
+
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels.length > 0 ? labels : ['データなし'],
+                    datasets: [{
+                        data: values.length > 0 ? values : [1],
+                        backgroundColor: ['#2C3E50', '#B39B7D', '#E67E22', '#8E44AD', '#F1C40F', '#E74C3C', '#16A085', '#D35400', '#7F8C8D']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { font: { family: 'Shippori Mincho' } } }
+                    }
+                }
+            });
+        }
+
+        // CSV書き出し機能
+        function exportCSV() {
+            if (currentData.length === 0) {
+                alert('出力するデータがありません。');
+                return;
+            }
+
+            let csvContent = "\uFEFF日付,区分,科目,入力金額,按分率,経費計上額,摘要\n";
+            currentData.forEach(t => {
+                csvContent += `"${t.date}","${t.type}","${t.category}",${t.amount},${t.ratio},${t.actualAmount},"${t.memo || ''}"\n`;
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `SBA_会計データ_${new Date().toISOString().slice(0,10)}.csv`;
+            link.click();
+        }
+    </script>
+</body>
+</html>
