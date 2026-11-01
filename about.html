@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- ファビコンの設定 -->
+<link rel="icon" href="logo.ico" type="image/x-icon">
+<link rel="shortcut icon" href="logo.ico" type="image/x-icon">
+<link rel="apple-touch-icon" href="logo.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>店舗概要 - Spa Blanc Aroma</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    .container { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+    .page-header { text-align: center; padding: 120px 20px 40px; background-color: #f2ece4; }
+    .page-header h1 { font-size: 2rem; font-weight: 500; color: #3b3530; letter-spacing: 0.05em; }
+    .info-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+    .info-table th, .info-table td { padding: 20px; border-bottom: 1px solid #f0ede8; text-align: left; font-size: 0.95rem; }
+    .info-table th { width: 30%; color: #555; font-weight: 500; background: #f8f6f2; }
+    .info-table td { color: #444; }
+    .map-container { width: 100%; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-top: 30px; }
+    .map-container iframe { width: 100%; height: 350px; border: 0; display: block; }
+    .map-btn { display: block; width: 100%; padding: 15px; background: #b39b7d; color: #fff; text-align: center; text-decoration: none; border-radius: 30px; font-weight: 500; margin-top: 25px; transition: 0.3s; }
+    .map-btn:hover { background: #9c8263; }
+  </style>
+</head>
+<body>
+
+    <!-- ハンバーガーボタン & サイドバー -->
+    <button class="menu-toggle-btn" onclick="openNav()" aria-label="メニューを開く">☰</button>
+
+    <div class="sidebar-overlay" id="overlay" onclick="closeNav()"></div>
+
+    <aside class="sidebar" id="sidebar">
+      <button class="close-btn" onclick="closeNav()" aria-label="メニューを閉じる">✕</button>
+      <ul class="sidebar-menu">
+        <li><a href="index.html">トップ</a></li>
+        <li><a href="reservation.html">予約・空き状況確認</a></li>
+        <li><a href="column.html">コラム一覧</a></li>
+        <li><a href="news.html">お知らせ</a></li>
+        <li><a href="about.html">店舗概要</a></li>
+        <li><a href="recruit.html">セラピスト募集</a></li>
+        <li><a href="javascript:void(0);" onclick="loginAdmin()" class="admin-link">🔒 管理者画面</a></li>
+      </ul>
+    </aside>
+
+    <header class="site-header">
+        <div class="logo">
+          <a href="index.html">
+            <img src="logo.png" alt="Spa Blanc Aroma 店舗ロゴ" class="header-logo-img">
+            <span>Spa Blanc Aroma</span>
+          </a>
+        </div>
+        <nav class="nav-menu">
+            <a href="index.html#about">About</a>
+            <a href="index.html#therapist">Therapist</a>
+            <a href="index.html#service">Service</a>
+            <a href="index.html#menu">Price</a>
+            <a href="index.html#flow">Flow</a>
+            <a href="index.html#faq">FAQ</a>
+            <a href="column.html">Column</a>
+            <a href="reservation.html" class="nav-btn">ご予約</a>
+        </nav>
+    </header>
+
+    <div class="page-header">
+      <span class="section-en">About Store</span>
+      <h1>店舗概要</h1>
+    </div>
+
+<div class="container">
+  <table class="info-table">
+    <tr>
+      <th>店名</th>
+      <td>Spa Blanc Aroma</td>
+    </tr>
+    <tr>
+      <th>最寄駅</th>
+      <td>阪急京都線・千里線「淡路駅」東口徒歩3分<br>JRおおさか東線「JR淡路駅」徒歩5分</td>
+    </tr>
+    <tr>
+      <th>基本営業時間</th>
+      <td>平 日：20:00 ～ 24:00<br>土日祝：10:00 ～ 24:00<br><small>※セラピストのスケジュールによります。<br>※完全予約制です。</small></td>
+    </tr>
+  </table>
+
+  <!-- Googleマップ -->
+  <div class="map-container">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d2678.5480478724166!2d135.51999291350188!3d34.738303212071735!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6000e40f4a9e334b%3A0x209867a914c937d!2z5p2x5reh6Lev55S65YWs5ZyS!5e0!3m2!1sja!2sjp!4v1789575650238!5m2!1sja!2sjp" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+
+  <a href="https://maps.google.com/maps?q=34.738303212071735,135.51999291350188" target="_blank" rel="noopener noreferrer" class="map-btn">📍 Googleマップアプリで開く</a>
+</div>
+
+<!-- フッター -->
+<footer>
+    <p>&copy; Spa Blanc Aroma All Rights Reserved.</p>
+</footer>
+
+<script>
+  function openNav() {
+    document.getElementById('sidebar').classList.add('is-active');
+    document.getElementById('overlay').classList.add('is-active');
+  }
+
+  function closeNav() {
+    document.getElementById('sidebar').classList.remove('is-active');
+    document.getElementById('overlay').classList.remove('is-active');
+  }
+
+  function loginAdmin() {
+    const pass = prompt("管理者用パスワードを入力してください:");
+    if (pass === "blanc2025") {
+      sessionStorage.setItem("adminAuth", "true");
+      window.location.href = "admin.html";
+    } else if (pass !== null) {
+      alert("パスワードが正しくありません。");
+    }
+  }
+</script>
+</body>
+</html>

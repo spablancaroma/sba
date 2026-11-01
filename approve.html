@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- ファビコンの設定 -->
+<link rel="icon" href="logo.ico" type="image/x-icon">
+<link rel="shortcut icon" href="logo.ico" type="image/x-icon">
+<link rel="apple-touch-icon" href="logo.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>予約処理 - Spa Blanc Aroma</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .container { max-width: 600px; margin: 80px auto; padding: 40px; background: #fff; border-radius: 8px; border: 1px solid #f0ede8; text-align: center; }
+    .status-msg { font-size: 1.1rem; color: #333; margin-bottom: 20px; line-height: 1.6; }
+    .btn-home { display: inline-block; padding: 12px 30px; background: #b39b7d; color: #fff; border-radius: 30px; text-decoration: none; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 id="title">予約処理中...</h2>
+    <p id="message" class="status-msg">サーバーと通信しています。しばらくお待ちください。</p>
+    <a href="index.html" class="btn-home">トップページへ戻る</a>
+  </div>
+
+  <script>
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzINJ6cRRGnjW4n1n1zW42LDRqziMAkOKwDZrwMhMWnNdmO74K815ld_gbcnB94eh8/exec";
+
+    // URLのパラメーター取得 (?action=approve&id=Rxxxxx)
+    const urlParams = new URLSearchParams(window.location.search);
+    const action = urlParams.get('action');
+    const id = urlParams.get('id');
+
+    if (!action || !id) {
+      document.getElementById('title').innerText = "エラー";
+      document.getElementById('message').innerText = "無効なアクセスです。パラメーターが不足しています。";
+    } else {
+      // JSONPでGAS APIを実行
+      const callbackName = 'jsonp_approval_' + Math.random().toString(36).substr(2, 9);
+      const script = document.createElement('script');
+
+      window[callbackName] = function(data) {
+        delete window[callbackName];
+        document.body.removeChild(script);
+
+        if (data.success) {
+          document.getElementById('title').innerText = action === 'approve' ? "予約承認完了" : "予約却下完了";
+          document.getElementById('message').innerText = data.message;
+        } else {
+          document.getElementById('title').innerText = "処理失敗";
+          document.getElementById('message').innerText = data.message;
+        }
+      };
+
+      script.src = `${GAS_API_URL}?action=${action}&id=${id}&callback=${callbackName}`;
+      script.onerror = function() {
+        document.getElementById('title').innerText = "通信エラー";
+        document.getElementById('message').innerText = "サーバーとの通信に失敗しました。";
+      };
+      document.body.appendChild(script);
+    }
+  </script>
+</body>
+</html>
