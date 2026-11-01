@@ -9,53 +9,33 @@
     <link rel="icon" href="https://spablancaroma.github.io/sba/logo.ico" type="image/x-icon">
     <link rel="apple-touch-icon" href="https://spablancaroma.github.io/sba/logo.png">
 
-    <!-- Google Fonts（SBA公式採用フォント） -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-    <!-- グラフ用ライブラリ (Chart.js) -->
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        /* === Basic認証用オーバーレイスタイル === */
         #auth-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
             background-color: #2C3E50;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            display: flex; justify-content: center; align-items: center;
             z-index: 9999;
         }
-
         .auth-card {
             background: #FFFFFF;
             padding: 30px 25px;
             border-radius: 8px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            width: 90%;
-            max-width: 360px;
-            text-align: center;
+            width: 90%; max-width: 360px; text-align: center;
         }
+        .auth-card h2 { font-family: 'Shippori Mincho', serif; font-size: 1.2rem; color: #2C3E50; margin-bottom: 8px; }
+        .auth-card p { font-size: 0.85rem; color: #666666; margin-bottom: 20px; }
 
-        .auth-card h2 {
-            font-family: 'Shippori Mincho', serif;
-            font-size: 1.2rem;
-            color: #2C3E50;
-            margin-bottom: 8px;
-        }
-
-        .auth-card p {
-            font-size: 0.85rem;
-            color: #666666;
-            margin-bottom: 20px;
-        }
-
-        /* === Spa Blanc Aroma ブランドデザイン設定 === */
         :root {
             --bg-sand: #FAF9F6;
             --bg-white: #FFFFFF;
@@ -70,402 +50,114 @@
             --font-en: 'Montserrat', sans-serif;
         }
 
-        *, *::before, *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { overflow-x: hidden; width: 100%; }
+        body { font-family: var(--font-jp); background-color: var(--bg-sand); color: var(--text-main); line-height: 1.6; padding-bottom: 60px; }
 
-        html, body {
-            overflow-x: hidden;
-            width: 100%;
-        }
-
-        body {
-            font-family: var(--font-jp);
-            background-color: var(--bg-sand);
-            color: var(--text-main);
-            line-height: 1.6;
-            padding-bottom: 60px;
-        }
-
-        /* ヘッダー */
         .site-header {
-            background-color: var(--primary-dark);
-            color: #FFFFFF;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background-color: var(--primary-dark); color: #FFFFFF;
+            padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
+        .site-header .logo { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; text-decoration: none; color: #FFFFFF; }
+        .header-logo-img { height: 38px; width: auto; object-fit: contain; }
+        .site-header .logo-text { font-family: var(--font-en); font-size: 1.2rem; letter-spacing: 1px; font-weight: 500; }
+        .header-badge { background: var(--accent-gold); font-family: var(--font-jp); font-size: 0.75rem; padding: 3px 10px; border-radius: 12px; color: #FFFFFF; white-space: nowrap; }
 
-        .site-header .logo {
+        .container { width: 100%; max-width: 1100px; margin: 20px auto; padding: 0 15px; }
+
+        /* 年度選択セレクタータブ */
+        .year-selector-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 8px 12px;
-            text-decoration: none;
-            color: #FFFFFF;
-        }
-
-        .header-logo-img {
-            height: 38px;
-            width: auto;
-            object-fit: contain;
-        }
-
-        .site-header .logo-text {
-            font-family: var(--font-en);
-            font-size: 1.2rem;
-            letter-spacing: 1px;
-            font-weight: 500;
-        }
-
-        .header-badge {
-            background: var(--accent-gold);
-            font-family: var(--font-jp);
-            font-size: 0.75rem;
-            padding: 3px 10px;
-            border-radius: 12px;
-            color: #FFFFFF;
-            white-space: nowrap;
-        }
-
-        /* コンテナ */
-        .container {
-            width: 100%;
-            max-width: 1100px;
-            margin: 20px auto;
-            padding: 0 15px;
-        }
-
-        /* ダッシュボード（集計カード） */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .dash-card {
-            background: var(--bg-white);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: var(--card-shadow);
-            border-top: 4px solid var(--accent-gold);
-        }
-
-        .dash-card.expense {
-            border-top-color: #E74C3C;
-        }
-
-        .dash-card.balance {
-            border-top-color: var(--primary-dark);
-        }
-
-        .dash-label {
-            font-size: 0.85rem;
-            color: var(--text-sub);
-            margin-bottom: 5px;
-        }
-
-        .dash-value {
-            font-family: var(--font-en);
-            font-size: 1.8rem;
-            font-weight: 600;
-            color: var(--primary-dark);
-            word-break: break-all;
-        }
-
-        /* グラフカード */
-        .chart-card {
-            background: var(--bg-white);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: var(--card-shadow);
-            margin-bottom: 25px;
-        }
-
-        .chart-container {
-            position: relative;
-            height: 220px;
-            margin-top: 10px;
-            width: 100%;
-        }
-
-        /* メインレイアウト */
-        .main-grid {
-            display: grid;
-            grid-template-columns: 340px 1fr;
-            gap: 25px;
-        }
-
-        /* セクションカード */
-        .card {
-            background: var(--bg-white);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: var(--card-shadow);
-            margin-bottom: 20px;
-            width: 100%;
-            overflow: hidden;
-        }
-
-        .section-title {
-            font-size: 1.15rem;
-            color: var(--primary-dark);
-            margin-bottom: 20px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid var(--accent-gold);
-            display: flex;
             justify-content: space-between;
-            align-items: center;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
+            box-shadow: var(--card-shadow);
         }
-
-        .section-en {
-            font-family: var(--font-en);
-            font-size: 0.75rem;
-            color: var(--accent-gold);
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            display: block;
-        }
-
-        /* フォーム */
-        .form-group {
-            margin-bottom: 16px;
-            width: 100%;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: var(--primary-dark);
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-family: inherit;
-            font-size: 0.95rem;
-            background-color: var(--bg-sand);
-            color: var(--text-main);
-            transition: border-color 0.3s ease;
-            appearance: none;
-            -webkit-appearance: none;
-        }
-
-        select.form-control {
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232C3E50' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            background-size: 1em;
-            padding-right: 30px;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--accent-gold);
-            background-color: #FFFFFF;
-        }
-
-        /* クイックボタン用スタイル */
-        .quick-btn-container {
-            display: flex;
-            gap: 6px;
-            margin-top: 8px;
-            flex-wrap: wrap;
-        }
-
-        .quick-btn {
+        .year-label { font-size: 0.95rem; font-weight: 600; color: var(--primary-dark); }
+        .year-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+        .year-tab {
             background: var(--bg-sand);
             border: 1px solid var(--border-color);
             color: var(--primary-dark);
-            padding: 6px 10px;
-            font-size: 0.78rem;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: inherit;
-            transition: all 0.2s;
-        }
-
-        .quick-btn:hover {
-            background: var(--accent-gold);
-            color: #FFFFFF;
-            border-color: var(--accent-gold);
-        }
-
-        .quick-btn-add {
-            background: #E8F8F5;
-            color: #16A085;
-            border-color: #A3E4D7;
-        }
-
-        .quick-btn-add:hover {
-            background: #16A085;
-            color: #FFFFFF;
-        }
-
-        /* フィルタバー */
-        .filter-bar {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-
-        .filter-bar .form-control {
-            font-size: 0.85rem;
-            padding: 6px 10px;
-        }
-
-        /* ボタン */
-        .btn {
-            display: block;
-            width: 100%;
-            padding: 12px 20px;
-            background-color: var(--accent-gold);
-            color: #FFFFFF;
-            border: none;
-            border-radius: 6px;
-            font-family: var(--font-jp);
-            font-size: 0.95rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-
-        .btn:hover {
-            background-color: var(--accent-gold-hover);
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: var(--accent-gold);
-            border: 1px solid var(--accent-gold);
-        }
-
-        .btn-outline:hover {
-            background: var(--accent-gold);
-            color: #FFFFFF;
-        }
-
-        /* ページネーション */
-        .pagination-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 12px;
-            margin-top: 15px;
+            padding: 6px 16px;
             font-family: var(--font-en);
             font-size: 0.9rem;
-        }
-
-        .page-btn {
-            background: var(--bg-sand);
-            border: 1px solid var(--border-color);
-            color: var(--primary-dark);
-            padding: 4px 12px;
-            border-radius: 4px;
+            font-weight: 500;
+            border-radius: 20px;
             cursor: pointer;
             transition: all 0.2s;
         }
-
-        .page-btn:hover:not(:disabled) {
-            background: var(--accent-gold);
+        .year-tab.active {
+            background: var(--primary-dark);
             color: #FFFFFF;
-            border-color: var(--accent-gold);
+            border-color: var(--primary-dark);
         }
 
-        .page-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .dash-card { background: var(--bg-white); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; box-shadow: var(--card-shadow); border-top: 4px solid var(--accent-gold); }
+        .dash-card.expense { border-top-color: #E74C3C; }
+        .dash-card.balance { border-top-color: var(--primary-dark); }
+        .dash-label { font-size: 0.85rem; color: var(--text-sub); margin-bottom: 5px; }
+        .dash-value { font-family: var(--font-en); font-size: 1.8rem; font-weight: 600; color: var(--primary-dark); word-break: break-all; }
 
-        /* テーブル */
-        .table-responsive {
-            width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
+        .chart-card { background: var(--bg-white); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; box-shadow: var(--card-shadow); margin-bottom: 25px; }
+        .chart-container { position: relative; height: 220px; margin-top: 10px; width: 100%; }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.88rem;
-            min-width: 580px;
-        }
+        .main-grid { display: grid; grid-template-columns: 340px 1fr; gap: 25px; }
+        .card { background: var(--bg-white); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; box-shadow: var(--card-shadow); margin-bottom: 20px; width: 100%; overflow: hidden; }
 
-        th, td {
-            padding: 10px 8px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-        }
+        .section-title { font-size: 1.15rem; color: var(--primary-dark); margin-bottom: 20px; padding-bottom: 8px; border-bottom: 2px solid var(--accent-gold); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .section-en { font-family: var(--font-en); font-size: 0.75rem; color: var(--accent-gold); letter-spacing: 1.5px; text-transform: uppercase; display: block; }
 
-        th {
-            background-color: var(--bg-sand);
-            color: var(--primary-dark);
-            font-weight: 600;
-            white-space: nowrap;
-        }
+        .form-group { margin-bottom: 16px; width: 100%; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--primary-dark); }
+        .form-control { width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-family: inherit; font-size: 0.95rem; background-color: var(--bg-sand); color: var(--text-main); transition: border-color 0.3s ease; appearance: none; -webkit-appearance: none; }
+        select.form-control { background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232C3E50' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 10px center; background-size: 1em; padding-right: 30px; }
+        .form-control:focus { outline: none; border-color: var(--accent-gold); background-color: #FFFFFF; }
 
-        td.amount {
-            font-family: var(--font-en);
-            font-weight: 500;
-            text-align: right;
-            white-space: nowrap;
-        }
+        .quick-btn-container { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+        .quick-btn { background: var(--bg-sand); border: 1px solid var(--border-color); color: var(--primary-dark); padding: 6px 10px; font-size: 0.78rem; border-radius: 4px; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+        .quick-btn:hover { background: var(--accent-gold); color: #FFFFFF; border-color: var(--accent-gold); }
+        .quick-btn-add { background: #E8F8F5; color: #16A085; border-color: #A3E4D7; }
+        .quick-btn-add:hover { background: #16A085; color: #FFFFFF; }
 
-        .type-badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            white-space: nowrap;
-        }
+        .filter-bar { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .filter-bar .form-control { font-size: 0.85rem; padding: 6px 10px; }
 
-        .type-badge.income {
-            background: #E8F8F5;
-            color: #16A085;
-        }
+        .btn { display: block; width: 100%; padding: 12px 20px; background-color: var(--accent-gold); color: #FFFFFF; border: none; border-radius: 6px; font-family: var(--font-jp); font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: all 0.3s ease; text-align: center; }
+        .btn:hover { background-color: var(--accent-gold-hover); }
+        .btn-outline { background: transparent; color: var(--accent-gold); border: 1px solid var(--accent-gold); }
+        .btn-outline:hover { background: var(--accent-gold); color: #FFFFFF; }
 
-        .type-badge.expense {
-            background: #FDEDEC;
-            color: #E74C3C;
-        }
+        .pagination-container { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 15px; font-family: var(--font-en); font-size: 0.9rem; }
+        .page-btn { background: var(--bg-sand); border: 1px solid var(--border-color); color: var(--primary-dark); padding: 4px 12px; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
+        .page-btn:hover:not(:disabled) { background: var(--accent-gold); color: #FFFFFF; border-color: var(--accent-gold); }
+        .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-        footer {
-            text-align: center;
-            padding: 20px;
-            font-size: 0.8rem;
-            color: var(--text-sub);
-            font-family: var(--font-en);
-            margin-top: 40px;
-        }
+        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.88rem; min-width: 580px; }
+        th, td { padding: 10px 8px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        th { background-color: var(--bg-sand); color: var(--primary-dark); font-weight: 600; white-space: nowrap; }
+        td.amount { font-family: var(--font-en); font-weight: 500; text-align: right; white-space: nowrap; }
+
+        .type-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 500; white-space: nowrap; }
+        .type-badge.income { background: #E8F8F5; color: #16A085; }
+        .type-badge.expense { background: #FDEDEC; color: #E74C3C; }
+
+        footer { text-align: center; padding: 20px; font-size: 0.8rem; color: var(--text-sub); font-family: var(--font-en); margin-top: 40px; }
 
         @media (max-width: 850px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
-            .container {
-                padding: 0 12px;
-                margin: 15px auto;
-            }
-            .card {
-                padding: 16px;
-            }
+            .main-grid { grid-template-columns: 1fr; }
+            .container { padding: 0 12px; margin: 15px auto; }
+            .card { padding: 16px; }
+            .year-selector-card { flex-direction: column; align-items: flex-start; }
         }
     </style>
 </head>
@@ -496,18 +188,27 @@
         </header>
 
         <div class="container">
+
+            <!-- 会計年度選択タブ -->
+            <div class="year-selector-card">
+                <div class="year-label">対象会計年度</div>
+                <div class="year-tabs" id="year-tabs">
+                    <!-- JavaScriptで動的生成 -->
+                </div>
+            </div>
+
             <!-- 収支サマリーダッシュボード -->
             <div class="dashboard-grid">
                 <div class="dash-card">
-                    <div class="dash-label">今期の総売上 (収入)</div>
+                    <div class="dash-label"><span class="selected-year-text">2026</span>年度 総売上 (収入)</div>
                     <div class="dash-value" id="total-income">¥0</div>
                 </div>
                 <div class="dash-card expense">
-                    <div class="dash-label">今期の経費 (按分後支出)</div>
+                    <div class="dash-label"><span class="selected-year-text">2026</span>年度 経費 (按分後支出)</div>
                     <div class="dash-value" id="total-expense">¥0</div>
                 </div>
                 <div class="dash-card balance">
-                    <div class="dash-label">差引純利益</div>
+                    <div class="dash-label"><span class="selected-year-text">2026</span>年度 差引純利益</div>
                     <div class="dash-value" id="net-profit">¥0</div>
                 </div>
             </div>
@@ -531,7 +232,7 @@
                     <form id="accounting-form">
                         <div class="form-group">
                             <label for="entry-date">日付</label>
-                            <input type="date" id="entry-date" class="form-control" required>
+                            <input type="date" id="entry-date" class="form-control" onchange="syncYearWithDate()" required>
                         </div>
 
                         <div class="form-group">
@@ -550,7 +251,6 @@
                         <div class="form-group">
                             <label for="entry-amount">総額 (円)</label>
                             <input type="number" id="entry-amount" class="form-control" placeholder="例: 12000" min="0" required>
-                            <!-- コース・金額用クイック選択ボタン -->
                             <div class="quick-btn-container" id="quick-amount-buttons" style="display: none;">
                                 <button type="button" class="quick-btn" onclick="setAmount(9000)">60分 (9,000)</button>
                                 <button type="button" class="quick-btn" onclick="setAmount(12000)">90分 (12,000)</button>
@@ -596,7 +296,6 @@
                         <button class="btn btn-outline" onclick="exportCSV()" style="width: auto; padding: 4px 12px; font-size: 0.8rem;">確定申告用CSV出力</button>
                     </h2>
 
-                    <!-- 絞り込み検索バー -->
                     <div class="filter-bar">
                         <select id="filter-type" class="form-control" style="flex: 1;" onchange="applyFilters()">
                             <option value="ALL">すべての区分</option>
@@ -622,7 +321,6 @@
                         </table>
                     </div>
 
-                    <!-- ページネーション (＜ 1 / 3 ＞) -->
                     <div class="pagination-container">
                         <button class="page-btn" id="btn-prev" onclick="changePage(-1)">&lt;</button>
                         <span id="page-info">1 / 1</span>
@@ -647,6 +345,10 @@
             "経費": ["地代家賃", "消耗品費", "水道光熱費", "通信費", "広告宣伝費", "旅費交通費", "接待交際費", "新聞図書費", "雑費"]
         };
 
+        // 表示可能な選択肢（2025〜2028年度）
+        const AVAILABLE_YEARS = [2025, 2026, 2027, 2028];
+        let currentSelectedYear = new Date().getFullYear();
+
         let myChart = null;
         let currentData = [];
         let filteredData = [];
@@ -668,6 +370,7 @@
             document.getElementById('auth-overlay').style.display = 'none';
             document.getElementById('app-content').style.display = 'block';
             document.getElementById('entry-date').valueAsDate = new Date();
+            renderYearTabs();
             updateCategories();
             fetchTransactions();
         }
@@ -677,6 +380,41 @@
                 showApp();
             }
         });
+
+        // 年度切り替えタブの描画
+        function renderYearTabs() {
+            const tabContainer = document.getElementById('year-tabs');
+            tabContainer.innerHTML = '';
+            
+            AVAILABLE_YEARS.forEach(yr => {
+                const btn = document.createElement('button');
+                btn.className = `year-tab ${yr === currentSelectedYear ? 'active' : ''}`;
+                btn.textContent = `${yr}年度`;
+                btn.onclick = () => selectYear(yr);
+                tabContainer.appendChild(btn);
+            });
+
+            document.querySelectorAll('.selected-year-text').forEach(el => {
+                el.textContent = currentSelectedYear;
+            });
+        }
+
+        function selectYear(yr) {
+            currentSelectedYear = yr;
+            renderYearTabs();
+            fetchTransactions();
+        }
+
+        // 入力フォームの日付を変更した際、選択年度と食い違っていたら自動切り替え
+        function syncYearWithDate() {
+            const dateVal = document.getElementById('entry-date').value;
+            if (dateVal) {
+                const yearVal = parseInt(dateVal.substring(0, 4), 10);
+                if (yearVal && yearVal !== currentSelectedYear && AVAILABLE_YEARS.includes(yearVal)) {
+                    selectYear(yearVal);
+                }
+            }
+        }
 
         function updateCategories() {
             const type = document.getElementById('entry-type').value;
@@ -696,7 +434,6 @@
                 ratioGroup.style.display = 'none';
                 document.getElementById('entry-ratio').value = '1.0';
                 quickButtons.style.display = 'flex';
-                // 初期選択に合わせて自動金額設定
                 handleCategoryChange();
             } else {
                 ratioGroup.style.display = 'block';
@@ -704,7 +441,6 @@
             }
         }
 
-        // コース選択に応じた初期金額セット
         function handleCategoryChange() {
             const type = document.getElementById('entry-type').value;
             if (type !== "売上") return;
@@ -730,7 +466,6 @@
             const currentVal = Number(amountInput.value) || 0;
             amountInput.value = currentVal + 1000;
             
-            // 摘要に出張オプションの旨を追記補助
             const memoInput = document.getElementById('entry-memo');
             if (memoInput.value && !memoInput.value.includes('出張')) {
                 memoInput.value += '（出張+1,000円）';
@@ -741,7 +476,7 @@
 
         async function fetchTransactions() {
             try {
-                const url = `${GAS_API_URL}?password=${encodeURIComponent(API_PASSWORD)}`;
+                const url = `${GAS_API_URL}?password=${encodeURIComponent(API_PASSWORD)}&year=${currentSelectedYear}`;
                 const response = await fetch(url);
                 const result = await response.json();
 
@@ -880,6 +615,7 @@
 
             const payload = {
                 password: API_PASSWORD,
+                year: currentSelectedYear,
                 date: document.getElementById('entry-date').value,
                 type: document.getElementById('entry-type').value,
                 category: document.getElementById('entry-category').value,
@@ -930,7 +666,7 @@
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `SBA_確定申告用会計データ_${new Date().toISOString().slice(0,10)}.csv`;
+            link.download = `SBA_確定申告用データ_${currentSelectedYear}年度_${new Date().toISOString().slice(0,10)}.csv`;
             link.click();
         }
     </script>
