@@ -345,9 +345,18 @@
             "経費": ["地代家賃", "消耗品費", "水道光熱費", "通信費", "広告宣伝費", "旅費交通費", "接待交際費", "新聞図書費", "雑費"]
         };
 
-        // 表示可能な選択肢（2025〜2028年度）
-        const AVAILABLE_YEARS = [2025, 2026, 2027, 2028];
-        let currentSelectedYear = new Date().getFullYear();
+        // ★ 自動で現在の実西暦を取得し、デフォルト選択年度にする
+        const realCurrentYear = new Date().getFullYear();
+        let currentSelectedYear = realCurrentYear;
+
+        // 選択肢として表示する年度の範囲（必要に応じて未来の年も追加可能）
+        const AVAILABLE_YEARS = [2025, 2026, 2027, 2028, 2029, 2030];
+
+        // もし現在の実西暦がAVAILABLE_YEARSに含まれていなければ、自動的にリストに含める
+        if (!AVAILABLE_YEARS.includes(realCurrentYear)) {
+            AVAILABLE_YEARS.push(realCurrentYear);
+            AVAILABLE_YEARS.sort();
+        }
 
         let myChart = null;
         let currentData = [];
@@ -410,7 +419,12 @@
             const dateVal = document.getElementById('entry-date').value;
             if (dateVal) {
                 const yearVal = parseInt(dateVal.substring(0, 4), 10);
-                if (yearVal && yearVal !== currentSelectedYear && AVAILABLE_YEARS.includes(yearVal)) {
+                if (yearVal && yearVal !== currentSelectedYear) {
+                    // リストになければ自動追加してタブを描画
+                    if (!AVAILABLE_YEARS.includes(yearVal)) {
+                        AVAILABLE_YEARS.push(yearVal);
+                        AVAILABLE_YEARS.sort();
+                    }
                     selectYear(yearVal);
                 }
             }
