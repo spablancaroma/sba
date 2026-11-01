@@ -366,12 +366,12 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.9rem;
-            min-width: 500px;
+            font-size: 0.88rem;
+            min-width: 580px;
         }
 
         th, td {
-            padding: 12px 10px;
+            padding: 10px 8px;
             text-align: left;
             border-bottom: 1px solid var(--border-color);
         }
@@ -454,7 +454,7 @@
             <a href="#" class="logo">
                 <img src="logo.png" alt="Spa Blanc Aroma ロゴ" class="header-logo-img" onerror="this.style.display='none'">
                 <span class="logo-text">Spa Blanc Aroma</span>
-                <span class="header-badge">会計システム</span>
+                <span class="header-badge">会計管理システム</span>
             </a>
         </header>
 
@@ -511,7 +511,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="entry-amount">金額 (円)</label>
+                            <label for="entry-amount">総額 (円)</label>
                             <input type="number" id="entry-amount" class="form-control" placeholder="例: 12000" min="0" required>
                         </div>
 
@@ -526,8 +526,19 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="entry-memo">摘要・メモ</label>
-                            <input type="text" id="entry-memo" class="form-control" placeholder="例: 90分コース（PayPay決済）">
+                            <label for="entry-payment">決済手段</label>
+                            <select id="entry-payment" class="form-control">
+                                <option value="現金" selected>現金</option>
+                                <option value="PayPay">PayPay</option>
+                                <option value="クレジットカード">クレジットカード</option>
+                                <option value="銀行振込">銀行振込</option>
+                                <option value="その他">その他</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="entry-memo">取引先・摘要（メモ）</label>
+                            <input type="text" id="entry-memo" class="form-control" placeholder="例: Amazon（タオル購入）/ 山田様">
                         </div>
 
                         <button type="submit" id="submit-btn" class="btn">登録する</button>
@@ -539,7 +550,7 @@
                     <span class="section-en">Journal History</span>
                     <h2 class="section-title">
                         仕訳帳明細
-                        <button class="btn btn-outline" onclick="exportCSV()" style="width: auto; padding: 4px 12px; font-size: 0.8rem;">CSV出力</button>
+                        <button class="btn btn-outline" onclick="exportCSV()" style="width: auto; padding: 4px 12px; font-size: 0.8rem;">確定申告用CSV出力</button>
                     </h2>
 
                     <!-- 絞り込み検索バー -->
@@ -549,7 +560,7 @@
                             <option value="売上">収入（売上）のみ</option>
                             <option value="経費">支出（経費）のみ</option>
                         </select>
-                        <input type="text" id="filter-keyword" class="form-control" style="flex: 2;" placeholder="科目・メモで絞り込み" oninput="applyFilters()">
+                        <input type="text" id="filter-keyword" class="form-control" style="flex: 2;" placeholder="科目・取引先・摘要で検索" oninput="applyFilters()">
                     </div>
 
                     <div class="table-responsive">
@@ -558,16 +569,17 @@
                                 <tr>
                                     <th>日付</th>
                                     <th>区分</th>
-                                    <th>科目 / 内容</th>
-                                    <th>摘要</th>
-                                    <th style="text-align: right;">経費計上額</th>
+                                    <th>科目</th>
+                                    <th>取引先・摘要</th>
+                                    <th>決済</th>
+                                    <th style="text-align: right;">計上額</th>
                                 </tr>
                             </thead>
                             <tbody id="transaction-list"></tbody>
                         </table>
                     </div>
 
-                    <!-- ページネーション (＜ 1 2 ＞) -->
+                    <!-- ページネーション (＜ 1 / 3 ＞) -->
                     <div class="pagination-container">
                         <button class="page-btn" id="btn-prev" onclick="changePage(-1)">&lt;</button>
                         <span id="page-info">1 / 1</span>
@@ -584,7 +596,7 @@
 
     <script>
         const API_PASSWORD = "blanc2025_sec_key";
-        const SYSTEM_PASSWORD = "blanc2025"; // Web用認証パスワード
+        const SYSTEM_PASSWORD = "blanc2025";
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyEir1_W7TDnCGKqCDa32Ta9KlIW_8SvgW_oN1ISpXK7u4_ilZHBHRoIULjTGPN8Hw/exec";
 
         const categories = {
@@ -593,12 +605,11 @@
         };
 
         let myChart = null;
-        let currentData = [];      // 取得した全データ
-        let filteredData = [];     // 絞り込み後のデータ
+        let currentData = [];
+        let filteredData = [];
         let currentPage = 1;
         const PAGE_SIZE = 20;
 
-        // Basic認証処理
         function handleAuth(e) {
             e.preventDefault();
             const inputPw = document.getElementById('auth-password').value;
@@ -624,7 +635,6 @@
             }
         });
 
-        // 区分切り替え
         function updateCategories() {
             const type = document.getElementById('entry-type').value;
             const categorySelect = document.getElementById('entry-category');
@@ -646,7 +656,6 @@
             }
         }
 
-        // GASから最新データの取得
         async function fetchTransactions() {
             try {
                 const url = `${GAS_API_URL}?password=${encodeURIComponent(API_PASSWORD)}`;
@@ -660,7 +669,7 @@
 
                 currentData = result.data || [];
 
-                // 発生日順（日付の降順: 新しい順）にソート
+                // 発生日順（日付の降順: 新しい順）
                 currentData.sort((a, b) => {
                     const dateA = new Date(a.date);
                     const dateB = new Date(b.date);
@@ -676,7 +685,6 @@
             }
         }
 
-        // 絞り込み検索
         function applyFilters() {
             const typeFilter = document.getElementById('filter-type').value;
             const keyword = document.getElementById('filter-keyword').value.trim().toLowerCase();
@@ -685,7 +693,8 @@
                 const matchType = (typeFilter === 'ALL') || (item.type === typeFilter);
                 const matchKeyword = !keyword || 
                     (item.category && item.category.toLowerCase().includes(keyword)) ||
-                    (item.memo && item.memo.toLowerCase().includes(keyword));
+                    (item.memo && item.memo.toLowerCase().includes(keyword)) ||
+                    (item.payment && item.payment.toLowerCase().includes(keyword));
 
                 return matchType && matchKeyword;
             });
@@ -694,7 +703,6 @@
             renderTablePage();
         }
 
-        // テーブルとページネーション描画
         function renderTablePage() {
             const tbody = document.getElementById('transaction-list');
             tbody.innerHTML = '';
@@ -717,6 +725,7 @@
                     </td>
                     <td><strong>${t.category}</strong></td>
                     <td style="color: var(--text-sub); font-size: 0.85rem;">${t.memo || '-'}</td>
+                    <td style="font-size: 0.8rem; color: var(--primary-dark);">${t.payment || '現金'}</td>
                     <td class="amount">¥${actualAmount.toLocaleString()}</td>
                 `;
                 tbody.appendChild(tr);
@@ -732,7 +741,6 @@
             renderTablePage();
         }
 
-        // 集計＆グラフ描画（全データベース）
         function renderSummaryAndChart(data) {
             let totalIncome = 0;
             let totalExpense = 0;
@@ -781,7 +789,6 @@
             });
         }
 
-        // フォーム送信（登録）
         document.getElementById('accounting-form').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -796,6 +803,7 @@
                 category: document.getElementById('entry-category').value,
                 amount: document.getElementById('entry-amount').value,
                 ratio: document.getElementById('entry-ratio').value,
+                payment: document.getElementById('entry-payment').value,
                 memo: document.getElementById('entry-memo').value
             };
 
@@ -825,22 +833,24 @@
             }
         });
 
-        // CSV書き出し
+        // 確定申告用に最適化したCSV出力機能
         function exportCSV() {
             if (filteredData.length === 0) {
                 alert('出力するデータがありません。');
                 return;
             }
 
-            let csvContent = "\uFEFF日付,区分,科目,入力金額,按分率,経費計上額,摘要\n";
+            // 確定申告・会計ソフト取り込み用にフォーマットを整えたヘッダー
+            let csvContent = "\uFEFF日付,区分,勘定科目,取引先・摘要,入力金額(総額),事業按分率(%),経費計上額(円),決済手段\n";
             filteredData.forEach(t => {
-                csvContent += `"${t.date}","${t.type}","${t.category}",${t.amount},${t.ratio},${t.actualAmount},"${t.memo || ''}"\n`;
+                const ratioPercent = Math.round(Number(t.ratio) * 100) + "%";
+                csvContent += `"${t.date}","${t.type}","${t.category}","${t.memo || ''}",${t.amount},"${ratioPercent}",${t.actualAmount},"${t.payment || '現金'}"\n`;
             });
 
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `SBA_会計データ_${new Date().toISOString().slice(0,10)}.csv`;
+            link.download = `SBA_確定申告用会計データ_${new Date().toISOString().slice(0,10)}.csv`;
             link.click();
         }
     </script>
