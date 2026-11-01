@@ -2,12 +2,12 @@ name: Deploy static content to Pages
 
 on:
   push:
-    branches: ["main"] # masterブランチをご使用の場合は "master" に変更してください
+    branches: ["main"] # ※お使いのメインブランチ名が master の場合は "master" に変更してください
 
-  # 手動実行用ボタンを追加
+  # 手動実行用
   workflow_dispatch:
 
-# 重複デプロイエラーを自動キャンセルして防ぐ設定
+# ★重要：同じPagesデプロイが重複した際、古い実行を自動キャンセルして競合を防ぐ
 concurrency:
   group: "pages"
   cancel-in-progress: true
