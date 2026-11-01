@@ -2,12 +2,11 @@ name: Deploy static content to Pages
 
 on:
   push:
-    branches: ["main"] # ※お使いのメインブランチ名が master の場合は "master" に変更してください
+    branches: ["main"] # メインブランチが master の場合は master に変更してください
 
-  # 手動実行用
   workflow_dispatch:
 
-# ★重要：同じPagesデプロイが重複した際、古い実行を自動キャンセルして競合を防ぐ
+# 重複デプロイの競合を防ぐ設定
 concurrency:
   group: "pages"
   cancel-in-progress: true
@@ -26,12 +25,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
+          # リポジトリのルート直下を公開する場合
           path: '.'
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
