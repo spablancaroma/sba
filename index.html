@@ -18,6 +18,43 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
+        /* === Basic認証用オーバーレイスタイル === */
+        #auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #2C3E50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .auth-card {
+            background: #FFFFFF;
+            padding: 30px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            width: 90%;
+            max-width: 360px;
+            text-align: center;
+        }
+
+        .auth-card h2 {
+            font-family: 'Shippori Mincho', serif;
+            font-size: 1.2rem;
+            color: #2C3E50;
+            margin-bottom: 8px;
+        }
+
+        .auth-card p {
+            font-size: 0.85rem;
+            color: #666666;
+            margin-bottom: 20px;
+        }
+
         /* === Spa Blanc Aroma ブランドデザイン設定 === */
         :root {
             --bg-sand: #FAF9F6;
@@ -40,7 +77,7 @@
         }
 
         html, body {
-            overflow-x: hidden; /* スマホでの不要な横スクロールを防止 */
+            overflow-x: hidden;
             width: 100%;
         }
 
@@ -66,7 +103,7 @@
         .site-header .logo {
             display: flex;
             align-items: center;
-            flex-wrap: wrap; /* スマホ画面で要素があふれた場合自動改行 */
+            flex-wrap: wrap;
             gap: 8px 12px;
             text-decoration: none;
             color: #FFFFFF;
@@ -175,7 +212,7 @@
             box-shadow: var(--card-shadow);
             margin-bottom: 20px;
             width: 100%;
-            overflow: hidden; /* カード内要素のはみ出しを防ぐ */
+            overflow: hidden;
         }
 
         .section-title {
@@ -242,6 +279,19 @@
             background-color: #FFFFFF;
         }
 
+        /* フィルタバー */
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-bar .form-control {
+            font-size: 0.85rem;
+            padding: 6px 10px;
+        }
+
         /* ボタン */
         .btn {
             display: block;
@@ -274,6 +324,38 @@
             color: #FFFFFF;
         }
 
+        /* ページネーション */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-top: 15px;
+            font-family: var(--font-en);
+            font-size: 0.9rem;
+        }
+
+        .page-btn {
+            background: var(--bg-sand);
+            border: 1px solid var(--border-color);
+            color: var(--primary-dark);
+            padding: 4px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background: var(--accent-gold);
+            color: #FFFFFF;
+            border-color: var(--accent-gold);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
         /* テーブル */
         .table-responsive {
             width: 100%;
@@ -285,7 +367,7 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 0.9rem;
-            min-width: 500px; /* テーブルが縮みすぎないように横スクロールを許可 */
+            min-width: 500px;
         }
 
         th, td {
@@ -336,17 +418,14 @@
             margin-top: 40px;
         }
 
-        /* モバイル対応レスポンシブブレイクポイント */
         @media (max-width: 850px) {
             .main-grid {
                 grid-template-columns: 1fr;
             }
-            
             .container {
                 padding: 0 12px;
                 margin: 15px auto;
             }
-
             .card {
                 padding: 16px;
             }
@@ -355,149 +434,197 @@
 </head>
 <body>
 
-    <!-- ヘッダー -->
-    <header class="site-header">
-        <a href="#" class="logo">
-            <img src="logo.png" alt="Spa Blanc Aroma ロゴ" class="header-logo-img" onerror="this.style.display='none'">
-            <span class="logo-text">Spa Blanc Aroma</span>
-            <span class="header-badge">会計システム</span>
-        </a>
-    </header>
-
-    <div class="container">
-
-        <!-- 収支サマリーダッシュボード -->
-        <div class="dashboard-grid">
-            <div class="dash-card">
-                <div class="dash-label">今期の総売上 (収入)</div>
-                <div class="dash-value" id="total-income">¥0</div>
-            </div>
-            <div class="dash-card expense">
-                <div class="dash-label">今期の経費 (按分後支出)</div>
-                <div class="dash-value" id="total-expense">¥0</div>
-            </div>
-            <div class="dash-card balance">
-                <div class="dash-label">差引純利益</div>
-                <div class="dash-value" id="net-profit">¥0</div>
-            </div>
-        </div>
-
-        <!-- 内訳グラフ -->
-        <div class="chart-card">
-            <span class="section-en">Analytics</span>
-            <h2 class="section-title" style="margin-bottom: 10px; border: none;">経費費目別の割合</h2>
-            <div class="chart-container">
-                <canvas id="expenseChart"></canvas>
-            </div>
-        </div>
-
-        <!-- メイン入力・履歴エリア -->
-        <div class="main-grid">
-
-            <!-- 左側：伝票入力フォーム -->
-            <div class="card">
-                <span class="section-en">Entry Form</span>
-                <h2 class="section-title">取引の登録</h2>
-
-                <form id="accounting-form">
-                    <div class="form-group">
-                        <label for="entry-date">日付</label>
-                        <input type="date" id="entry-date" class="form-control" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="entry-type">区分</label>
-                        <select id="entry-type" class="form-control" onchange="updateCategories()">
-                            <option value="経費" selected>支出（経費）</option>
-                            <option value="売上">収入（売上）</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="entry-category">勘定科目 / メニュー</label>
-                        <select id="entry-category" class="form-control" required></select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="entry-amount">金額 (円)</label>
-                        <input type="number" id="entry-amount" class="form-control" placeholder="例: 12000" min="0" required>
-                    </div>
-
-                    <div class="form-group" id="ratio-group">
-                        <label for="entry-ratio">事業割合（家事按分）</label>
-                        <select id="entry-ratio" class="form-control">
-                            <option value="1.0">100%（全額事業用）</option>
-                            <option value="0.5">50%（自宅・通信など半分）</option>
-                            <option value="0.3">30%（自宅家賃など3割）</option>
-                            <option value="0.2">20%</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="entry-memo">摘要・メモ</label>
-                        <input type="text" id="entry-memo" class="form-control" placeholder="例: 90分コース（PayPay決済）">
-                    </div>
-
-                    <button type="submit" id="submit-btn" class="btn">登録する</button>
-                </form>
-            </div>
-
-            <!-- 右側：明細一覧テーブル -->
-            <div class="card">
-                <span class="section-en">Journal History</span>
-                <h2 class="section-title">
-                    仕訳帳明細
-                    <button class="btn btn-outline" onclick="exportCSV()" style="width: auto; padding: 4px 12px; font-size: 0.8rem;">CSV出力</button>
-                </h2>
-
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>日付</th>
-                                <th>区分</th>
-                                <th>科目 / 内容</th>
-                                <th>摘要</th>
-                                <th style="text-align: right;">経費計上額</th>
-                            </tr>
-                        </thead>
-                        <tbody id="transaction-list">
-                            <!-- 取得データがここに描画されます -->
-                        </tbody>
-                    </table>
+    <!-- Basic認証用パスワード入力画面 -->
+    <div id="auth-overlay">
+        <div class="auth-card">
+            <h2>認証が必要です</h2>
+            <p>パスワードを入力してログインしてください。</p>
+            <form id="auth-form" onsubmit="handleAuth(event)">
+                <div class="form-group">
+                    <input type="password" id="auth-password" class="form-control" placeholder="パスワード" required>
                 </div>
-            </div>
-
+                <button type="submit" class="btn">ログイン</button>
+            </form>
         </div>
     </div>
 
-    <footer>
-        &copy; Spa Blanc Aroma Accounting Module.
-    </footer>
+    <!-- メインコンテンツ -->
+    <div id="app-content" style="display: none;">
+        <header class="site-header">
+            <a href="#" class="logo">
+                <img src="logo.png" alt="Spa Blanc Aroma ロゴ" class="header-logo-img" onerror="this.style.display='none'">
+                <span class="logo-text">Spa Blanc Aroma</span>
+                <span class="header-badge">会計システム</span>
+            </a>
+        </header>
+
+        <div class="container">
+            <!-- 収支サマリーダッシュボード -->
+            <div class="dashboard-grid">
+                <div class="dash-card">
+                    <div class="dash-label">今期の総売上 (収入)</div>
+                    <div class="dash-value" id="total-income">¥0</div>
+                </div>
+                <div class="dash-card expense">
+                    <div class="dash-label">今期の経費 (按分後支出)</div>
+                    <div class="dash-value" id="total-expense">¥0</div>
+                </div>
+                <div class="dash-card balance">
+                    <div class="dash-label">差引純利益</div>
+                    <div class="dash-value" id="net-profit">¥0</div>
+                </div>
+            </div>
+
+            <!-- 内訳グラフ -->
+            <div class="chart-card">
+                <span class="section-en">Analytics</span>
+                <h2 class="section-title" style="margin-bottom: 10px; border: none;">経費費目別の割合</h2>
+                <div class="chart-container">
+                    <canvas id="expenseChart"></canvas>
+                </div>
+            </div>
+
+            <!-- メイン入力・履歴エリア -->
+            <div class="main-grid">
+                <!-- 左側：伝票入力フォーム -->
+                <div class="card">
+                    <span class="section-en">Entry Form</span>
+                    <h2 class="section-title">取引の登録</h2>
+
+                    <form id="accounting-form">
+                        <div class="form-group">
+                            <label for="entry-date">日付</label>
+                            <input type="date" id="entry-date" class="form-control" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="entry-type">区分</label>
+                            <select id="entry-type" class="form-control" onchange="updateCategories()">
+                                <option value="経費" selected>支出（経費）</option>
+                                <option value="売上">収入（売上）</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="entry-category">勘定科目 / メニュー</label>
+                            <select id="entry-category" class="form-control" required></select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="entry-amount">金額 (円)</label>
+                            <input type="number" id="entry-amount" class="form-control" placeholder="例: 12000" min="0" required>
+                        </div>
+
+                        <div class="form-group" id="ratio-group">
+                            <label for="entry-ratio">事業割合（家事按分）</label>
+                            <select id="entry-ratio" class="form-control">
+                                <option value="1.0">100%（全額事業用）</option>
+                                <option value="0.5">50%（自宅・通信など半分）</option>
+                                <option value="0.3">30%（自宅家賃など3割）</option>
+                                <option value="0.2">20%</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="entry-memo">摘要・メモ</label>
+                            <input type="text" id="entry-memo" class="form-control" placeholder="例: 90分コース（PayPay決済）">
+                        </div>
+
+                        <button type="submit" id="submit-btn" class="btn">登録する</button>
+                    </form>
+                </div>
+
+                <!-- 右側：明細一覧テーブル -->
+                <div class="card">
+                    <span class="section-en">Journal History</span>
+                    <h2 class="section-title">
+                        仕訳帳明細
+                        <button class="btn btn-outline" onclick="exportCSV()" style="width: auto; padding: 4px 12px; font-size: 0.8rem;">CSV出力</button>
+                    </h2>
+
+                    <!-- 絞り込み検索バー -->
+                    <div class="filter-bar">
+                        <select id="filter-type" class="form-control" style="flex: 1;" onchange="applyFilters()">
+                            <option value="ALL">すべての区分</option>
+                            <option value="売上">収入（売上）のみ</option>
+                            <option value="経費">支出（経費）のみ</option>
+                        </select>
+                        <input type="text" id="filter-keyword" class="form-control" style="flex: 2;" placeholder="科目・メモで絞り込み" oninput="applyFilters()">
+                    </div>
+
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>日付</th>
+                                    <th>区分</th>
+                                    <th>科目 / 内容</th>
+                                    <th>摘要</th>
+                                    <th style="text-align: right;">経費計上額</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transaction-list"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- ページネーション (＜ 1 2 ＞) -->
+                    <div class="pagination-container">
+                        <button class="page-btn" id="btn-prev" onclick="changePage(-1)">&lt;</button>
+                        <span id="page-info">1 / 1</span>
+                        <button class="page-btn" id="btn-next" onclick="changePage(1)">&gt;</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            &copy; Spa Blanc Aroma Accounting Module.
+        </footer>
+    </div>
 
     <script>
-        // === 設定項目 ===
-        // デプロイしたGASのWeb API URLに置き換えてください
-        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyEir1_W7TDnCGKqCDa32Ta9KlIW_8SvgW_oN1ISpXK7u4_ilZHBHRoIULjTGPN8Hw/exec";
-        // 簡易暗号キー（GAS側のキーと一致させてください）
         const API_PASSWORD = "blanc2025_sec_key";
+        const SYSTEM_PASSWORD = "blanc2025"; // Web用認証パスワード
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyEir1_W7TDnCGKqCDa32Ta9KlIW_8SvgW_oN1ISpXK7u4_ilZHBHRoIULjTGPN8Hw/exec";
 
-        // SBA専用勘定科目定義
         const categories = {
             "売上": ["60分コース", "90分コース", "120分コース", "出張料金オプション", "売上高（その他）"],
             "経費": ["地代家賃", "消耗品費", "水道光熱費", "通信費", "広告宣伝費", "旅費交通費", "接待交際費", "新聞図書費", "雑費"]
         };
 
         let myChart = null;
-        let currentData = [];
+        let currentData = [];      // 取得した全データ
+        let filteredData = [];     // 絞り込み後のデータ
+        let currentPage = 1;
+        const PAGE_SIZE = 20;
 
-        document.addEventListener('DOMContentLoaded', () => {
+        // Basic認証処理
+        function handleAuth(e) {
+            e.preventDefault();
+            const inputPw = document.getElementById('auth-password').value;
+            if (inputPw === SYSTEM_PASSWORD) {
+                sessionStorage.setItem('sba_auth', 'true');
+                showApp();
+            } else {
+                alert('パスワードが正しくありません。');
+            }
+        }
+
+        function showApp() {
+            document.getElementById('auth-overlay').style.display = 'none';
+            document.getElementById('app-content').style.display = 'block';
             document.getElementById('entry-date').valueAsDate = new Date();
             updateCategories();
             fetchTransactions();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (sessionStorage.getItem('sba_auth') === 'true') {
+                showApp();
+            }
         });
 
-        // 区分切り替え制御
+        // 区分切り替え
         function updateCategories() {
             const type = document.getElementById('entry-type').value;
             const categorySelect = document.getElementById('entry-category');
@@ -532,10 +659,126 @@
                 }
 
                 currentData = result.data || [];
-                renderUI(currentData);
+
+                // 発生日順（日付の降順: 新しい順）にソート
+                currentData.sort((a, b) => {
+                    const dateA = new Date(a.date);
+                    const dateB = new Date(b.date);
+                    if (dateA > dateB) return -1;
+                    if (dateA < dateB) return 1;
+                    return b.id - a.id;
+                });
+
+                renderSummaryAndChart(currentData);
+                applyFilters();
             } catch (error) {
                 console.error('通信エラー:', error);
             }
+        }
+
+        // 絞り込み検索
+        function applyFilters() {
+            const typeFilter = document.getElementById('filter-type').value;
+            const keyword = document.getElementById('filter-keyword').value.trim().toLowerCase();
+
+            filteredData = currentData.filter(item => {
+                const matchType = (typeFilter === 'ALL') || (item.type === typeFilter);
+                const matchKeyword = !keyword || 
+                    (item.category && item.category.toLowerCase().includes(keyword)) ||
+                    (item.memo && item.memo.toLowerCase().includes(keyword));
+
+                return matchType && matchKeyword;
+            });
+
+            currentPage = 1;
+            renderTablePage();
+        }
+
+        // テーブルとページネーション描画
+        function renderTablePage() {
+            const tbody = document.getElementById('transaction-list');
+            tbody.innerHTML = '';
+
+            const totalPages = Math.ceil(filteredData.length / PAGE_SIZE) || 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            const startIndex = (currentPage - 1) * PAGE_SIZE;
+            const pageData = filteredData.slice(startIndex, startIndex + PAGE_SIZE);
+
+            pageData.forEach(t => {
+                const actualAmount = Number(t.actualAmount);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-family: var(--font-en);">${t.date}</td>
+                    <td>
+                        <span class="type-badge ${t.type === '売上' ? 'income' : 'expense'}">
+                            ${t.type}
+                        </span>
+                    </td>
+                    <td><strong>${t.category}</strong></td>
+                    <td style="color: var(--text-sub); font-size: 0.85rem;">${t.memo || '-'}</td>
+                    <td class="amount">¥${actualAmount.toLocaleString()}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('page-info').textContent = `${currentPage} / ${totalPages}`;
+            document.getElementById('btn-prev').disabled = (currentPage <= 1);
+            document.getElementById('btn-next').disabled = (currentPage >= totalPages);
+        }
+
+        function changePage(direction) {
+            currentPage += direction;
+            renderTablePage();
+        }
+
+        // 集計＆グラフ描画（全データベース）
+        function renderSummaryAndChart(data) {
+            let totalIncome = 0;
+            let totalExpense = 0;
+            const breakdown = {};
+
+            data.forEach(t => {
+                const actualAmount = Number(t.actualAmount);
+                if (t.type === '売上') {
+                    totalIncome += Number(t.amount);
+                } else {
+                    totalExpense += actualAmount;
+                    breakdown[t.category] = (breakdown[t.category] || 0) + actualAmount;
+                }
+            });
+
+            document.getElementById('total-income').textContent = '¥' + totalIncome.toLocaleString();
+            document.getElementById('total-expense').textContent = '¥' + totalExpense.toLocaleString();
+            document.getElementById('net-profit').textContent = '¥' + (totalIncome - totalExpense).toLocaleString();
+
+            renderChart(breakdown);
+        }
+
+        function renderChart(breakdown) {
+            const ctx = document.getElementById('expenseChart').getContext('2d');
+            const labels = Object.keys(breakdown);
+            const values = Object.values(breakdown);
+
+            if (myChart) myChart.destroy();
+
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels.length > 0 ? labels : ['データなし'],
+                    datasets: [{
+                        data: values.length > 0 ? values : [1],
+                        backgroundColor: ['#2C3E50', '#B39B7D', '#E67E22', '#8E44AD', '#F1C40F', '#E74C3C', '#16A085', '#D35400', '#7F8C8D']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { font: { family: 'Shippori Mincho' } } }
+                    }
+                }
+            });
         }
 
         // フォーム送信（登録）
@@ -582,83 +825,15 @@
             }
         });
 
-        // 画面およびグラフの描画更新
-        function renderUI(data) {
-            const tbody = document.getElementById('transaction-list');
-            tbody.innerHTML = '';
-
-            let totalIncome = 0;
-            let totalExpense = 0;
-            const breakdown = {};
-
-            data.forEach(t => {
-                const actualAmount = Number(t.actualAmount);
-                if (t.type === '売上') {
-                    totalIncome += Number(t.amount);
-                } else {
-                    totalExpense += actualAmount;
-                    breakdown[t.category] = (breakdown[t.category] || 0) + actualAmount;
-                }
-
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td style="font-family: var(--font-en);">${t.date}</td>
-                    <td>
-                        <span class="type-badge ${t.type === '売上' ? 'income' : 'expense'}">
-                            ${t.type}
-                        </span>
-                    </td>
-                    <td><strong>${t.category}</strong></td>
-                    <td style="color: var(--text-sub); font-size: 0.85rem;">${t.memo || '-'}</td>
-                    <td class="amount">¥${actualAmount.toLocaleString()}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-
-            // ダッシュボード反映
-            document.getElementById('total-income').textContent = '¥' + totalIncome.toLocaleString();
-            document.getElementById('total-expense').textContent = '¥' + totalExpense.toLocaleString();
-            document.getElementById('net-profit').textContent = '¥' + (totalIncome - totalExpense).toLocaleString();
-
-            // グラフ描画
-            renderChart(breakdown);
-        }
-
-        function renderChart(breakdown) {
-            const ctx = document.getElementById('expenseChart').getContext('2d');
-            const labels = Object.keys(breakdown);
-            const values = Object.values(breakdown);
-
-            if (myChart) myChart.destroy();
-
-            myChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: labels.length > 0 ? labels : ['データなし'],
-                    datasets: [{
-                        data: values.length > 0 ? values : [1],
-                        backgroundColor: ['#2C3E50', '#B39B7D', '#E67E22', '#8E44AD', '#F1C40F', '#E74C3C', '#16A085', '#D35400', '#7F8C8D']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'right', labels: { font: { family: 'Shippori Mincho' } } }
-                    }
-                }
-            });
-        }
-
-        // CSV書き出し機能
+        // CSV書き出し
         function exportCSV() {
-            if (currentData.length === 0) {
+            if (filteredData.length === 0) {
                 alert('出力するデータがありません。');
                 return;
             }
 
             let csvContent = "\uFEFF日付,区分,科目,入力金額,按分率,経費計上額,摘要\n";
-            currentData.forEach(t => {
+            filteredData.forEach(t => {
                 csvContent += `"${t.date}","${t.type}","${t.category}",${t.amount},${t.ratio},${t.actualAmount},"${t.memo || ''}"\n`;
             });
 
