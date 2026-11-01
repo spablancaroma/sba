@@ -279,6 +279,43 @@
             background-color: #FFFFFF;
         }
 
+        /* クイックボタン用スタイル */
+        .quick-btn-container {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .quick-btn {
+            background: var(--bg-sand);
+            border: 1px solid var(--border-color);
+            color: var(--primary-dark);
+            padding: 6px 10px;
+            font-size: 0.78rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .quick-btn:hover {
+            background: var(--accent-gold);
+            color: #FFFFFF;
+            border-color: var(--accent-gold);
+        }
+
+        .quick-btn-add {
+            background: #E8F8F5;
+            color: #16A085;
+            border-color: #A3E4D7;
+        }
+
+        .quick-btn-add:hover {
+            background: #16A085;
+            color: #FFFFFF;
+        }
+
         /* フィルタバー */
         .filter-bar {
             display: flex;
@@ -454,7 +491,7 @@
             <a href="#" class="logo">
                 <img src="logo.png" alt="Spa Blanc Aroma ロゴ" class="header-logo-img" onerror="this.style.display='none'">
                 <span class="logo-text">Spa Blanc Aroma</span>
-                <span class="header-badge">会計管理システム</span>
+                <span class="header-badge">会計システム</span>
             </a>
         </header>
 
@@ -507,12 +544,19 @@
 
                         <div class="form-group">
                             <label for="entry-category">勘定科目 / メニュー</label>
-                            <select id="entry-category" class="form-control" required></select>
+                            <select id="entry-category" class="form-control" onchange="handleCategoryChange()" required></select>
                         </div>
 
                         <div class="form-group">
                             <label for="entry-amount">総額 (円)</label>
                             <input type="number" id="entry-amount" class="form-control" placeholder="例: 12000" min="0" required>
+                            <!-- コース・金額用クイック選択ボタン -->
+                            <div class="quick-btn-container" id="quick-amount-buttons" style="display: none;">
+                                <button type="button" class="quick-btn" onclick="setAmount(9000)">60分 (9,000)</button>
+                                <button type="button" class="quick-btn" onclick="setAmount(12000)">90分 (12,000)</button>
+                                <button type="button" class="quick-btn" onclick="setAmount(14000)">120分 (14,000)</button>
+                                <button type="button" class="quick-btn quick-btn-add" onclick="addTravelFee()">+ 出張 (+1,000)</button>
+                            </div>
                         </div>
 
                         <div class="form-group" id="ratio-group">
@@ -529,16 +573,15 @@
                             <label for="entry-payment">決済手段</label>
                             <select id="entry-payment" class="form-control">
                                 <option value="現金" selected>現金</option>
-                                <option value="PayPay">PayPay</option>
-                                <option value="クレジットカード">クレジットカード</option>
-                                <option value="銀行振込">銀行振込</option>
-                                <option value="その他">その他</option>
+                                <option value="クレジット">クレジット</option>
+                                <option value="QR">QR</option>
+                                <option value="電子マネー">電子マネー</option>
                             </select>
                         </div>
 
                         <div class="form-group">
                             <label for="entry-memo">取引先・摘要（メモ）</label>
-                            <input type="text" id="entry-memo" class="form-control" placeholder="例: Amazon（タオル購入）/ 山田様">
+                            <input type="text" id="entry-memo" class="form-control" placeholder="例: 山田様 / Amazon（消耗品）">
                         </div>
 
                         <button type="submit" id="submit-btn" class="btn">登録する</button>
@@ -639,6 +682,7 @@
             const type = document.getElementById('entry-type').value;
             const categorySelect = document.getElementById('entry-category');
             const ratioGroup = document.getElementById('ratio-group');
+            const quickButtons = document.getElementById('quick-amount-buttons');
             
             categorySelect.innerHTML = '';
             categories[type].forEach(cat => {
@@ -651,8 +695,47 @@
             if (type === "売上") {
                 ratioGroup.style.display = 'none';
                 document.getElementById('entry-ratio').value = '1.0';
+                quickButtons.style.display = 'flex';
+                // 初期選択に合わせて自動金額設定
+                handleCategoryChange();
             } else {
                 ratioGroup.style.display = 'block';
+                quickButtons.style.display = 'none';
+            }
+        }
+
+        // コース選択に応じた初期金額セット
+        function handleCategoryChange() {
+            const type = document.getElementById('entry-type').value;
+            if (type !== "売上") return;
+
+            const category = document.getElementById('entry-category').value;
+            const amountInput = document.getElementById('entry-amount');
+
+            if (category === "60分コース") {
+                amountInput.value = 9000;
+            } else if (category === "90分コース") {
+                amountInput.value = 12000;
+            } else if (category === "120分コース") {
+                amountInput.value = 14000;
+            }
+        }
+
+        function setAmount(val) {
+            document.getElementById('entry-amount').value = val;
+        }
+
+        function addTravelFee() {
+            const amountInput = document.getElementById('entry-amount');
+            const currentVal = Number(amountInput.value) || 0;
+            amountInput.value = currentVal + 1000;
+            
+            // 摘要に出張オプションの旨を追記補助
+            const memoInput = document.getElementById('entry-memo');
+            if (memoInput.value && !memoInput.value.includes('出張')) {
+                memoInput.value += '（出張+1,000円）';
+            } else if (!memoInput.value) {
+                memoInput.value = '出張オプション';
             }
         }
 
@@ -669,7 +752,6 @@
 
                 currentData = result.data || [];
 
-                // 発生日順（日付の降順: 新しい順）
                 currentData.sort((a, b) => {
                     const dateA = new Date(a.date);
                     const dateB = new Date(b.date);
@@ -833,14 +915,12 @@
             }
         });
 
-        // 確定申告用に最適化したCSV出力機能
         function exportCSV() {
             if (filteredData.length === 0) {
                 alert('出力するデータがありません。');
                 return;
             }
 
-            // 確定申告・会計ソフト取り込み用にフォーマットを整えたヘッダー
             let csvContent = "\uFEFF日付,区分,勘定科目,取引先・摘要,入力金額(総額),事業按分率(%),経費計上額(円),決済手段\n";
             filteredData.forEach(t => {
                 const ratioPercent = Math.round(Number(t.ratio) * 100) + "%";
