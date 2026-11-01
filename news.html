@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- ファビコンの設定 -->
+<link rel="icon" href="logo.ico" type="image/x-icon">
+<link rel="shortcut icon" href="logo.ico" type="image/x-icon">
+<link rel="apple-touch-icon" href="logo.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>お知らせ - Spa Blanc Aroma</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    .container { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+    .page-header { text-align: center; padding: 120px 20px 40px; background-color: #f2ece4; }
+    .page-header h1 { font-size: 2rem; font-weight: 500; color: #3b3530; letter-spacing: 0.05em; }
+    .news-card { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 20px; border: 1px solid #f0ede8; }
+    .news-date { font-size: 0.85rem; color: #888; margin-bottom: 8px; font-family: 'Montserrat', sans-serif; }
+    .news-title { font-size: 1.15rem; font-weight: 500; color: #333; margin-bottom: 12px; }
+    .news-body { font-size: 0.95rem; color: #555; line-height: 1.8; white-space: pre-wrap; }
+    .no-news { text-align: center; color: #888; padding: 40px 0; background: #fff; border-radius: 8px; }
+  </style>
+</head>
+<body>
+
+    <!-- ハンバーガーボタン & サイドバー -->
+    <button class="menu-toggle-btn" onclick="openNav()" aria-label="メニューを開く">☰</button>
+
+    <div class="sidebar-overlay" id="overlay" onclick="closeNav()"></div>
+
+    <aside class="sidebar" id="sidebar">
+      <button class="close-btn" onclick="closeNav()" aria-label="メニューを閉じる">✕</button>
+      <ul class="sidebar-menu">
+        <li><a href="index.html">トップ</a></li>
+        <li><a href="reservation.html">予約・空き状況確認</a></li>
+        <li><a href="column.html">コラム一覧</a></li>
+        <li><a href="news.html">お知らせ</a></li>
+        <li><a href="about.html">店舗概要</a></li>
+        <li><a href="recruit.html">セラピスト募集</a></li>
+        <li><a href="javascript:void(0);" onclick="loginAdmin()" class="admin-link">🔒 管理者画面</a></li>
+      </ul>
+    </aside>
+
+    <header class="site-header">
+        <div class="logo">
+          <a href="index.html">
+            <img src="logo.png" alt="Spa Blanc Aroma 店舗ロゴ" class="header-logo-img">
+            <span>Spa Blanc Aroma</span>
+          </a>
+        </div>
+        <nav class="nav-menu">
+            <a href="index.html#about">About</a>
+            <a href="index.html#therapist">Therapist</a>
+            <a href="index.html#service">Service</a>
+            <a href="index.html#menu">Price</a>
+            <a href="index.html#flow">Flow</a>
+            <a href="index.html#faq">FAQ</a>
+            <a href="column.html">Column</a>
+            <a href="reservation.html" class="nav-btn">ご予約</a>
+        </nav>
+    </header>
+
+    <div class="page-header">
+      <span class="section-en">News</span>
+      <h1>お知らせ一覧</h1>
+    </div>
+
+<div class="container">
+  <div id="newsContainer">
+    <p style="text-align: center; color: #888; padding: 40px 0;">読み込み中...</p>
+  </div>
+</div>
+
+<!-- フッター -->
+<footer>
+    <p>&copy; Spa Blanc Aroma All Rights Reserved.</p>
+</footer>
+
+<script>
+  function openNav() {
+    document.getElementById('sidebar').classList.add('is-active');
+    document.getElementById('overlay').classList.add('is-active');
+  }
+
+  function closeNav() {
+    document.getElementById('sidebar').classList.remove('is-active');
+    document.getElementById('overlay').classList.remove('is-active');
+  }
+
+  function loginAdmin() {
+    const pass = prompt("管理者用パスワードを入力してください:");
+    if (pass === "blanc2025") {
+      sessionStorage.setItem("adminAuth", "true");
+      window.location.href = "admin.html";
+    } else if (pass !== null) {
+      alert("パスワードが正しくありません。");
+    }
+  }
+
+  const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzINJ6cRRGnjW4n1n1zW42LDRqziMAkOKwDZrwMhMWnNdmO74K815ld_gbcnB94eh8/exec";
+
+  function jsonp(action) {
+    return new Promise((resolve, reject) => {
+      const callbackName = 'jsonp_' + Math.random().toString(36).substr(2, 9);
+      const script = document.createElement('script');
+      
+      const timer = setTimeout(() => {
+        delete window[callbackName];
+        if (script.parentNode) document.body.removeChild(script);
+        reject(new Error('通信タイムアウトが発生しました'));
+      }, 15000);
+
+      window[callbackName] = function(data) {
+        clearTimeout(timer);
+        delete window[callbackName];
+        if (script.parentNode) document.body.removeChild(script);
+        resolve(data);
+      };
+
+      script.src = `${GAS_API_URL}?action=${action}&callback=${callbackName}`;
+      script.onerror = () => {
+        clearTimeout(timer);
+        delete window[callbackName];
+        if (script.parentNode) document.body.removeChild(script);
+        reject(new Error('通信エラーが発生しました'));
+      };
+      document.body.appendChild(script);
+    });
+  }
+
+  window.onload = function() {
+    jsonp('getNewsList').then(newsList => {
+      const container = document.getElementById('newsContainer');
+      if (!newsList || newsList.length === 0) {
+        container.innerHTML = '<div class="no-news">現在お知らせはありません。</div>';
+        return;
+      }
+      let html = '';
+      newsList.forEach(item => {
+        html += `
+          <div class="news-card">
+            <div class="news-date">${item.date}</div>
+            <div class="news-title">${item.subject}</div>
+            <div class="news-body">${item.body}</div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }).catch(err => {
+      document.getElementById('newsContainer').innerHTML = '<div class="no-news" style="color:red;">データの読み込みに失敗しました。</div>';
+    });
+  };
+</script>
+</body>
+</html>

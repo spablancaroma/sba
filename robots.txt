@@ -1,0 +1,11 @@
+# 検索エンジンおよびAIクローラーのアクセス許可設定
+User-agent: *
+Allow: /
+
+# 管理画面などインデックス不要なページの除外
+Disallow: /admin.html
+Disallow: /accounts.html
+Disallow: /admin/manual.html
+
+# サイトマップの指定
+Sitemap: https://spa-blanc-aroma.com/sitemap.xml

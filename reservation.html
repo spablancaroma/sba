@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- ファビコンの設定 -->
+  <link rel="icon" href="logo.ico" type="image/x-icon">
+  <link rel="shortcut icon" href="logo.ico" type="image/x-icon">
+
+  <!-- スマホでホーム画面に追加したときのアイコン -->
+  <link rel="apple-touch-icon" href="logo.png">
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ご予約・空き状況確認 - Spa Blanc Aroma</title>
+
+  <!-- SEO / AIO / LLMO Meta Tags -->
+  <meta name="description" content="大阪市東淀川区（新大阪駅からJRで2駅・淡路駅徒歩5分）のゲイ向けアロママッサージサロン「Spa Blanc Aroma」のWEB予約・空き状況確認ページです。リアルタイムで空き枠を確認して簡単にご予約いただけます。">
+  <meta name="keywords" content="Spa Blanc Aroma, 予約, 空き状況, 新大阪 ゲイマッサージ, 大阪 ゲイマッサージ, 淡路 ゲイマッサージ, 東淀川区 ゲイサロン">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://spa-blanc-aroma.com/reservation.html">
+
+  <!-- OGP (Open Graph Protocol) -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="ご予約・空き状況確認 | Spa Blanc Aroma">
+  <meta property="og:description" content="大阪市東淀川区（新大阪駅からJRで2駅・淡路駅徒歩5分）のゲイ向けアロママッサージサロン「Spa Blanc Aroma」のWEB予約ページ。空き枠の確認からご予約までオンラインで完結します。">
+  <meta property="og:site_name" content="Spa Blanc Aroma">
+  <meta property="og:url" content="https://spa-blanc-aroma.com/reservation.html">
+  <meta property="og:image" content="https://spa-blanc-aroma.com/ogp-main.png">
+  <meta property="og:locale" content="ja_JP">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ご予約・空き状況確認 | Spa Blanc Aroma">
+  <meta name="twitter:description" content="大阪市東淀川区（新大阪駅からJRで2駅・淡路駅徒歩5分）のゲイ向けアロママッサージサロン「Spa Blanc Aroma」のWEB予約ページ。空き枠の確認からご予約までオンラインで完結します。">
+  <meta name="twitter:image" content="https://spa-blanc-aroma.com/ogp-main.png">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="style.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    /* --- ベース・スマホ向けスタイル --- */
+    .page-header { text-align: center; padding: 120px 20px 30px; background-color: #f2ece4; }
+    .page-header h1 { font-size: 2rem; font-weight: 500; color: #3b3530; letter-spacing: 0.05em; }
+    
+    .container-form { 
+      max-width: 600px; 
+      margin: 40px auto; 
+      padding: 30px 20px; 
+      background: #fff; 
+      border-radius: 8px; 
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03); 
+      border: 1px solid #f0ede8; 
+      transition: max-width 0.3s ease, padding 0.3s ease;
+    }
+
+    /* --- Flatpickr カレンダーカスタマイズ（スマホ・ベース） --- */
+    .flatpickr-calendar.inline { 
+      margin: 0 auto !important; 
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important; 
+      border: 1px solid #f0ede8 !important; 
+      border-radius: 12px !important; 
+      width: 100% !important;
+      max-width: 360px !important;
+      padding: 10px 5px !important;
+    }
+    .flatpickr-days, .dayContainer {
+      width: 100% !important;
+      max-width: 350px !important;
+      min-width: 280px !important;
+    }
+    .flatpickr-day {
+      max-width: 48px !important;
+      height: 44px !important;
+      line-height: 44px !important;
+      font-size: 1rem !important;
+      border-radius: 8px !important;
+    }
+    .flatpickr-day.selected {
+      background: #b39b7d !important;
+      border-color: #b39b7d !important;
+    }
+
+    .time-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
+    .time-btn { padding: 12px; border: 1px solid #b39b7d; color: #333; background: #fff; cursor: pointer; border-radius: 6px; font-size: 0.95rem; transition: 0.3s; }
+    .time-btn:hover:not(:disabled) { background: #b39b7d; color: #fff; }
+    .time-btn:disabled { background: #f8f6f2; border: 1px solid #eee; color: #ccc; cursor: not-allowed; }
+    
+    button#submitBtn, .action-btn { width: 100%; padding: 15px; background: #b39b7d; color: #fff; border: none; border-radius: 30px; font-size: 0.95rem; font-weight: 500; margin-top: 20px; cursor: pointer; transition: 0.3s; }
+    button#submitBtn:hover:not(:disabled), .action-btn:hover { background: #9c8263; }
+    button#submitBtn:disabled { background: #ccc; cursor: not-allowed; }
+    
+    .retry-btn { width: 100%; padding: 12px; background: #666; color: #fff; border: none; border-radius: 30px; font-size: 0.9rem; font-weight: 500; margin-top: 15px; cursor: pointer; transition: 0.3s; }
+    .retry-btn:hover { background: #444; }
+    
+    .form-group { margin-bottom: 20px; }
+    input, select { width: 100%; padding: 14px; box-sizing: border-box; border: 1px solid #e0dcd5; border-radius: 6px; font-size: 0.95rem; background: #fff; font-family: inherit; }
+    input:focus, select:focus { outline: none; border-color: #b39b7d; }
+    h2 { border-left: 4px solid #b39b7d; padding-left: 15px; color: #3b3530; font-size: 1.2rem; margin-bottom: 20px; font-weight: 500; }
+
+    /* 個人情報保護に関する文言・同意ボックス */
+    .privacy-box {
+      background: #fdfbf9;
+      border: 1px solid #e8e3da;
+      border-radius: 6px;
+      padding: 15px;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      font-size: 0.85rem;
+      color: #666;
+      line-height: 1.5;
+    }
+    .privacy-checkbox-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: #3b3530;
+      cursor: pointer;
+    }
+    .privacy-checkbox-wrap input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: #b39b7d;
+    }
+
+    /* サマリーカード（PC/スマホ共通定義） */
+    .summary-card {
+      background: #fdfbf7;
+      border: 1px solid #e8e3da;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .summary-card p {
+      margin: 8px 0;
+      color: #555;
+      font-size: 0.95rem;
+    }
+    .summary-card strong {
+      color: #3b3530;
+    }
+
+    /* キャンセル規定カード */
+    .cancel-policy-card {
+      background-color: #fdfbf9;
+      border: 1px solid #f0ede8;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 20px;
+      text-align: left;
+    }
+    .cancel-policy-card h4 {
+      font-size: 0.98rem;
+      color: #3b3530;
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-weight: 500;
+      border-left: 3px solid #b39b7d;
+      padding-left: 8px;
+      line-height: 1.2;
+    }
+    .cancel-policy-card ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+      font-size: 0.88rem;
+      color: #3b3530;
+    }
+    .cancel-policy-card li {
+      padding: 5px 0;
+      border-bottom: 1px dashed #e0dcd5;
+      display: flex;
+      justify-content: space-between;
+    }
+    .cancel-policy-card li:last-child {
+      border-bottom: none;
+    }
+
+    /* ローディングスピナー UI */
+    .loading-box { text-align: center; padding: 30px 20px; }
+    .spinner {
+      width: 36px; height: 36px; margin: 0 auto 15px;
+      border: 3px solid #f2ece4; border-top: 3px solid #b39b7d;
+      border-radius: 50%; animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .loading-text { font-size: 0.95rem; color: #666; margin: 0; transition: opacity 0.3s ease; }
+    .error-box { text-align: center; padding: 20px; background: #fdf2f2; border: 1px solid #f8d7da; border-radius: 8px; color: #721c24; }
+
+    /* --- PC向けレスポンシブスタイル (992px以上) --- */
+    @media (min-width: 992px) {
+      .container-form {
+        max-width: 960px;
+        padding: 50px 60px;
+      }
+
+      /* PC版 カレンダー大幅拡大カスタマイズ */
+      .flatpickr-calendar.inline {
+        max-width: 520px !important;
+        padding: 20px !important;
+      }
+      .flatpickr-days, .dayContainer {
+        width: 480px !important;
+        max-width: 480px !important;
+        min-width: 480px !important;
+      }
+      .flatpickr-day {
+        max-width: 65px !important;
+        height: 58px !important;
+        line-height: 58px !important;
+        font-size: 1.15rem !important;
+        margin: 2px 0 !important;
+      }
+      .flatpickr-months .flatpickr-month {
+        height: 50px !important;
+      }
+      .flatpickr-current-month {
+        font-size: 1.3rem !important;
+        padding-top: 10px !important;
+      }
+      span.flatpickr-weekday {
+        font-size: 1.05rem !important;
+        font-weight: 600 !important;
+        padding-top: 10px !important;
+        padding-bottom: 10px !important;
+      }
+
+      /* Step 2（時間選択）: ボタン配列を4列へ */
+      .time-slots {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+      }
+
+      /* Step 3（詳細入力）: 2カラムレイアウト */
+      .step3-grid {
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+        gap: 40px;
+        align-items: start;
+      }
+
+      .summary-card {
+        margin-bottom: 0;
+        padding: 25px;
+      }
+
+      .step3-actions {
+        grid-column: 1 / -1;
+        max-width: 400px;
+        margin: 10px auto 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+    <!-- ハンバーガーボタン & サイドバー -->
+    <button class="menu-toggle-btn" onclick="openNav()" aria-label="メニューを開く">☰</button>
+
+    <div class="sidebar-overlay" id="overlay" onclick="closeNav()"></div>
+
+    <aside class="sidebar" id="sidebar">
+      <button class="close-btn" onclick="closeNav()" aria-label="メニューを閉じる">✕</button>
+      <ul class="sidebar-menu">
+        <li><a href="index.html">トップ</a></li>
+        <li><a href="reservation.html">予約・空き状況確認</a></li>
+        <li><a href="column.html">コラム一覧</a></li>
+        <li><a href="news.html">お知らせ</a></li>
+        <li><a href="about.html">店舗概要</a></li>
+        <li><a href="recruit.html">セラピスト募集</a></li>
+        <li><a href="javascript:void(0);" onclick="loginAdmin()" class="admin-link">🔒 管理者画面</a></li>
+      </ul>
+    </aside>
+
+    <header class="site-header">
+        <div class="logo">
+          <a href="index.html">
+            <img src="logo.png" alt="Spa Blanc Aroma 店舗ロゴ" class="header-logo-img">
+            <span>Spa Blanc Aroma</span>
+          </a>
+        </div>
+        <nav class="nav-menu">
+            <a href="index.html#about">About</a>
+            <a href="index.html#therapist">Therapist</a>
+            <a href="index.html#service">Service</a>
+            <a href="index.html#menu">Price</a>
+            <a href="index.html#flow">Flow</a>
+            <a href="index.html#faq">FAQ</a>
+            <a href="column.html">Column</a>
+            <a href="reservation.html" class="nav-btn">ご予約</a>
+        </nav>
+    </header>
+
+    <div class="page-header">
+      <span class="section-en">Reservation</span>
+      <h1>ご予約・空き状況確認</h1>
+    </div>
+
+<div class="container-form" id="app">
+  <div id="latestNewsArea"></div>
+  
+  <div id="loading" class="loading-box">
+    <div class="spinner"></div>
+    <p id="loadingMsg" class="loading-text">データを読み込み中...</p>
+  </div>
+  
+  <!-- Step 0: セラピスト選択 -->
+  <div id="step0" style="display:none">
+    <h2>1. セラピスト選択</h2>
+    <div class="form-group" style="max-width: 500px; margin: 0 auto 20px;">
+      <label for="therapistSelect" style="font-weight: 500; color: #555; display: block; margin-bottom: 8px; font-size: 0.95rem;">ご希望のセラピストを選択してください</label>
+      <select id="therapistSelect">
+        <option value="指名なし">指名なし</option>
+      </select>
+    </div>
+    <div style="max-width: 400px; margin: 0 auto;">
+      <button class="action-btn" onclick="confirmTherapist()">次へ（日付選択）</button>
+    </div>
+  </div>
+
+  <!-- Step 1: 日付選択 -->
+  <div id="step1" style="display:none">
+    <h2>2. 日付選択</h2>
+    <p id="selectedTherapistText" style="text-align:center; font-weight:500; color:#b39b7d; margin-bottom:20px; font-size: 1.1rem;"></p>
+    <input type="text" id="datePicker" style="display:none;">
+    <button onclick="backToStep0()" style="margin-top:25px; background:none; border:none; text-decoration:underline; width:100%; cursor:pointer; color:#666;">セラピスト選択に戻る</button>
+  </div>
+  
+  <!-- Step 2: 時間選択 -->
+  <div id="step2" style="display:none">
+    <h2>3. 時間選択</h2>
+    <p id="selectedDateText" style="text-align:center; font-weight:500; color:#3b3530; margin-bottom:20px; font-size: 1.1rem;"></p>
+    <div id="timeSlots" class="time-slots"></div>
+    <button onclick="backToStep1()" style="margin-top:25px; background:none; border:none; text-decoration:underline; width:100%; cursor:pointer; color:#666;">日時選択に戻る</button>
+  </div>
+  
+  <!-- Step 3: 詳細入力 -->
+  <div id="step3" style="display:none">
+    <h2>4. 詳細入力</h2>
+    
+    <div class="step3-grid">
+      <!-- 左カラム（PC表示時）：ご予約サマリー ＆ キャンセル規定 -->
+      <div>
+        <div class="summary-card">
+          <h3 style="margin: 0 0 15px 0; font-size: 1.05rem; color: #b39b7d; border-bottom: 1px solid #e8e3da; padding-bottom: 8px;">選択中のご予約内容</h3>
+          <p><strong>指名セラピスト:</strong> <span id="summaryTherapist">指名なし</span></p>
+          <p><strong>ご予約日時:</strong> <span id="summaryDateTime">-</span></p>
+          <div class="form-group" style="margin-top: 15px; margin-bottom: 0;">
+            <label style="font-weight: 500; color: #555; display: block; margin-bottom: 8px; font-size: 0.95rem;">コース選択</label>
+            <select id="course">
+              <option value="60">60分コース (9,000円) - オイルマッサージ</option>
+              <option value="90">90分コース (12,000円) - 指圧＋オイル</option>
+              <option value="120">120分コース (14,000円) - 足裏＋指圧＋オイル</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- キャンセル規定カード -->
+        <div class="cancel-policy-card">
+          <h4>キャンセル規定について</h4>
+          <ul>
+            <li><span>前日のキャンセル</span><strong style="color: #b39b7d;">施術料金の 50%</strong></li>
+            <li><span>当日・無断キャンセル</span><strong style="color: #c0392b;">施術料金の 100%</strong></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 右カラム（PC表示時）：お客様情報フォーム -->
+      <div class="customer-inputs">
+        <div class="form-group">
+          <label style="font-weight: 500; color: #555; display: block; margin-bottom: 6px; font-size: 0.9rem;">お名前 <span style="color:#d9534f;">*</span></label>
+          <input type="text" id="name" placeholder="例: 山田 太郎">
+        </div>
+        <div class="form-group">
+          <label style="font-weight: 500; color: #555; display: block; margin-bottom: 6px; font-size: 0.9rem;">メールアドレス <span style="color:#d9534f;">*</span></label>
+          <input type="email" id="email" placeholder="例: example@email.com">
+        </div>
+        <div class="form-group">
+          <label style="font-weight: 500; color: #555; display: block; margin-bottom: 6px; font-size: 0.9rem;">電話番号 <span style="color:#d9534f;">*</span></label>
+          <input type="tel" id="tel" placeholder="例: 09012345678">
+        </div>
+
+        <!-- 個人情報の取り扱いに関する簡単な記載・同意チェック -->
+        <div class="form-group" style="margin-bottom: 10px;">
+          <label style="font-weight: 500; color: #555; display: block; margin-bottom: 6px; font-size: 0.9rem;">個人情報の取り扱いについて</label>
+          <div class="privacy-box">
+            ご入力いただいた個人情報（お名前・メールアドレス・電話番号等）は、ご予約の確認、当サロンからのご連絡、およびサービス提供の目的でのみ使用し、厳重に管理いたします。第三者に提供することはございません。
+          </div>
+          <label class="privacy-checkbox-wrap">
+            <input type="checkbox" id="privacyAgree">
+            <span>個人情報の取り扱いに同意する</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- 送信・戻るボタン -->
+      <div class="step3-actions">
+        <button id="submitBtn">予約を送信する</button>
+        <button onclick="backToStep2()" style="margin-top:15px; background:none; border:none; text-decoration:underline; width:100%; cursor:pointer; color:#666;">時間選択に戻る</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- フッター -->
+<footer>
+    <p>&copy; Spa Blanc Aroma All Rights Reserved.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
+<script>
+  function openNav() {
+    document.getElementById('sidebar').classList.add('is-active');
+    document.getElementById('overlay').classList.add('is-active');
+  }
+
+  function closeNav() {
+    document.getElementById('sidebar').classList.remove('is-active');
+    document.getElementById('overlay').classList.remove('is-active');
+  }
+
+  function loginAdmin() {
+    const pass = prompt("管理者用パスワードを入力してください:");
+    if (pass === "blanc2025") {
+      sessionStorage.setItem("adminAuth", "true");
+      window.location.href = "admin.html";
+    } else if (pass !== null) {
+      alert("パスワードが正しくありません。");
+    }
+  }
+
+  const API_URL = "https://script.google.com/macros/s/AKfycbzINJ6cRRGnjW4n1n1zW42LDRqziMAkOKwDZrwMhMWnNdmO74K815ld_gbcnB94eh8/exec";
+
+  let bizDays = [], booked = [], selTherapist = "指名なし", selDate = "", selTime = "";
+  let fpInstance = null;
+  let scheduleCache = {}; 
+  let loadingTimers = [];
+
+  function showProgressLoading(initialMsg) {
+    loadingTimers.forEach(t => clearTimeout(t));
+    loadingTimers = [];
+
+    const loadingEl = document.getElementById('loading');
+    if (loadingEl) {
+      loadingEl.style.display = 'block';
+      loadingEl.className = 'loading-box';
+      loadingEl.innerHTML = `
+        <div class="spinner"></div>
+        <p id="loadingMsg" class="loading-text">${initialMsg}</p>
+      `;
+    }
+
+    loadingTimers.push(setTimeout(() => {
+      const msgEl = document.getElementById('loadingMsg');
+      if (msgEl) msgEl.innerText = "最新の予約状況を照会中です...";
+    }, 4000));
+
+    loadingTimers.push(setTimeout(() => {
+      const msgEl = document.getElementById('loadingMsg');
+      if (msgEl) msgEl.innerText = "システムの起動に少し時間がかかっています。そのままお待ちください...";
+    }, 10000));
+  }
+
+  function hideProgressLoading() {
+    loadingTimers.forEach(t => clearTimeout(t));
+    loadingTimers = [];
+    const loadingEl = document.getElementById('loading');
+    if (loadingEl) loadingEl.style.display = 'none';
+  }
+
+  function showErrorWithRetry(message, retryCallbackName) {
+    hideProgressLoading();
+    const loadingEl = document.getElementById('loading');
+    if (loadingEl) {
+      loadingEl.style.display = 'block';
+      loadingEl.className = 'error-box';
+      loadingEl.innerHTML = `
+        <p style="margin: 0 0 10px 0; font-weight: 500;">データの読み込みに時間がかかっています。</p>
+        <p style="font-size: 0.85rem; margin-bottom: 15px; opacity: 0.8;">(${message})</p>
+        <button class="retry-btn" onclick="${retryCallbackName}()">🔄 もう一度試す</button>
+      `;
+    }
+  }
+
+  function jsonp(action, params = {}) {
+    return new Promise((resolve, reject) => {
+      const callbackName = 'jsonp_' + Math.random().toString(36).substr(2, 9);
+      const script = document.createElement('script');
+      
+      const timer = setTimeout(() => {
+        delete window[callbackName];
+        if (script.parentNode) document.body.removeChild(script);
+        reject(new Error('通信タイムアウトが発生しました'));
+      }, 25000);
+
+      window[callbackName] = function(data) {
+        clearTimeout(timer);
+        delete window[callbackName];
+        if (script.parentNode) document.body.removeChild(script);
+        if (data && (data.error || data.success === false)) {
+          reject(new Error(data.error || data.message || 'エラーが発生しました'));
+        } else {
+          resolve(data);
+        }
+      };
+
+      const query = new URLSearchParams({ action, callback: callbackName, ...params }).toString();
+      script.src = `${API_URL}?${query}`;
+      script.onerror = () => {
+        clearTimeout(timer);
+        delete window[callbackName];
+        if (script.parentNode) document.body.removeChild(script);
+        reject(new Error('通信エラーが発生しました'));
+      };
+      document.body.appendChild(script);
+    });
+  }
+
+  async function postApi(action, payload = {}, retries = 2, delay = 1000) {
+    for (let i = 0; i <= retries; i++) {
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: action, ...payload })
+        });
+
+        if (!response.ok) {
+          throw new Error(`サーバーエラーが発生しました (${response.status})`);
+        }
+
+        const result = await response.json();
+        if (result.error || result.success === false) {
+          throw new Error(result.error || result.message || 'エラーが発生しました');
+        }
+
+        return result;
+      } catch (error) {
+        if (i === retries) {
+          console.error("API呼び出し最終失敗:", error);
+          throw new Error("通信が混み合っているか不安定です。時間を置いてもう一度お試しのうえ、送信してください。");
+        }
+        await new Promise(res => setTimeout(res, delay * (i + 1)));
+      }
+    }
+  }
+
+  async function initApp() {
+    showProgressLoading("データを読み込み中...");
+    try {
+      const initData = await jsonp('getAppInitData', { therapist: '指名なし' });
+
+      if (initData.news && initData.news.subject) {
+        const news = initData.news;
+        document.getElementById('latestNewsArea').innerHTML = `
+          <div style="background: #f8f6f2; padding: 20px; border-radius: 8px; margin-bottom: 25px; border: 1px solid #e0dcd5; text-align: left;">
+            <h3 style="margin: 0 0 10px 0; font-size: 1rem; color: #3b3530; font-weight: 500;">最新のお知らせ</h3>
+            <p style="margin: 0 0 5px 0; font-size: 0.8rem; color: #888; font-family: 'Montserrat', sans-serif;">${news.date}</p>
+            <p style="margin: 0 0 5px 0; font-weight: 500; font-size: 0.95rem; color: #333;">${news.subject}</p>
+            <p style="margin: 0 0 10px 0; font-size: 0.9rem; color: #555; white-space: pre-wrap;">${news.body}</p>
+            <div style="text-align: right;"><a href="news.html" style="color: #b39b7d; font-weight: 500; font-size: 0.85rem; text-decoration: none;">お知らせ一覧へ ＞</a></div>
+          </div>
+        `;
+      }
+
+      const select = document.getElementById('therapistSelect');
+      select.innerHTML = '<option value="指名なし">指名なし</option>';
+      if (initData.therapists && initData.therapists.length > 0) {
+        initData.therapists.forEach(t => {
+          const opt = document.createElement('option');
+          opt.value = t;
+          opt.innerText = t;
+          select.appendChild(opt);
+        });
+      }
+
+      if (initData.schedule) {
+        scheduleCache['指名なし'] = initData.schedule;
+      }
+
+      hideProgressLoading();
+      document.getElementById('step0').style.display = 'block';
+    } catch (err) {
+      showErrorWithRetry(err.message, 'initApp');
+    }
+  }
+
+  window.onload = function() {
+    initApp();
+  };
+
+  async function confirmTherapist() {
+    selTherapist = document.getElementById('therapistSelect').value;
+    document.getElementById('step0').style.display = 'none';
+
+    if (scheduleCache[selTherapist]) {
+      const res = scheduleCache[selTherapist];
+      bizDays = res.bizDays || [];
+      booked = res.booked || [];
+      document.getElementById('step1').style.display = 'block';
+      document.getElementById('selectedTherapistText').innerText = "担当セラピスト: " + selTherapist;
+      initCalendar();
+      return;
+    }
+
+    showProgressLoading('カレンダーを読み込み中...');
+
+    try {
+      const res = await jsonp('getTherapistScheduleData', { therapist: selTherapist });
+      scheduleCache[selTherapist] = res;
+      bizDays = res.bizDays || [];
+      booked = res.booked || [];
+      hideProgressLoading();
+      document.getElementById('step1').style.display = 'block';
+      document.getElementById('selectedTherapistText').innerText = "担当セラピスト: " + selTherapist;
+      initCalendar();
+    } catch (err) {
+      showErrorWithRetry(err.message, 'confirmTherapist');
+    }
+  }
+
+  function initCalendar() {
+    if (fpInstance) fpInstance.destroy();
+    fpInstance = flatpickr("#datePicker", {
+      locale: "ja", 
+      inline: true, 
+      minDate: "today",
+      disable: [function(date) { 
+        return !bizDays.find(b => b.date === flatpickr.formatDate(date, "Y-m-d")); 
+      }],
+      onChange: (d, s) => { 
+        selDate = s; 
+        document.getElementById('step1').style.display = 'none'; 
+        document.getElementById('step2').style.display = 'block';
+        document.getElementById('selectedDateText').innerText = selDate + " (" + selTherapist + ")"; 
+        renderTime(); 
+      }
+    });
+  }
+
+  function renderTime() {
+    const day = bizDays.find(b => b.date === selDate);
+    const slots = document.getElementById('timeSlots'); 
+    slots.innerHTML = '';
+    
+    if (!day) return;
+
+    const startHour = parseInt(String(day.start).split(':')[0], 10) || 10;
+    const endHour = parseInt(String(day.end).split(':')[0], 10) || 19;
+
+    for(let h = startHour; h < endHour; h++) {
+      [0, 30].forEach(m => {
+        let t = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
+        let fullDateTime = selDate + ' ' + t;
+        
+        let slotTime = new Date(selDate.replace(/-/g, '/') + ' ' + t);
+        let now = new Date();
+        let isTooLate = (slotTime.getTime() - now.getTime()) < (3 * 60 * 60 * 1000);
+
+        let btn = document.createElement('button'); 
+        btn.className = 'time-btn'; 
+        btn.innerText = t;
+        
+        if (booked.includes(fullDateTime) || isTooLate) btn.disabled = true;
+        
+        btn.onclick = () => { 
+          selTime = t; 
+          document.getElementById('step2').style.display = 'none'; 
+          document.getElementById('step3').style.display = 'block';
+          
+          document.getElementById('summaryTherapist').innerText = selTherapist;
+          document.getElementById('summaryDateTime').innerText = selDate + " " + selTime + "〜";
+        };
+        slots.appendChild(btn);
+      });
+    }
+  }
+
+  function backToStep0() {
+    document.getElementById('step1').style.display = 'none';
+    document.getElementById('step0').style.display = 'block';
+  }
+
+  function backToStep1() { 
+    document.getElementById('step2').style.display = 'none'; 
+    document.getElementById('step1').style.display = 'block'; 
+  }
+  
+  function backToStep2() { 
+    document.getElementById('step3').style.display = 'none'; 
+    document.getElementById('step2').style.display = 'block'; 
+  }
+
+  function closeTab() {
+    window.open('about:blank', '_self').close();
+    window.close();
+    setTimeout(function() {
+      alert('ブラウザの仕様により自動で閉じられませんでした。\n恐れ入りますが、手動でタブを閉じてください。');
+    }, 500);
+  }
+
+  document.getElementById('submitBtn').onclick = async () => {
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const tel = document.getElementById('tel').value.trim();
+    const course = document.getElementById('course').value;
+    const privacyAgree = document.getElementById('privacyAgree').checked;
+    
+    if(!name || !email || !tel) { 
+      alert("お名前、メールアドレス、電話番号をすべて入力してください。"); 
+      return; 
+    }
+
+    if(!privacyAgree) {
+      alert("ご予約には「個人情報の取り扱いについて」への同意が必要です。");
+      return;
+    }
+    
+    const btn = document.getElementById('submitBtn'); 
+    btn.disabled = true; 
+    showProgressLoading("予約リクエストを送信中...");
+    
+    try {
+      await postApi('saveReservation', {
+        course: course,
+        datetime: selDate + ' ' + selTime,
+        name: name,
+        email: email,
+        tel: tel,
+        therapist: selTherapist
+      });
+
+      hideProgressLoading();
+      document.getElementById('app').innerHTML = `
+        <div style="text-align:center; padding: 40px 0;">
+          <h2 style="border:none; color:#3b3530; font-size: 1.4rem;">予約リクエストありがとうございます</h2>
+          <p style="font-size:1rem; color:#555; margin-bottom:30px;">ご入力いただいたメールアドレス（<strong>${email}</strong>）へ確認メールをお送りしました。</p>
+          <a href="index.html" style="display:inline-block; padding:12px 25px; background-color:#b39b7d; color:#fff; text-decoration:none; border-radius:30px; font-weight:500; margin-right:8px;">トップへ戻る</a>
+          <a href="javascript:void(0);" onclick="closeTab();" style="display:inline-block; padding:12px 25px; background-color:#888; color:#fff; text-decoration:none; border-radius:30px; font-weight:500;">画面を閉じる</a>
+        </div>
+      `;
+    } catch (err) {
+      hideProgressLoading();
+      alert("送信に失敗しました: " + err.message);
+      btn.disabled = false;
+      btn.innerText = "予約を送信する";
+    }
+  };
+</script>
+</body>
+</html>

@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spa Blanc Aroma - セラピスト運営＆施術総合マニュアル</title>
+    <style>
+        /* --- 印刷・画面共通設定 --- */
+        * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #555;
+            font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+            color: #3b3530;
+            line-height: 1.5;
+        }
+
+        /* --- PDF出力ボタン --- */
+        .print-btn-container {
+            text-align: center;
+            padding: 15px;
+            background-color: #333;
+        }
+        .print-btn {
+            background-color: #b39b7d;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            font-size: 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+        .print-btn:hover {
+            background-color: #9f8668;
+        }
+
+        /* --- A4ページ枠固定（全4ページ構成） --- */
+        .a4-page {
+            background-color: #ffffff;
+            width: 210mm;
+            height: 297mm;
+            margin: 10mm auto;
+            padding: 12mm 15mm 10mm 15mm;
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+            page-break-after: always;
+            break-after: page;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* --- 表紙ページスタイル（中央配置） --- */
+        .cover-page {
+            background-color: #f2ece4;
+            padding: 18mm 15mm 14mm 15mm;
+            text-align: center;
+            justify-content: space-between;
+        }
+        .cover-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            width: 100%;
+        }
+        .cover-logo-img {
+            max-width: 130px;
+            height: auto;
+            margin-bottom: 15px;
+        }
+        .cover-brand {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.25em;
+            color: #777;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .cover-title {
+            font-size: 2.1rem;
+            font-weight: 600;
+            color: #3b3530;
+            margin-bottom: 8px;
+            letter-spacing: 0.05em;
+        }
+        .cover-subtitle {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 25px;
+            letter-spacing: 0.03em;
+        }
+        .cover-desc {
+            font-size: 0.96rem;
+            color: #444;
+            background-color: #ffffff;
+            padding: 14px 18px;
+            border-radius: 6px;
+            border-left: 4px solid #b39b7d;
+            text-align: left;
+            margin-bottom: 20px;
+            line-height: 1.55;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            width: 100%;
+        }
+        .cover-disclaimer {
+            background-color: #fdf4f2;
+            border: 1px solid rgba(200, 107, 90, 0.3);
+            border-left: 4px solid #c86b5a;
+            border-radius: 6px;
+            padding: 14px 18px;
+            text-align: left;
+            width: 100%;
+        }
+        .cover-disclaimer-title {
+            font-weight: bold;
+            color: #c86b5a;
+            font-size: 0.92rem;
+            margin-bottom: 4px;
+        }
+        .cover-disclaimer-text {
+            font-size: 0.86rem;
+            color: #3b3530;
+            line-height: 1.5;
+        }
+
+        /* --- 通常ページのコンテンツ分配コンテナ --- */
+        .page-body {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-grow: 1;
+            margin: 4px 0;
+        }
+
+        /* --- セクション＆ボックス構造 --- */
+        .page-header {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #3b3530;
+            border-left: 4px solid #b39b7d;
+            padding-left: 8px;
+            margin-bottom: 6px;
+            letter-spacing: 0.02em;
+        }
+
+        .section-box {
+            background-color: #faf8f5;
+            border: 1px solid #eee5dc;
+            border-radius: 5px;
+            padding: 10px 14px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .section-box + .section-box {
+            margin-top: 8px;
+        }
+
+        .manual-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        .manual-list li {
+            position: relative;
+            padding-left: 16px;
+            font-size: 0.92rem;
+            color: #444;
+            margin-bottom: 4px;
+            line-height: 1.48;
+        }
+        .manual-list li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #b39b7d;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* --- コースグリッド --- */
+        .course-grid {
+            display: flex;
+            gap: 8px;
+            margin-top: 6px;
+        }
+        .course-card {
+            flex: 1;
+            background-color: #ffffff;
+            border: 1px solid #e6ded5;
+            border-radius: 4px;
+            padding: 6px 8px;
+            text-align: center;
+        }
+        .course-title {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #b39b7d;
+            margin-bottom: 2px;
+        }
+        .course-desc {
+            font-size: 0.82rem;
+            color: #444;
+        }
+
+        /* --- スマートロック案内用レイアウト --- */
+        .smart-lock-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .smart-lock-img {
+            width: 65px;
+            height: 65px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid #e6ded5;
+            flex-shrink: 0;
+        }
+
+        /* --- 精算手順専用の横並びカードレイアウト --- */
+        .settlement-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-top: 4px;
+        }
+        .settlement-card {
+            background-color: #faf8f5;
+            border: 1px solid #eee5dc;
+            border-radius: 5px;
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .settlement-svg {
+            background-color: #ffffff;
+            border: 1px solid #e6ded5;
+            border-radius: 4px;
+            padding: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 110px;
+            margin-bottom: 8px;
+        }
+        .settlement-svg svg {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .settlement-title {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #3b3530;
+            border-bottom: 1px dashed #dcd5cc;
+            padding-bottom: 4px;
+            margin-bottom: 6px;
+            text-align: center;
+        }
+        .settlement-text {
+            font-size: 0.82rem;
+            color: #444;
+            line-height: 1.42;
+        }
+
+        /* --- 施術カード (SVG＋解説) --- */
+        .procedure-card {
+            background-color: #faf8f5;
+            border: 1px solid #eee5dc;
+            border-radius: 5px;
+            padding: 8px 12px;
+            flex-grow: 1;
+            display: grid;
+            grid-template-columns: 130px 1fr;
+            gap: 12px;
+            align-items: center;
+        }
+        .procedure-card + .procedure-card {
+            margin-top: 6px;
+        }
+        .svg-container {
+            background-color: #ffffff;
+            border-radius: 4px;
+            padding: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #eee5dc;
+            height: 95px;
+        }
+        .svg-container svg {
+            width: 100%;
+            height: 70px;
+            object-fit: contain;
+        }
+        .svg-caption {
+            font-size: 0.74rem;
+            color: #666;
+            margin-top: 3px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .proc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3px;
+            border-bottom: 1px dashed #dcd5cc;
+            padding-bottom: 2px;
+        }
+        .proc-title {
+            font-size: 0.96rem;
+            font-weight: bold;
+            color: #3b3530;
+        }
+        .proc-tag {
+            background-color: #f2ece4;
+            color: #3b3530;
+            font-size: 0.78rem;
+            padding: 1px 5px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .proc-steps {
+            font-size: 0.88rem;
+            color: #444;
+            line-height: 1.45;
+        }
+        .proc-steps p {
+            margin-bottom: 2px;
+        }
+        .proc-caution {
+            background-color: #fdf4f2;
+            border-left: 2.5px solid #c86b5a;
+            padding: 2px 6px;
+            font-size: 0.83rem;
+            color: #c86b5a;
+            margin-top: 3px;
+            border-radius: 0 3px 3px 0;
+            font-weight: bold;
+        }
+
+        /* --- フッター --- */
+        .footer {
+            text-align: center;
+            font-size: 0.78rem;
+            color: #888;
+            border-top: 1px solid #f0ede8;
+            padding-top: 4px;
+            margin-top: 3px;
+        }
+
+        /* --- 印刷設定 --- */
+        @media print {
+            body {
+                background-color: #ffffff !important;
+            }
+            .print-btn-container {
+                display: none !important;
+            }
+            .a4-page {
+                margin: 0 !important;
+                box-shadow: none !important;
+                width: 210mm !important;
+                height: 297mm !important;
+                page-break-after: always !important;
+                break-after: page !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="print-btn-container">
+        <button class="print-btn" onclick="window.print()">🖨️ A4・全4ページでPDF保存 / 印刷する</button>
+    </div>
+
+    <!-- ==========================================
+         【表紙ページ】
+         ========================================== -->
+    <div class="a4-page cover-page">
+        <div class="cover-content">
+            <img src="https://spa-blanc-aroma.com/logo.png" alt="Spa Blanc Aroma Logo" class="cover-logo-img">
+            <div>
+                <div class="cover-brand">SPA BLANC AROMA</div>
+                <h1 class="cover-title">セラピスト運営 & 施術マニュアル</h1>
+                <p class="cover-subtitle">Therapist Operation & Technique Manual</p>
+            </div>
+            
+            <div class="cover-desc">
+                サロンの基本運営ルールから実務推奨標準手順、そして精算方法までを網羅したスタッフ共通の総合マニュアルです。
+            </div>
+
+            <div class="cover-disclaimer">
+                <div class="cover-disclaimer-title">⚠️ 【重要】業務委託契約における施術の位置付けについて</div>
+                <div class="cover-disclaimer-text">
+                    本サロンとセラピスト様との契約は業務委託契約となります。本マニュアルに掲載されている施術手順および手技内容は品質維持・推奨標準を示すものであり、実際の施術において本手順通りの実施を指示・強制するものではありません。
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer" style="border-top: none; width: 100%;">
+            Spa Blanc Aroma All Rights Reserved.
+        </div>
+    </div>
+
+    <!-- ==========================================
+         【1ページ目】 基本運営ルール (1〜4)
+         ========================================== -->
+    <div class="a4-page">
+        <div class="page-body">
+            <div>
+                <div class="page-header">1. シフト登録の仕方 & 個室入室方法</div>
+                <div class="section-box" style="padding: 12px 16px;">
+                    <div class="smart-lock-row">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3rDaZOce5oR7yb3SqqDIKuSBtyynK9JvpgnWnbjdQLA&s=10" alt="スマートロック" class="smart-lock-img">
+                        <ul class="manual-list" style="flex-grow: 1;">
+                            <li><b>管理者画面ログイン:</b> メニュー等の「管理者画面」よりパスワードを用いてログインしてください。</li>
+                            <li><b>シフト・営業日登録:</b> ご出勤日およびご予約受付時間枠（例: 10:00〜19:00）を正確に設定し保存をお願いいたします。</li>
+                            <li><b>個室入室:</b> 個室ドアのスマートキーに指定の暗証番号を入力してご入室ください。オートロック仕様のため、施錠の確認を徹底してください。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="page-header">2. 入店条件 & ウェルカムドリンク</div>
+                <div class="section-box" style="padding: 12px 16px;">
+                    <ul class="manual-list">
+                        <li><b>入店条件:</b> 未成年者のご利用は固くお断りしております。また、泥酔状態のお客様、発熱・体調不良が見受けられる方、過度な要求が予想される場合は、即時退店および入店拒否の対応をとってください。</li>
+                        <li><b>ドリンク提供:</b> ホワイトボードをご提示し、お客様にお好きなお飲み物をお選びいただきます。ドルチェグストまたはアイスティー（濃いめ抽出・氷急冷）をご用意ください。ご使用後のグラスは速やかに洗浄をお願いいたします。</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div>
+                <div class="page-header">3. カウンセリング & 施術フロー</div>
+                <div class="section-box" style="padding: 12px 16px;">
+                    <ul class="manual-list">
+                        <li><b>準備・演出:</b> 体調のヒアリングとオイルの香り選びを行います。ディフューザーとオイルの香りを統一し、アレクサにてBGMを再生してリラックス空間を演出します。</li>
+                        <li><b>施術フロー:</b> ドリンク提供 ➜ カウンセリング ➜ シャワー＆準備 ➜ 各コース施術 ➜ シャワー＆アフタードリンク ➜ お見送り。</li>
+                    </ul>
+                    <div class="course-grid">
+                        <div class="course-card">
+                            <div class="course-title">60分コース</div>
+                            <div class="course-desc">オイルマッサージのみ</div>
+                        </div>
+                        <div class="course-card">
+                            <div class="course-title">90分コース</div>
+                            <div class="course-desc">指圧 ＋ オイルマッサージ</div>
+                        </div>
+                        <div class="course-card">
+                            <div class="course-title">120分コース</div>
+                            <div class="course-desc">足裏 ＋ 指圧 ＋ オイル</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="page-header">4. 片付け & 禁止事項</div>
+                <div class="section-box" style="padding: 12px 16px;">
+                    <ul class="manual-list">
+                        <li><b>片付け:</b> タオル類は洗濯機にて「洗乾標準モード」で回してください。オイルなどの備品はすべて元の位置に戻し、お部屋の換気および掃除機掛けを行います。退室時には公式LINEへ「終了しました。現金だったので茶封筒に入れています。／クレジットだったので報酬はPayPayで送金お願いします。」とご報告ください。室内のゴミはすべて持ち出し、マンション前のゴミ置き場に廃棄して完了となります。</li>
+                        <li><b>近隣対応:</b> 万が一、近隣の方からお声掛けがあった場合は「社宅なので分かりません」とお伝えいただき、速やかに店舗へご報告ください。</li>
+                        <li><b>禁止事項:</b> 性交は厳禁です。お客様との連絡先交換、および他店へのセラピストの引き抜き行為は一切禁止としております。万が一、性感染症に罹患された場合は、速やかにオーナーへご報告いただき指示を仰いでください。</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer">Spa Blanc Aroma All Rights Reserved. [1/4]</div>
+    </div>
+
+    <!-- ==========================================
+         【2ページ目】 施術技術 ① (下半身・背面フェーズ)
+         ========================================== -->
+    <div class="a4-page">
+        <div class="page-body" style="justify-content: space-between;">
+            <div class="page-header" style="margin-bottom: 2px;">5. 施術技術: 下半身・背面フェーズ</div>
+            
+            <div class="procedure-card">
+                <div class="svg-container">
+                    <svg viewBox="0 0 100 120">
+                        <path d="M 35 110 C 25 110 20 90 20 75 C 20 60 30 50 25 35 C 22 25 30 10 50 10 C 70 10 78 25 75 35 C 70 50 80 60 80 75 C 80 90 75 110 65 110 Z" fill="#D6CEB9" stroke="#7A726B" stroke-width="1.5"/>
+                        <circle cx="28" cy="18" r="5" fill="#D6CEB9" stroke="#7A726B"/>
+                        <circle cx="40" cy="12" r="4.5" fill="#D6CEB9" stroke="#7A726B"/>
+                        <circle cx="52" cy="11" r="4" fill="#D6CEB9" stroke="#7A726B"/>
+                        <circle cx="63" cy="13" r="3.5" fill="#D6CEB9" stroke="#7A726B"/>
+                        <circle cx="72" cy="18" r="3" fill="#D6CEB9" stroke="#7A726B"/>
+                        <path d="M 50 95 L 50 35" stroke="#7A726B" stroke-width="1.5" stroke-dasharray="2,2"/>
+                        <circle cx="50" cy="90" r="3" fill="#A39382"/><circle cx="50" cy="72" r="3" fill="#A39382"/>
+                        <circle cx="50" cy="54" r="3" fill="#A39382"/><circle cx="50" cy="36" r="3" fill="#A39382"/>
+                        <circle cx="28" cy="18" r="8" fill="none" stroke="#C86B5A" stroke-width="1.5" stroke-dasharray="2,1"/>
+                    </svg>
+                    <div class="svg-caption">足裏4点押圧 & 親指骨NG</div>
+                </div>
+                <div class="proc-content">
+                    <div class="proc-header">
+                        <span class="proc-title">1. FOOT CARE (足裏クリーム指圧)</span>
+                        <span class="proc-tag">うつ伏せ / クリーム</span>
+                    </div>
+                    <div class="proc-steps">
+                        <p><b>① クリーム塗布:</b> さくらんぼ大を手になじませ、かかとから指先へ塗布。</p>
+                        <p><b>② 4点指圧:</b> かかとから指に向かって直線状に4箇所を順番に持続圧。</p>
+                        <p><b>③ 親指周り:</b> 指を1本独立させ、親指骨の横3ポイントを圧迫。</p>
+                    </div>
+                    <div class="proc-caution">⚠️ 注意: 親指の骨直上は押圧厳禁。施術後は完全に拭き取ること。</div>
+                </div>
+            </div>
+
+            <div class="procedure-card">
+                <div class="svg-container">
+                    <svg viewBox="0 0 100 120">
+                        <path d="M 35 115 L 38 80 C 25 60 25 35 35 10 L 65 10 C 75 35 75 60 62 80 L 65 115 Z" fill="#D6CEB9" stroke="#7A726B" stroke-width="1.5"/>
+                        <line x1="50" y1="20" x2="50" y2="75" stroke="#3A3532" stroke-width="2"/>
+                        <line x1="38" y1="20" x2="42" y2="70" stroke="#7A726B" stroke-width="1.5"/>
+                        <line x1="62" y1="20" x2="58" y2="70" stroke="#7A726B" stroke-width="1.5"/>
+                        <ellipse cx="35" cy="18" rx="7" ry="12" fill="none" stroke="#C86B5A" stroke-width="1.5"/>
+                    </svg>
+                    <div class="svg-caption">ふくらはぎ3ライン & 膝内側NG</div>
+                </div>
+                <div class="proc-content">
+                    <div class="proc-header">
+                        <span class="proc-title">2. CALF SHIATSU (ふくらはぎ指圧)</span>
+                        <span class="proc-tag">うつ伏せ / 指圧</span>
+                    </div>
+                    <div class="proc-steps">
+                        <p><b>① 順番:</b> 「①中央 ➜ ②内側 ➜ ③外側」の順に膝裏手前までほぐす。</p>
+                        <p><b>② 体圧:</b> 手の力ではなく、上半身の体重 (体圧) を乗せて押し込む。</p>
+                        <p><b>③ 固定:</b> 足首をしっかり固定して圧を安定させる。</p>
+                    </div>
+                    <div class="proc-caution">⚠️ 禁忌: 膝の内側・膝裏は強い指圧禁止。軽擦のみ。</div>
+                </div>
+            </div>
+
+            <div class="procedure-card">
+                <div class="svg-container">
+                    <svg viewBox="0 0 100 120">
+                        <path d="M 25 115 L 35 10 L 65 10 L 75 115 Z" fill="#D6CEB9" stroke="#7A726B" stroke-width="1.5"/>
+                        <line x1="50" y1="20" x2="50" y2="105" stroke="#3A3532" stroke-width="2"/>
+                        <line x1="38" y1="20" x2="32" y2="105" stroke="#7A726B" stroke-width="1.5"/>
+                        <line x1="62" y1="20" x2="68" y2="105" stroke="#7A726B" stroke-width="1.5"/>
+                        <ellipse cx="50" cy="50" rx="9" ry="6" fill="#A39382" opacity="0.8"/>
+                    </svg>
+                    <div class="svg-caption">太ももハムストリングス面圧</div>
+                </div>
+                <div class="proc-content">
+                    <div class="proc-header">
+                        <span class="proc-title">3. THIGH SHIATSU (太もも指圧)</span>
+                        <span class="proc-tag">うつ伏せ / 指圧</span>
+                    </div>
+                    <div class="proc-steps">
+                        <p><b>① 3ライン解し:</b> 「①中央 ➜ ②内側 ➜ ③外側」の順にほぐす。</p>
+                        <p><b>② 掌根の活用:</b> 点ではなく掌根を使って広い面で圧をかける。</p>
+                        <p><b>③ 基本方針:</b> 手のひら全体を密着させ均一な圧をかける。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="procedure-card">
+                <div class="svg-container">
+                    <svg viewBox="0 0 100 120">
+                        <path d="M 38 115 L 30 70 L 22 10 L 78 10 L 70 70 L 62 115 Z" fill="#D6CEB9" stroke="#7A726B" stroke-width="1.5"/>
+                        <path d="M 50 110 L 50 15" stroke="#3A3532" stroke-width="2.5"/>
+                        <circle cx="28" cy="18" r="6" fill="#A39382" opacity="0.7"/>
+                    </svg>
+                    <div class="svg-caption">ロングストローク & 鼠蹊部</div>
+                </div>
+                <div class="proc-content">
+                    <div class="proc-header">
+                        <span class="proc-title">4. LOWER BODY OIL (下半身オイル流し)</span>
+                        <span class="proc-tag">うつ伏せ / オイル</span>
+                    </div>
+                    <div class="proc-steps">
+                        <p><b>① ロングストローク:</b> 足首から太もも・お尻の下まで一気に引き上げる。</p>
+                        <p><b>② 鼠蹊部アプローチ:</b> 内側施術時は鼠蹊部に触れ、独立させた指先で丁寧に流す。</p>
+                        <p><b>③ 密着:</b> 密着感を維持しリラクゼーションを深める。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer">Spa Blanc Aroma All Rights Reserved. [2/4]</div>
+    </div>
+
+    <!-- ==========================================
+         【3ページ目】 背面・腹部施術 ＆ 精算方法
+         ========================================== -->
+    <div class="a4-page">
+        <div class="page-body" style="justify-content: space-between;">
+            <div class="page-header" style="margin-bottom: 2px;">6. 施術技術: 背面・腹部フェーズ ＆ 精算方法</div>
+            
+            <div class="procedure-card" style="padding: 6px 10px;">
+                <div class="svg-container" style="height: 72px;">
+                    <svg viewBox="0 0 100 120">
+                        <path d="M 20 115 L 20 40 L 10 25 L 30 10 L 70 10 L 90 25 L 80 40 L 80 115 Z" fill="#D6CEB9" stroke="#7A726B" stroke-width="1.5"/>
+                        <line x1="42" y1="110" x2="42" y2="20" stroke="#3A3532" stroke-width="2"/>
+                        <line x1="58" y1="110" x2="58" y2="20" stroke="#3A3532" stroke-width="2"/>
+                        <path d="M 25 35 C 25 25 40 25 38 45 Z" fill="#A39382"/>
+                    </svg>
+                    <div class="svg-caption">脊柱両脇ストローク</div>
+                </div>
+                <div class="proc-content">
+                    <div class="proc-header">
+                        <span class="proc-title" style="font-size: 0.85rem;">5. BACK & SHOULDER (背中・肩甲骨)</span>
+                        <span class="proc-tag">うつ伏せ / オイル</span>
+                    </div>
+                    <div class="proc-steps" style="font-size: 0.78rem;">
+                        <p><b>① 直線性流し:</b> 腰から首元・肩口へ脊柱両脇を直線状に滑らせる。</p>
+                        <p><b>② 肩甲骨ストレッチ:</b> 腕を持ち上げ、背中側へ引き出し内縁をほぐす。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="procedure-card" style="padding: 6px 10px;">
+                <div class="svg-container" style="height: 72px;">
+                    <svg viewBox="0 0 100 120">
+                        <path d="M 15 60 C 15 20 85 20 85 60 C 85 100 15 100 15 60 Z" fill="#D6CEB9" stroke="#7A726B" stroke-width="1.5"/>
+                        <rect x="22" y="45" width="24" height="30" rx="5" fill="#A39382" opacity="0.8"/>
+                        <rect x="54" y="45" width="24" height="30" rx="5" fill="#A39382" opacity="0.8"/>
+                    </svg>
+                    <div class="svg-caption">臀部流し</div>
+                </div>
+                <div class="proc-content">
+                    <div class="proc-header">
+                        <span class="proc-title" style="font-size: 0.85rem;">6. HIP TREATMENT (臀部・お尻オイル)</span>
+                        <span class="proc-tag">四つん場・伏せ</span>
+                    </div>
+                    <div class="proc-steps" style="font-size: 0.78rem;">
+                        <p><b>① 姿勢調整:</b> 体勢を調整してお尻の筋肉を刺激する。</p>
+                        <p><b>② 前腕面の活用:</b> 肘下までオイルを塗り、前腕全体の面を密着させて包み込むように流す。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="procedure-card" style="padding: 6px 10px;">
+                <div class="svg-container" style="height: 72px;">
+                    <svg viewBox="0 0 100 120">
+                        <ellipse cx="50" cy="60" rx="35" ry="45" fill="#D6CEB9" stroke="#7A726B" stroke-width="1.5"/>
+                        <path d="M 50 25 A 30 30 0 1 1 49 25" fill="none" stroke="#3A3532" stroke-width="2" stroke-dasharray="3,2"/>
+                        <line x1="50" y1="35" x2="50" y2="80" stroke="#C86B5A" stroke-width="2"/>
+                    </svg>
+                    <div class="svg-caption">腹部時計回り</div>
+                </div>
+                <div class="proc-content">
+                    <div class="proc-header">
+                        <span class="proc-title" style="font-size: 0.85rem;">7. ABDOMEN & FINISH (腹部ケア・仕上げ)</span>
+                        <span class="proc-tag">仰向け / オイル</span>
+                    </div>
+                    <div class="proc-steps" style="font-size: 0.78rem;">
+                        <p><b>① 時計回り流し:</b> 仰向けへ誘導し、お腹全体に時計回りに馴染ませる。</p>
+                        <p><b>② 集血イメージ:</b> 下腹部に血液を集めるイメージで上から下へ流す。</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 精算方法 -->
+            <div>
+                <div class="page-header" style="font-size: 0.98rem;">7. セラピスト精算方法 (詳細)</div>
+                <div class="section-box" style="padding: 6px 10px;">
+                    <p style="font-size: 0.78rem; font-weight: bold; color: #3b3530; margin-bottom: 2px;">■ 精算フロー (報酬金額 ＋ 店舗分3,000円 ＝ コース金額)</p>
+                    <div class="settlement-container">
+                        <!-- ①縦長茶封筒 -->
+                        <div class="settlement-card">
+                            <div class="settlement-title">① 茶封筒の記入</div>
+                            <div class="settlement-svg">
+                                <svg viewBox="0 0 75 110" preserveAspectRatio="xMidYMid meet">
+                                    <rect x="5" y="5" width="65" height="100" fill="#F4EADB" stroke="#8C7A6B" stroke-width="1.5" rx="2"/>
+                                    <path d="M 5 5 L 37.5 40 L 70 5" fill="none" stroke="#8C7A6B" stroke-width="1.5"/>
+                                    <text x="10" y="52" font-size="6.5" fill="#333" font-weight="bold">そうた 10/31</text>
+                                    <text x="10" y="64" font-size="6.5" fill="#333" font-weight="bold">90分 ¥12.000</text>
+                                    <text x="10" y="76" font-size="5.5" fill="#C86B5A" font-weight="bold">※PayPay</text>
+                                </svg>
+                            </div>
+                            <div class="settlement-text">
+                                • <b>名・日・コース・金額</b>を記入。<br>
+                                (例: そうた 10/31 90分 ¥12.000 / キャッシュレス時は決済方法も)
+                            </div>
+                        </div>
+
+                        <!-- ②領収証 -->
+                        <div class="settlement-card">
+                            <div class="settlement-title">② 領収証の作成</div>
+                            <div class="settlement-svg">
+                                <svg viewBox="0 0 100 75" preserveAspectRatio="xMidYMid meet">
+                                    <rect x="5" y="5" width="90" height="65" fill="#FFF" stroke="#8C7A6B" stroke-width="1.5" rx="1"/>
+                                    <text x="36" y="16" font-size="7.5" fill="#333" font-weight="bold">領 収 証</text>
+                                    <text x="10" y="26" font-size="6" fill="#444">宛名: Spa BlancAroma</text>
+                                    <text x="10" y="35" font-size="6" fill="#444">金額: 9,000円 (内訳:90分ｺｰｽ)</text>
+                                    <text x="50" y="54" font-size="6" fill="#444">松本大暉</text>
+                                    <circle cx="80" cy="51" r="8" fill="none" stroke="#C86B5A" stroke-width="1"/>
+                                    <text x="74" y="53" font-size="5" fill="#C86B5A" font-weight="bold">松本</text>
+                                </svg>
+                            </div>
+                            <div class="settlement-text">
+                                • 宛名: <b>Spa BlancAroma</b><br>
+                                • 金額: <b>コース-3,000円</b> (例:9,000円)<br>
+                                • 発行者: <b>本名 ＋ 印鑑</b>
+                            </div>
+                        </div>
+
+                        <!-- ③封入・投函 -->
+                        <div class="settlement-card">
+                            <div class="settlement-title">③ 封入と収納</div>
+                            <div class="settlement-svg">
+                                <svg viewBox="0 0 75 110" preserveAspectRatio="xMidYMid meet">
+                                    <rect x="10" y="5" width="55" height="100" fill="#F4EADB" stroke="#8C7A6B" stroke-width="1.5" rx="2"/>
+                                    <rect x="15" y="40" width="45" height="10" fill="#C86B5A" rx="1"/>
+                                    <text x="20" y="47" font-size="5.5" fill="#FFF" font-weight="bold">封緘シール</text>
+                                    <path d="M 10 80 L 37.5 95 L 65 80" fill="#C86B5A" opacity="0.5"/>
+                                </svg>
+                            </div>
+                            <div class="settlement-text">
+                                • <b>領収証と3,000円</b>を封入。<br>
+                                • <b>封緘シール</b>を貼りかごへ。<br>
+                                (報酬領収証 ＋ 3,000円 ＝ コース金額)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer">Spa Blanc Aroma All Rights Reserved. [3/4]</div>
+    </div>
+
+    <!-- ==========================================
+         【4ページ目】 身だしなみ & オーナーからのメッセージ（独立してゆったり）
+         ========================================== -->
+    <div class="a4-page">
+        <div class="page-body" style="justify-content: flex-start; gap: 20px;">
+            <div>
+                <div class="page-header" style="font-size: 1.2rem; margin-bottom: 12px;">8. セラピストの身だしなみ & 衛生基準</div>
+                <div class="section-box" style="padding: 16px 20px;">
+                    <ul class="manual-list" style="font-size: 1rem; line-height: 1.6;">
+                        <li><b>服装・身だしなみ:</b> 清潔感があり、施術しやすく動きやすい服装を着用してください。</li>
+                        <li><b>衛生管理:</b> 爪は短く綺麗に整え、お客様の施術前には必ず手指の洗浄・消毒を徹底してください。</li>
+                        <li><b>スケジュール管理:</b> お客様が遅刻された場合は時間を短縮調整してください。ご自身の遅刻やシフト変更は判明次第、速やかにご報告ください。</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div>
+                <div class="page-header" style="font-size: 1.2rem; margin-bottom: 12px;">💡 オーナーよりセラピストの皆様へ</div>
+                <div style="background-color: #fdf4f2; border: 1px solid rgba(200, 107, 90, 0.3); border-left: 6px solid #c86b5a; border-radius: 6px; padding: 18px 22px;">
+                    <p style="font-size: 1rem; color: #3b3530; line-height: 1.6;">
+                        健全で安全なサロン運営と、お客様へ最高品質のサービスを提供するため、本ガイドラインの遵守にご協力をお願い申し上げます。<br><br>
+                        日々のサロン運営の中で不安な点やトラブルが発生した場合は、いつでも遠慮なくオーナーまでご報告・ご相談ください。共に素晴らしいサロンを作っていきましょう。
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="footer">Spa Blanc Aroma All Rights Reserved. [4/4]</div>
+    </div>
+
+</body>
+</html>

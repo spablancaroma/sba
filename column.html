@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- ファビコンの設定 -->
+<link rel="icon" href="logo.ico" type="image/x-icon">
+<link rel="shortcut icon" href="logo.ico" type="image/x-icon">
+<link rel="apple-touch-icon" href="logo.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>コラム・ブログ一覧 - Spa Blanc Aroma</title>
+  <meta name="description" content="大阪・淡路のゲイ向けアロママッサージサロン「Spa Blanc Aroma」のコラム一覧。初めてご利用の方へのガイドやアロマオイルの効能、コース選びのコツなどを発信しています。">
+  <link rel="stylesheet" href="style.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    .container { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+    .page-header { text-align: center; padding: 120px 20px 40px; background-color: #f2ece4; }
+    .page-header h1 { font-size: 2rem; font-weight: 500; color: #3b3530; letter-spacing: 0.05em; }
+    
+    .column-list { display: flex; flex-direction: column; gap: 20px; margin-top: 20px; }
+    .column-card { 
+      background: #fff; 
+      padding: 20px; 
+      border-radius: 8px; 
+      border: 1px solid #f0ede8; 
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03); 
+      display: flex; 
+      gap: 20px;
+      align-items: center;
+      text-decoration: none; 
+      color: inherit; 
+      transition: all 0.3s ease; 
+    }
+    .column-card:hover { transform: translateY(-3px); border-color: #b39b7d; box-shadow: 0 6px 20px rgba(179, 155, 125, 0.15); }
+    
+    .column-card-img {
+      width: 220px;
+      height: 130px;
+      object-fit: cover;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+    .column-card-content { flex: 1; }
+    
+    .column-card-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; font-size: 0.8rem; }
+    .column-card-date { color: #888; font-family: 'Montserrat', sans-serif; }
+    .column-card-tag { background: #f8f6f2; color: #b39b7d; border: 1px solid #e0dcd5; padding: 2px 10px; border-radius: 12px; font-weight: 500; }
+    .column-card-title { font-size: 1.1rem; font-weight: 500; color: #3b3530; margin-bottom: 8px; line-height: 1.5; }
+    .column-card-desc { font-size: 0.88rem; color: #666; line-height: 1.6; }
+
+    /* ページネーション（数字選択）スタイル */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-top: 40px;
+      font-family: 'Montserrat', sans-serif;
+    }
+    .pagination button {
+      border: 1px solid #e0dcd5;
+      background: #fff;
+      color: #3b3530;
+      min-width: 40px;
+      height: 40px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .pagination button:hover:not(:disabled) {
+      background: #f8f6f2;
+      border-color: #b39b7d;
+      color: #b39b7d;
+    }
+    .pagination button.active {
+      background: #b39b7d;
+      color: #fff;
+      border-color: #b39b7d;
+      font-weight: 600;
+    }
+    .pagination button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 600px) {
+      .column-card {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 15px;
+      }
+      .column-card-img {
+        width: 100%;
+        height: 180px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+    <!-- ハンバーガーボタン & サイドバー -->
+    <button class="menu-toggle-btn" onclick="openNav()" aria-label="メニューを開く">☰</button>
+
+    <div class="sidebar-overlay" id="overlay" onclick="closeNav()"></div>
+
+    <aside class="sidebar" id="sidebar">
+      <button class="close-btn" onclick="closeNav()" aria-label="メニューを閉じる">✕</button>
+      <ul class="sidebar-menu">
+        <li><a href="index.html">トップ</a></li>
+        <li><a href="reservation.html">予約・空き状況確認</a></li>
+        <li><a href="column.html">コラム一覧</a></li>
+        <li><a href="news.html">お知らせ</a></li>
+        <li><a href="about.html">店舗概要</a></li>
+        <li><a href="recruit.html">セラピスト募集</a></li>
+        <li><a href="javascript:void(0);" onclick="loginAdmin()" class="admin-link">🔒 管理者画面</a></li>
+      </ul>
+    </aside>
+
+    <header class="site-header">
+        <div class="logo">
+          <a href="index.html">
+            <img src="logo.png" alt="Spa Blanc Aroma 店舗ロゴ" class="header-logo-img">
+            <span>Spa Blanc Aroma</span>
+          </a>
+        </div>
+        <nav class="nav-menu">
+            <a href="index.html#about">About</a>
+            <a href="index.html#therapist">Therapist</a>
+            <a href="index.html#service">Service</a>
+            <a href="index.html#menu">Price</a>
+            <a href="index.html#flow">Flow</a>
+            <a href="index.html#faq">FAQ</a>
+            <a href="column.html">Column</a>
+            <a href="reservation.html" class="nav-btn">ご予約</a>
+        </nav>
+    </header>
+
+    <div class="page-header">
+      <span class="section-en">Column</span>
+      <h1>コラム一覧</h1>
+    </div>
+
+    <div class="container">
+      <div class="column-list" id="columnList">
+        
+        <!-- 記事11 (新規追加：りょうすけ紹介) -->
+        <a href="column/therapist-ryosuke.html" class="column-card">
+          <img src="column/ogp-ryosuke.png" alt="新人セラピストりょうすけ加入" class="column-card-img">
+          <div class="column-card-content">
+            <div class="column-card-meta">
+              <span class="column-card-date">2026.10.27</span>
+              <span class="column-card-tag">お知らせ・スタッフ</span>
+            </div>
+            <div class="column-card-title">新人セラピスト「りょうすけ」加入！陸上＆水泳部出身の爽やかスポーツマンが届ける極上アロマ体験</div>
+            <div class="column-card-desc">Spa Blanc Aromaに新人セラピスト「りょうすけ」が新加入！陸上・水泳部出身の体育会系爽やかセラピストによる丁寧なアロマトリートメントの魅力をご紹介します。</div>
+          </div>
+        </a>
+
+        <!-- 記事10 -->
+        <a href="column/hygiene-plasmacluster.html" class="column-card">
+          <img src="column/ogp-hygiene.png" alt="衛生・安心へのこだわり" class="column-card-img">
+          <div class="column-card-content">
+            <div class="column-card-meta">
+              <span class="column-card-date">2026.10.15</span>
+              <span class="column-card-tag">品質・こだわり・設備</span>
+            </div>
+            <div class="column-card-title">【衛生・安心へのこだわり】プラズマクラスター加湿空気清浄機＆洗濯乾燥機で叶える清潔なプライベート空間</div>
+            <div class="column-card-desc">シャープのプラズマクラスター加湿空気清浄機と洗濯乾燥機を完備。目に見えない空気やタオルの1枚にまでこだわった、Spa Blanc Aromaの衛生管理についてご紹介。</div>
+          </div>
+        </a>
+
+        <!-- 記事9 -->
+        <a href="column/comparison-seitai.html" class="column-card">
+          <img src="column/ogp-comparison.png" alt="普通の整体と何が違う？" class="column-card-img">
+          <div class="column-card-content">
+            <div class="column-card-meta">
+              <span class="column-card-date">2026.10.15</span>
+              <span class="column-card-tag">サービス・コース比較</span>
+            </div>
+            <div class="column-card-title">【比較】普通の整体と何が違う？ゲイマッサージならではの「癒やしと密着感」の魅力</div>
+            <div class="column-card-desc">街の整体やもみほぐし店とゲイマッサージ（当サロン）の違いを解説。身体の不調改善だけでなく、心まで深く満たされる安心感と密着トリートメントの魅力を徹底比較します。</div>
+          </div>
+        </a>
+
+        <!-- 記事8 -->
+        <a href="column/winter-care.html" class="column-card">
+          <img src="column/ogp-winter.png" alt="冬の寒さ・冷え対策" class="column-card-img">
+          <div class="column-card-content">
+            <div class="column-card-meta">
+              <span class="column-card-date">2026.10.15</span>
+              <span class="column-card-tag">季節・お悩み別</span>
+            </div>
+            <div class="column-card-title">【冬の寒さ・冷え対策】ガチガチの身体を芯から温める！冬にゲイマッサージをおすすめする理由</div>
+            <div class="column-card-desc">寒さによる肩こりや冷え性、自律神経の乱れに。温かいアロマオイルと暖房完備の完全個室、温かいシャワーで身体を芯から温める冬のゲイマッサージの魅力を解説。</div>
+          </div>
+        </a>
+
+        <!-- 記事7 -->
+        <a href="column/welcome-drink.html" class="column-card">
+          <img src="column/ogp-drink.png" alt="ウェルカムドリンクへのこだわり" class="column-card-img">
+          <div class="column-card-content">
+            <div class="column-card-meta">
+              <span class="column-card-date">2026.10.15</span>
+              <span class="column-card-tag">品質・こだわり・設備</span>
+            </div>
+            <div class="column-card-title">【おもてなし】カフェ並みのラインナップ！？Spa Blanc Aromaのウェルカムドリンクへのこだわり</div>
+            <div class="column-card-desc">ネスカフェ ドルチェ グストで淹れる本格コーヒーやTWININGSの紅茶など、10種類以上から選べるSpa Blanc Aromaの豊富なウェルカムドリンクメニューをご紹介。</div>
+          </div>
+        </a>
+
+        <!-- 記事6 -->
+        <a href="column/quality-commitment.html" class="column-card">
+          <img src="column/ogp-quality.png" alt="品質へのこだわり" class="column-card-img">
+          <div class="column-card-content">
+            <div class="column-card-meta">
+              <span class="column-card-date">2026.10.15</span>
+              <span class="column-card-tag">品質・こだわり・設備</span>
+            </div>
+            <div class="column-card-title">【品質へのこだわり】Spa Blanc Aromaが「サクラアンドナチュラル ボタニカルブレンドオイル」を選び続ける理由</div>
+            <div class="column-card-desc">100%天然由来の「サクラアンドナチュラル ボタニカルブレンドオイル」やニベアW濃密保湿ボディソープなど、Spa Blanc Aromaが妥協なく厳選したオイル＆アメニティのこだわりをご紹介します。</div>
+          </div>
+        </a>
+
+        <!-- 記事5 -->
+        <a href="column/oil-vs-shiatsu.html" class="column-card">
+          <img src="column/ogp-oil-vs-shiatsu.png" alt="オイルマッサージと指圧の違い" class="column-card-img">
+          <div class="column-card-content">
+            <div class="column-card-meta">
+              <span class="column-card-date">2026.09.19</span>
+              <span class="column-card-tag">メニュー・コース選び</span>
+            </div>
+            <div class="column-card-title">オイルマッサージと指圧の違いとは？気分や体調に合わせたコースの選び方</div>
+            <div class="column-card-desc">頑固なコリを解消する指圧と、全身の疲労・ストレスを流すアロママッサージの違いを徹底解説。60分・90分・120分コースの最適な選び方をご提案します。</div>
+          </div>
+        </a>
+
+        <!-- 記事4 -->
+        <a href="column/access-guide.html" class="column-card">
+          <img src="column/ogp-access.png" alt="大阪・淡路エリアからのアクセスガイド" class="column-card-img">
+          <div class="column-card-content">
+            <div class="column-card-meta">
+              <span class="column-card-date">2026.09.19</span>
+              <span class="column-card-tag">アクセス・店舗情報</span>
+            </div>
+            <div class="column-card-title">大阪・淡路エリアからのアクセス完全ガイド（阪急淡路・JR淡路・梅田・新大阪から）</div>
+            <div class="column-card-desc">最寄り駅（阪急淡路駅・JR淡路駅）からの徒歩ルートや、大阪梅田・新大阪・天六方面からの電車アクセスと所要時間を分かりやすくご紹介します。</div>
+          </div>
+        </a>
+
+        <!-- 記事3 -->
+        <a href="column/mobile-vs-salon.html" class="column-card">
+          <img src="column/ogp-mobile-vs-salon.png" alt="出張マッサージと店舗型サロンの比較" class="column-card-img">
+          <div class="column-card-content">
+            <div class="column-card-meta">
+              <span class="column-card-date">2026.09.19</span>
+              <span class="column-card-tag">サロン選び・比較</span>
+            </div>
+            <div class="column-card-title">出張マッサージと店舗型サロン（個室）はどちらがおすすめ？メリット・デメリット比較</div>
+            <div class="column-card-desc">ゲイマッサージの出張（自宅・ホテル）と店舗型個室サロンの特徴や料金、設備の違いを徹底比較。あなたにぴったりのスタイルが分かります。</div>
+          </div>
+        </a>
+
+        <!-- 記事2 -->
+        <a href="column/aroma-oil-effects.html" class="column-card">
+          <img src="column/ogp-aroma-effects.png" alt="ゲイマッサージで人気の天然アロマオイル5選" class="column-card-img">
+          <div class="column-card-content">
+            <div class="column-card-meta">
+              <span class="column-card-date">2026.09.19</span>
+              <span class="column-card-tag">コース・アロマ選び</span>
+            </div>
+            <div class="column-card-title">【5選】ゲイマッサージで人気の天然アロマオイルと効能（ラベンダー・イランイラン他）</div>
+            <div class="column-card-desc">ラベンダー、イランイラン、金木犀、オレンジスイート、ホワイトサボンなど人気の天然アロマオイル5選の効果と、その日の気分に応じた選び方を解説。</div>
+          </div>
+        </a>
+
+        <!-- 記事1 -->
+        <a href="column/gay-massage-guide.html" class="column-card">
+          <img src="column/ogp-guide.png" alt="初めてのゲイマッサージ初心者ガイド" class="column-card-img">
+          <div class="column-card-content">
+            <div class="column-card-meta">
+              <span class="column-card-date">2026.09.19</span>
+              <span class="column-card-tag">初めての方へ</span>
+            </div>
+            <div class="column-card-title">【初心者ガイド】初めてのゲイマッサージ利用の流れ・マナー・準備まとめ</div>
+            <div class="column-card-desc">初めてサロンを利用される方向けの完全ガイド。Web予約から当日のカウンセリング、持ち物や利用マナーまで分かりやすくまとめています。</div>
+          </div>
+        </a>
+
+      </div>
+
+      <!-- ページネーションコントロール -->
+      <div class="pagination" id="pagination"></div>
+
+    </div>
+
+    <!-- フッター -->
+    <footer>
+        <p>&copy; Spa Blanc Aroma All Rights Reserved.</p>
+    </footer>
+
+    <script>
+      function openNav() {
+        document.getElementById('sidebar').classList.add('is-active');
+        document.getElementById('overlay').classList.add('is-active');
+      }
+
+      function closeNav() {
+        document.getElementById('sidebar').classList.remove('is-active');
+        document.getElementById('overlay').classList.remove('is-active');
+      }
+
+      function loginAdmin() {
+        const pass = prompt("管理者用パスワードを入力してください:");
+        if (pass === "blanc2025") {
+          sessionStorage.setItem("adminAuth", "true");
+          window.location.href = "admin.html";
+        } else if (pass !== null) {
+          alert("パスワードが正しくありません。");
+        }
+      }
+
+      // --- ページネーション処理 ---
+      const ITEMS_PER_PAGE = 5; // 1ページあたりの表示件数
+      let currentPage = 1;
+
+      function renderPagination() {
+        const list = document.getElementById('columnList');
+        const cards = Array.from(list.querySelectorAll('.column-card'));
+        const totalPages = Math.ceil(cards.length / ITEMS_PER_PAGE);
+        const paginationContainer = document.getElementById('pagination');
+
+        // 総件数が1ページ以内に収まる場合はページネーション非表示
+        if (totalPages <= 1) {
+          paginationContainer.style.display = 'none';
+          cards.forEach(card => card.style.display = 'flex');
+          return;
+        }
+
+        paginationContainer.style.display = 'flex';
+
+        // 表示切り替え
+        cards.forEach((card, index) => {
+          const start = (currentPage - 1) * ITEMS_PER_PAGE;
+          const end = start + ITEMS_PER_PAGE;
+          if (index >= start && index < end) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+
+        // ボタンの再生成
+        paginationContainer.innerHTML = '';
+
+        // 「前へ」ボタン
+        const prevBtn = document.createElement('button');
+        prevBtn.textContent = '＜';
+        prevBtn.disabled = currentPage === 1;
+        prevBtn.onclick = () => {
+          currentPage--;
+          renderPagination();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+        paginationContainer.appendChild(prevBtn);
+
+        // 数字ボタン
+        for (let i = 1; i <= totalPages; i++) {
+          const pageBtn = document.createElement('button');
+          pageBtn.textContent = i;
+          if (i === currentPage) {
+            pageBtn.classList.add('active');
+          }
+          pageBtn.onclick = () => {
+            currentPage = i;
+            renderPagination();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          };
+          paginationContainer.appendChild(pageBtn);
+        }
+
+        // 「次へ」ボタン
+        const nextBtn = document.createElement('button');
+        nextBtn.textContent = '＞';
+        nextBtn.disabled = currentPage === totalPages;
+        nextBtn.onclick = () => {
+          currentPage++;
+          renderPagination();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+        paginationContainer.appendChild(nextBtn);
+      }
+
+      // 初期実行
+      document.addEventListener('DOMContentLoaded', renderPagination);
+    </script>
+</body>
+</html>
