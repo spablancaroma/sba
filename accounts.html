@@ -66,7 +66,7 @@
 
         .container { width: 100%; max-width: 1100px; margin: 20px auto; padding: 0 15px; }
 
-        /* 年度選択セレクタータブ */
+        /* 年度選択・月別集計フィルターカード */
         .year-selector-card {
             background: var(--bg-white);
             border: 1px solid var(--border-color);
@@ -104,8 +104,18 @@
         .dash-card { background: var(--bg-white); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; box-shadow: var(--card-shadow); border-top: 4px solid var(--accent-gold); }
         .dash-card.expense { border-top-color: #E74C3C; }
         .dash-card.balance { border-top-color: var(--primary-dark); }
-        .dash-label { font-size: 0.85rem; color: var(--text-sub); margin-bottom: 5px; }
+        .dash-label { font-size: 0.85rem; color: var(--text-sub); margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center; }
         .dash-value { font-family: var(--font-en); font-size: 1.8rem; font-weight: 600; color: var(--primary-dark); word-break: break-all; }
+
+        /* 月別サマリーカード */
+        .monthly-summary-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 25px;
+        }
 
         .chart-card { background: var(--bg-white); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; box-shadow: var(--card-shadow); margin-bottom: 25px; }
         .chart-container { position: relative; height: 220px; margin-top: 10px; width: 100%; }
@@ -135,6 +145,13 @@
         .btn:hover { background-color: var(--accent-gold-hover); }
         .btn-outline { background: transparent; color: var(--accent-gold); border: 1px solid var(--accent-gold); }
         .btn-outline:hover { background: var(--accent-gold); color: #FFFFFF; }
+        
+        .btn-danger { background-color: #E74C3C; }
+        .btn-danger:hover { background-color: #C0392B; }
+        .btn-secondary { background-color: #7F8C8D; }
+        .btn-secondary:hover { background-color: #626D6E; }
+
+        .form-row-buttons { display: flex; gap: 8px; }
 
         .pagination-container { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 15px; font-family: var(--font-en); font-size: 0.9rem; }
         .page-btn { background: var(--bg-sand); border: 1px solid var(--border-color); color: var(--primary-dark); padding: 4px 12px; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
@@ -142,7 +159,7 @@
         .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
         .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.88rem; min-width: 580px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.88rem; min-width: 650px; }
         th, td { padding: 10px 8px; text-align: left; border-bottom: 1px solid var(--border-color); }
         th { background-color: var(--bg-sand); color: var(--primary-dark); font-weight: 600; white-space: nowrap; }
         td.amount { font-family: var(--font-en); font-weight: 500; text-align: right; white-space: nowrap; }
@@ -150,6 +167,11 @@
         .type-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 500; white-space: nowrap; }
         .type-badge.income { background: #E8F8F5; color: #16A085; }
         .type-badge.expense { background: #FDEDEC; color: #E74C3C; }
+
+        .action-btns-cell { display: flex; gap: 4px; }
+        .action-sm-btn { padding: 3px 8px; font-size: 0.75rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-sand); cursor: pointer; font-family: inherit; }
+        .action-sm-btn:hover { background: var(--primary-dark); color: #FFF; border-color: var(--primary-dark); }
+        .action-sm-btn.del:hover { background: #E74C3C; border-color: #E74C3C; }
 
         footer { text-align: center; padding: 20px; font-size: 0.8rem; color: var(--text-sub); font-family: var(--font-en); margin-top: 40px; }
 
@@ -192,24 +214,53 @@
             <!-- 会計年度選択タブ -->
             <div class="year-selector-card">
                 <div class="year-label">対象会計年度</div>
-                <div class="year-tabs" id="year-tabs">
-                    <!-- JavaScriptで動的生成 -->
-                </div>
+                <div class="year-tabs" id="year-tabs"></div>
             </div>
 
             <!-- 収支サマリーダッシュボード -->
             <div class="dashboard-grid">
                 <div class="dash-card">
-                    <div class="dash-label"><span class="selected-year-text">2026</span>年度 総売上 (収入)</div>
+                    <div class="dash-label">
+                        <span><span class="selected-year-text">2026</span>年度 総売上 (収入)</span>
+                        <span id="period-display-badge" style="font-size:0.7rem; background:#FAF9F6; padding:2px 6px; border-radius:4px; border:1px solid var(--border-color); color:var(--text-sub);">全期間表示</span>
+                    </div>
                     <div class="dash-value" id="total-income">¥0</div>
                 </div>
                 <div class="dash-card expense">
-                    <div class="dash-label"><span class="selected-year-text">2026</span>年度 経費 (按分後支出)</div>
+                    <div class="dash-label"><span><span class="selected-year-text">2026</span>年度 経費 (按分後支出)</span></div>
                     <div class="dash-value" id="total-expense">¥0</div>
                 </div>
                 <div class="dash-card balance">
-                    <div class="dash-label"><span class="selected-year-text">2026</span>年度 差引純利益</div>
+                    <div class="dash-label"><span><span class="selected-year-text">2026</span>年度 差引純利益</span></div>
                     <div class="dash-value" id="net-profit">¥0</div>
+                </div>
+            </div>
+
+            <!-- 月別・期間別サマリーカード -->
+            <div class="monthly-summary-card">
+                <span class="section-en">Monthly Breakdown</span>
+                <h2 class="section-title" style="margin-bottom: 12px; font-size: 1rem;">
+                    月別 収支推移・確認
+                </h2>
+                <div class="filter-bar" style="margin-bottom: 12px;">
+                    <select id="filter-month" class="form-control" style="max-width: 220px;" onchange="onMonthFilterChange()">
+                        <option value="ALL">通年（すべての月）を表示</option>
+                        <option value="01">1月</option>
+                        <option value="02">2月</option>
+                        <option value="03">3月</option>
+                        <option value="04">4月</option>
+                        <option value="05">5月</option>
+                        <option value="06">6月</option>
+                        <option value="07">7月</option>
+                        <option value="08">8月</option>
+                        <option value="09">9月</option>
+                        <option value="10">10月</option>
+                        <option value="11">11月</option>
+                        <option value="12">12月</option>
+                    </select>
+                </div>
+                <div id="monthly-stats-text" style="font-size: 0.9rem; color: var(--text-sub);">
+                    月を選択すると、その月の売上・経費・純利益を詳細に絞り込めます。
                 </div>
             </div>
 
@@ -224,12 +275,14 @@
 
             <!-- メイン入力・履歴エリア -->
             <div class="main-grid">
-                <!-- 左側：伝票入力フォーム -->
+                <!-- 左側：伝票入力・編集フォーム -->
                 <div class="card">
-                    <span class="section-en">Entry Form</span>
-                    <h2 class="section-title">取引の登録</h2>
+                    <span class="section-en" id="form-mode-en">Entry Form</span>
+                    <h2 class="section-title" id="form-title">取引の登録</h2>
 
                     <form id="accounting-form">
+                        <input type="hidden" id="edit-row-id" value="">
+
                         <div class="form-group">
                             <label for="entry-date">日付</label>
                             <input type="date" id="entry-date" class="form-control" onchange="syncYearWithDate()" required>
@@ -284,7 +337,10 @@
                             <input type="text" id="entry-memo" class="form-control" placeholder="例: 山田様 / Amazon（消耗品）">
                         </div>
 
-                        <button type="submit" id="submit-btn" class="btn">登録する</button>
+                        <div class="form-row-buttons">
+                            <button type="submit" id="submit-btn" class="btn" style="flex: 2;">登録する</button>
+                            <button type="button" id="cancel-edit-btn" class="btn btn-secondary" style="flex: 1; display: none;" onclick="cancelEditMode()">キャンセル</button>
+                        </div>
                     </form>
                 </div>
 
@@ -315,6 +371,7 @@
                                     <th>取引先・摘要</th>
                                     <th>決済</th>
                                     <th style="text-align: right;">計上額</th>
+                                    <th style="text-align: center; width: 80px;">操作</th>
                                 </tr>
                             </thead>
                             <tbody id="transaction-list"></tbody>
@@ -340,19 +397,16 @@
         const SYSTEM_PASSWORD = "blanc2025";
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyEir1_W7TDnCGKqCDa32Ta9KlIW_8SvgW_oN1ISpXK7u4_ilZHBHRoIULjTGPN8Hw/exec";
 
+        // ご要望に合わせ「支払手数料」「セラピスト報酬」を追加
         const categories = {
             "売上": ["60分コース", "90分コース", "120分コース", "出張料金オプション", "売上高（その他）"],
-            "経費": ["地代家賃", "消耗品費", "水道光熱費", "通信費", "広告宣伝費", "旅費交通費", "接待交際費", "新聞図書費", "雑費"]
+            "経費": ["地代家賃", "消耗品費", "水道光熱費", "通信費", "広告宣伝費", "旅費交通費", "接待交際費", "支払手数料", "セラピスト報酬", "新聞図書費", "雑費"]
         };
 
-        // ★ 自動で現在の実西暦を取得し、デフォルト選択年度にする
         const realCurrentYear = new Date().getFullYear();
         let currentSelectedYear = realCurrentYear;
-
-        // 選択肢として表示する年度の範囲（必要に応じて未来の年も追加可能）
         const AVAILABLE_YEARS = [2025, 2026, 2027, 2028, 2029, 2030];
 
-        // もし現在の実西暦がAVAILABLE_YEARSに含まれていなければ、自動的にリストに含める
         if (!AVAILABLE_YEARS.includes(realCurrentYear)) {
             AVAILABLE_YEARS.push(realCurrentYear);
             AVAILABLE_YEARS.sort();
@@ -390,7 +444,6 @@
             }
         });
 
-        // 年度切り替えタブの描画
         function renderYearTabs() {
             const tabContainer = document.getElementById('year-tabs');
             tabContainer.innerHTML = '';
@@ -411,16 +464,16 @@
         function selectYear(yr) {
             currentSelectedYear = yr;
             renderYearTabs();
+            // 年度変更時は月別フィルターをリセット
+            document.getElementById('filter-month').value = 'ALL';
             fetchTransactions();
         }
 
-        // 入力フォームの日付を変更した際、選択年度と食い違っていたら自動切り替え
         function syncYearWithDate() {
             const dateVal = document.getElementById('entry-date').value;
             if (dateVal) {
                 const yearVal = parseInt(dateVal.substring(0, 4), 10);
                 if (yearVal && yearVal !== currentSelectedYear) {
-                    // リストになければ自動追加してタブを描画
                     if (!AVAILABLE_YEARS.includes(yearVal)) {
                         AVAILABLE_YEARS.push(yearVal);
                         AVAILABLE_YEARS.sort();
@@ -509,29 +562,49 @@
                     return b.id - a.id;
                 });
 
-                renderSummaryAndChart(currentData);
                 applyFilters();
             } catch (error) {
                 console.error('通信エラー:', error);
             }
         }
 
+        function onMonthFilterChange() {
+            applyFilters();
+        }
+
         function applyFilters() {
+            const monthFilter = document.getElementById('filter-month').value;
             const typeFilter = document.getElementById('filter-type').value;
             const keyword = document.getElementById('filter-keyword').value.trim().toLowerCase();
 
+            // 月別フィルターのバッジテキスト表示更新
+            const badgeEl = document.getElementById('period-display-badge');
+            if (monthFilter === 'ALL') {
+                badgeEl.textContent = `${currentSelectedYear}年度 通年`;
+            } else {
+                badgeEl.textContent = `${currentSelectedYear}年 ${parseInt(monthFilter, 10)}月`;
+            }
+
             filteredData = currentData.filter(item => {
+                // 月フィルターチェック (YYYY-MM-DDの形式から月部分を抽出)
+                let matchMonth = true;
+                if (monthFilter !== 'ALL') {
+                    const itemMonth = item.date ? item.date.substring(5, 7) : '';
+                    matchMonth = (itemMonth === monthFilter);
+                }
+
                 const matchType = (typeFilter === 'ALL') || (item.type === typeFilter);
                 const matchKeyword = !keyword || 
                     (item.category && item.category.toLowerCase().includes(keyword)) ||
                     (item.memo && item.memo.toLowerCase().includes(keyword)) ||
                     (item.payment && item.payment.toLowerCase().includes(keyword));
 
-                return matchType && matchKeyword;
+                return matchMonth && matchType && matchKeyword;
             });
 
             currentPage = 1;
             renderTablePage();
+            renderSummaryAndChart(filteredData); // 選択中の月（または通年）のデータでダッシュボードを再計算
         }
 
         function renderTablePage() {
@@ -558,6 +631,12 @@
                     <td style="color: var(--text-sub); font-size: 0.85rem;">${t.memo || '-'}</td>
                     <td style="font-size: 0.8rem; color: var(--primary-dark);">${t.payment || '現金'}</td>
                     <td class="amount">¥${actualAmount.toLocaleString()}</td>
+                    <td style="text-align: center;">
+                        <div class="action-btns-cell">
+                            <button class="action-sm-btn" onclick="startEdit(${t.id})" title="編集">編集</button>
+                            <button class="action-sm-btn del" onclick="deleteTransaction(${t.id})" title="削除">削除</button>
+                        </div>
+                    </td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -607,7 +686,7 @@
                     labels: labels.length > 0 ? labels : ['データなし'],
                     datasets: [{
                         data: values.length > 0 ? values : [1],
-                        backgroundColor: ['#2C3E50', '#B39B7D', '#E67E22', '#8E44AD', '#F1C40F', '#E74C3C', '#16A085', '#D35400', '#7F8C8D']
+                        backgroundColor: ['#2C3E50', '#B39B7D', '#E67E22', '#8E44AD', '#F1C40F', '#E74C3C', '#16A085', '#D35400', '#7F8C8D', '#3498DB', '#9B59B6']
                     }]
                 },
                 options: {
@@ -620,16 +699,100 @@
             });
         }
 
+        // --- 編集モード開始 ---
+        function startEdit(id) {
+            const item = currentData.find(t => t.id === id);
+            if (!item) return;
+
+            document.getElementById('edit-row-id').value = item.id;
+            document.getElementById('entry-date').value = item.date;
+            
+            const typeSelect = document.getElementById('entry-type');
+            typeSelect.value = item.type;
+            updateCategories();
+
+            document.getElementById('entry-category').value = item.category;
+            document.getElementById('entry-amount').value = item.amount;
+            document.getElementById('entry-ratio').value = item.ratio;
+            document.getElementById('entry-payment').value = item.payment || '現金';
+            document.getElementById('entry-memo').value = item.memo || '';
+
+            // UIを編集モードに変更
+            document.getElementById('form-mode-en').textContent = 'Edit Form';
+            document.getElementById('form-title').textContent = '取引の編集 (ID: ' + item.id + ')';
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.textContent = '更新を保存する';
+            submitBtn.className = 'btn btn-danger'; // 編集中は色を変えてわかりやすく
+            document.getElementById('cancel-edit-btn').style.display = 'block';
+
+            // 画面トップまたはフォームの位置へスクロール
+            window.scrollTo({ top: 400, behavior: 'smooth' });
+        }
+
+        function cancelEditMode() {
+            document.getElementById('edit-row-id').value = '';
+            document.getElementById('accounting-form').reset();
+            document.getElementById('entry-date').valueAsDate = new Date();
+            updateCategories();
+
+            document.getElementById('form-mode-en').textContent = 'Entry Form';
+            document.getElementById('form-title').textContent = '取引の登録';
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.textContent = '登録する';
+            submitBtn.className = 'btn';
+            document.getElementById('cancel-edit-btn').style.display = 'none';
+        }
+
+        // --- 削除処理 ---
+        async function deleteTransaction(id) {
+            if (!confirm('本当にこの明細データを削除しますか？')) return;
+
+            try {
+                const payload = {
+                    password: API_PASSWORD,
+                    action: 'delete',
+                    year: currentSelectedYear,
+                    id: id
+                };
+
+                const response = await fetch(GAS_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    alert('削除しました。');
+                    if (document.getElementById('edit-row-id').value == id) {
+                        cancelEditMode();
+                    }
+                    fetchTransactions();
+                } else {
+                    alert('削除エラー: ' + result.message);
+                }
+            } catch (err) {
+                alert('通信エラーが発生しました。');
+                console.error(err);
+            }
+        }
+
+        // 登録・更新フォーム送信処理
         document.getElementById('accounting-form').addEventListener('submit', async (e) => {
             e.preventDefault();
 
+            const editId = document.getElementById('edit-row-id').value;
+            const isEditing = (editId !== '');
+
             const submitBtn = document.getElementById('submit-btn');
             submitBtn.disabled = true;
-            submitBtn.textContent = '送信中...';
+            submitBtn.textContent = isEditing ? '更新中...' : '送信中...';
 
             const payload = {
                 password: API_PASSWORD,
+                action: isEditing ? 'update' : 'add',
                 year: currentSelectedYear,
+                id: editId,
                 date: document.getElementById('entry-date').value,
                 type: document.getElementById('entry-type').value,
                 category: document.getElementById('entry-category').value,
@@ -649,19 +812,18 @@
                 const result = await response.json();
 
                 if (result.status === 'success') {
-                    alert('登録が完了しました');
-                    document.getElementById('entry-amount').value = '';
-                    document.getElementById('entry-memo').value = '';
+                    alert(isEditing ? '更新が完了しました' : '登録が完了しました');
+                    cancelEditMode();
                     fetchTransactions();
                 } else {
-                    alert('登録エラー: ' + result.message);
+                    alert('処理エラー: ' + result.message);
                 }
             } catch (error) {
                 alert('通信エラーが発生しました');
                 console.error(error);
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.textContent = '登録する';
+                submitBtn.textContent = isEditing ? '更新を保存する' : '登録する';
             }
         });
 
