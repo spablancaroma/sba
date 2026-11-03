@@ -95,8 +95,8 @@
     .retry-btn:hover { background: #444; }
     
     .form-group { margin-bottom: 20px; }
-    input, select { width: 100%; padding: 14px; box-sizing: border-box; border: 1px solid #e0dcd5; border-radius: 6px; font-size: 0.95rem; background: #fff; font-family: inherit; }
-    input:focus, select:focus { outline: none; border-color: #b39b7d; }
+    input, select, textarea { width: 100%; padding: 14px; box-sizing: border-box; border: 1px solid #e0dcd5; border-radius: 6px; font-size: 0.95rem; background: #fff; font-family: inherit; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #b39b7d; }
     h2 { border-left: 4px solid #b39b7d; padding-left: 15px; color: #3b3530; font-size: 1.2rem; margin-bottom: 20px; font-weight: 500; }
 
     /* 個人情報保護に関する文言・同意ボックス */
@@ -351,10 +351,13 @@
           <p><strong>ご予約日時:</strong> <span id="summaryDateTime">-</span></p>
           <div class="form-group" style="margin-top: 15px; margin-bottom: 0;">
             <label style="font-weight: 500; color: #555; display: block; margin-bottom: 8px; font-size: 0.95rem;">コース選択</label>
-            <select id="course">
+            <select id="course" onchange="toggleOutcallFields()">
               <option value="60">60分コース (9,000円) - オイルマッサージ</option>
               <option value="90">90分コース (12,000円) - 指圧＋オイル</option>
               <option value="120">120分コース (14,000円) - 足裏＋指圧＋オイル</option>
+              <option value="出張60">出張60分コース (10,000円〜) - オイルマッサージ</option>
+              <option value="出張90">出張90分コース (13,000円〜) - 指圧＋オイル</option>
+              <option value="出張120">出張120分コース (15,000円〜) - 足裏＋指圧＋オイル</option>
             </select>
           </div>
         </div>
@@ -382,6 +385,27 @@
         <div class="form-group">
           <label style="font-weight: 500; color: #555; display: block; margin-bottom: 6px; font-size: 0.9rem;">電話番号 <span style="color:#d9534f;">*</span></label>
           <input type="tel" id="tel" placeholder="例: 09012345678">
+        </div>
+
+        <!-- 出張先入力欄（出張コース選択時のみ表示） -->
+        <div id="outcallSection" style="display:none; background: #faf8f5; border: 1px solid #e8e3da; border-radius: 8px; padding: 18px; margin-bottom: 20px;">
+          <h3 style="margin: 0 0 10px 0; font-size: 0.95rem; color: #b39b7d; border-bottom: 1px solid #e0dcd5; padding-bottom: 6px;">出張先のご入力（ホテルの場合 または ご自宅の場合 いずれか必須）</h3>
+          <p style="font-size: 0.8rem; color: #e74c3c; margin-bottom: 15px; line-height: 1.5;">※出張交通費として+1,000円(超えた分は実費)頂きます。交通費は個室からの交通費です。</p>
+          
+          <div class="form-group">
+            <label style="font-weight: 500; color: #555; display: block; margin-bottom: 6px; font-size: 0.85rem;">■ ホテルの場合</label>
+            <input type="text" id="outcallHotel" placeholder="（ホテル名）（部屋番号）例: 新大阪ホテル 501号室">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label style="font-weight: 500; color: #555; display: block; margin-bottom: 6px; font-size: 0.85rem;">■ ご自宅の場合</label>
+            <input type="text" id="outcallHome" placeholder="（住所）（最寄り駅と徒歩分数）例: 大阪市東淀川区... 淡路駅徒歩5分">
+          </div>
+        </div>
+
+        <!-- 備考欄 -->
+        <div class="form-group">
+          <label style="font-weight: 500; color: #555; display: block; margin-bottom: 6px; font-size: 0.9rem;">備考欄</label>
+          <textarea id="remarks" rows="3" placeholder="ご要望やご質問などがございましたらご記入ください"></textarea>
         </div>
 
         <!-- 個人情報の取り扱いに関する簡単な記載・同意チェック -->
@@ -675,9 +699,22 @@
           
           document.getElementById('summaryTherapist').innerText = selTherapist;
           document.getElementById('summaryDateTime').innerText = selDate + " " + selTime + "〜";
+          toggleOutcallFields();
         };
         slots.appendChild(btn);
       });
+    }
+  }
+
+  function toggleOutcallFields() {
+    const courseVal = document.getElementById('course').value;
+    const outcallSection = document.getElementById('outcallSection');
+    if (courseVal.startsWith('出張')) {
+      outcallSection.style.display = 'block';
+    } else {
+      outcallSection.style.display = 'none';
+      document.getElementById('outcallHotel').value = '';
+      document.getElementById('outcallHome').value = '';
     }
   }
 
@@ -709,11 +746,29 @@
     const email = document.getElementById('email').value.trim();
     const tel = document.getElementById('tel').value.trim();
     const course = document.getElementById('course').value;
+    const remarks = document.getElementById('remarks').value.trim();
     const privacyAgree = document.getElementById('privacyAgree').checked;
     
     if(!name || !email || !tel) { 
       alert("お名前、メールアドレス、電話番号をすべて入力してください。"); 
       return; 
+    }
+
+    let outcallDest = "";
+    if (course.startsWith('出張')) {
+      const hotel = document.getElementById('outcallHotel').value.trim();
+      const home = document.getElementById('outcallHome').value.trim();
+      if (!hotel && !home) {
+        alert("出張コースの場合は、「ホテルの場合」または「ご会話の場合（住所・最寄り駅）」のいずれかを必ずご入力ください。");
+        return;
+      }
+      if (hotel && home) {
+        outcallDest = `ホテル: ${hotel} / ご自宅: ${home}`;
+      } else if (hotel) {
+        outcallDest = `ホテル: ${hotel}`;
+      } else {
+        outcallDest = `ご自宅: ${home}`;
+      }
     }
 
     if(!privacyAgree) {
@@ -732,7 +787,9 @@
         name: name,
         email: email,
         tel: tel,
-        therapist: selTherapist
+        therapist: selTherapist,
+        outcall: outcallDest,
+        remarks: remarks
       });
 
       hideProgressLoading();
