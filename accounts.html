@@ -150,24 +150,25 @@
         .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
         .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 720px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 680px; }
         th, td { padding: 8px 6px; text-align: left; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
         th { background-color: var(--bg-sand); color: var(--primary-dark); font-weight: 600; white-space: nowrap; }
+        td.amount { font-family: var(--font-en); font-weight: 500; text-align: right; white-space: nowrap; }
 
         .type-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 500; white-space: nowrap; }
         .type-badge.income { background: #E8F8F5; color: #16A085; }
         .type-badge.expense { background: #FDEDEC; color: #E74C3C; }
 
+        /* テーブル内インライン編集用入力フィールド */
+        .inline-input { width: 100%; padding: 4px 6px; border: 1px solid var(--accent-gold); border-radius: 4px; font-size: 0.85rem; font-family: inherit; background: #FFF; }
+        .inline-select { width: 100%; padding: 4px 4px; border: 1px solid var(--accent-gold); border-radius: 4px; font-size: 0.8rem; font-family: inherit; background: #FFF; }
+
         .action-btns-cell { display: flex; gap: 4px; justify-content: center; }
-        .action-sm-btn { padding: 4px 8px; font-size: 0.75rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-sand); cursor: pointer; font-family: inherit; white-space: nowrap; }
+        .action-sm-btn { padding: 3px 8px; font-size: 0.75rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-sand); cursor: pointer; font-family: inherit; }
         .action-sm-btn:hover { background: var(--primary-dark); color: #FFF; border-color: var(--primary-dark); }
         .action-sm-btn.save { background: #16A085; color: #FFF; border-color: #16A085; }
-        .action-sm-btn.save:hover { background: #117a65; }
+        .action-sm-btn.save:hover { background: #138D75; }
         .action-sm-btn.del:hover { background: #E74C3C; border-color: #E74C3C; color: #FFF; }
-
-        /* テーブル内インライン編集用コントロール */
-        .inline-input { width: 100%; padding: 4px 6px; font-size: 0.82rem; border: 1px solid var(--accent-gold); border-radius: 4px; background: #FFF; font-family: inherit; }
-        .inline-select { width: 100%; padding: 4px 4px; font-size: 0.8rem; border: 1px solid var(--accent-gold); border-radius: 4px; background: #FFF; font-family: inherit; }
 
         footer { text-align: center; padding: 20px; font-size: 0.8rem; color: var(--text-sub); font-family: var(--font-en); margin-top: 40px; }
 
@@ -274,7 +275,7 @@
                 <!-- 左側：新規伝票登録フォーム -->
                 <div class="card">
                     <span class="section-en">Entry Form</span>
-                    <h2 class="section-title">新しい取引の登録</h2>
+                    <h2 class="section-title">取引の新規登録</h2>
 
                     <form id="accounting-form">
                         <div class="form-group">
@@ -335,7 +336,7 @@
                     </form>
                 </div>
 
-                <!-- 右側：明細一覧テーブル（インライン編集対応） -->
+                <!-- 右側：明細一覧テーブル -->
                 <div class="card">
                     <span class="section-en">Journal History</span>
                     <h2 class="section-title">
@@ -356,12 +357,12 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th style="width: 105px;">日付</th>
-                                    <th style="width: 65px;">区分</th>
+                                    <th>日付</th>
+                                    <th>区分</th>
                                     <th>科目</th>
-                                    <th>摘要・メモ</th>
-                                    <th style="width: 75px;">決済</th>
-                                    <th style="text-align: right; width: 90px;">金額(按分)</th>
+                                    <th>取引先・摘要</th>
+                                    <th>決済</th>
+                                    <th style="text-align: right;">計上額</th>
                                     <th style="text-align: center; width: 100px;">操作</th>
                                 </tr>
                             </thead>
@@ -608,42 +609,30 @@
 
             pageData.forEach(t => {
                 const tr = document.createElement('tr');
+                const isEditing = (editingRowId === t.id);
 
-                if (editingRowId === t.id) {
-                    // --- インライン編集中の行 ---
-                    const catOptions = (categories[t.type] || []).map(c => `<option value="${c}" ${c === t.category ? 'selected' : ''}>${c}</option>`).join('');
-                    
+                if (isEditing) {
+                    // --- インライン編集中の行表示 ---
+                    const catList = categories[t.type] || categories["経費"];
+                    const catOptions = catList.map(c => `<option value="${c}" ${c === t.category ? 'selected' : ''}>${c}</option>`).join('');
+                    const payOptions = ["現金", "クレジット", "QR", "電子マネー"].map(p => `<option value="${p}" ${p === t.payment ? 'selected' : ''}>${p}</option>`).join('');
+
                     tr.innerHTML = `
                         <td><input type="date" id="edit-date-${t.id}" class="inline-input" value="${t.date}"></td>
-                        <td>
-                            <select id="edit-type-${t.id}" class="inline-select" onchange="onInlineTypeChange(${t.id})">
-                                <option value="経費" ${t.type === '経費' ? 'selected' : ''}>経費</option>
-                                <option value="売上" ${t.type === '売上' ? 'selected' : ''}>売上</option>
-                            </select>
-                        </td>
+                        <td><span class="type-badge ${t.type === '売上' ? 'income' : 'expense'}">${t.type}</span></td>
                         <td><select id="edit-cat-${t.id}" class="inline-select">${catOptions}</select></td>
                         <td><input type="text" id="edit-memo-${t.id}" class="inline-input" value="${t.memo || ''}"></td>
-                        <td>
-                            <select id="edit-pay-${t.id}" class="inline-select">
-                                <option value="現金" ${t.payment === '現金' ? 'selected' : ''}>現金</option>
-                                <option value="クレジット" ${t.payment === 'クレジット' ? 'selected' : ''}>クレジット</option>
-                                <option value="QR" ${t.payment === 'QR' ? 'selected' : ''}>QR</option>
-                                <option value="電子マネー" ${t.payment === '電子マネー' ? 'selected' : ''}>電子マネー</option>
-                            </select>
-                        </td>
-                        <td style="text-align: right;">
-                            <input type="number" id="edit-amt-${t.id}" class="inline-input" style="text-align: right;" value="${t.amount}" min="0">
-                            <input type="hidden" id="edit-ratio-${t.id}" value="${t.ratio}">
-                        </td>
+                        <td><select id="edit-pay-${t.id}" class="inline-select">${payOptions}</select></td>
+                        <td><input type="number" id="edit-amt-${t.id}" class="inline-input" style="text-align:right;" value="${t.amount}" min="0"></td>
                         <td style="text-align: center;">
                             <div class="action-btns-cell">
-                                <button class="action-sm-btn save" onclick="saveInlineEdit(${t.id})">保存</button>
-                                <button class="action-sm-btn" onclick="cancelInlineEdit()">取消</button>
+                                <button class="action-sm-btn save" onclick="saveInlineEdit(${t.id})" title="保存">保存</button>
+                                <button class="action-sm-btn" onclick="cancelInlineEdit()" title="取消">取消</button>
                             </div>
                         </td>
                     `;
                 } else {
-                    // --- 通常表示行 ---
+                    // --- 通常の行表示 ---
                     const actualAmount = Number(t.actualAmount);
                     tr.innerHTML = `
                         <td style="font-family: var(--font-en);">${t.date}</td>
@@ -653,13 +642,13 @@
                             </span>
                         </td>
                         <td><strong>${t.category}</strong></td>
-                        <td style="color: var(--text-sub); font-size: 0.82rem;">${t.memo || '-'}</td>
+                        <td style="color: var(--text-sub); font-size: 0.85rem;">${t.memo || '-'}</td>
                         <td style="font-size: 0.8rem; color: var(--primary-dark);">${t.payment || '現金'}</td>
                         <td class="amount">¥${actualAmount.toLocaleString()}</td>
                         <td style="text-align: center;">
                             <div class="action-btns-cell">
-                                <button class="action-sm-btn" onclick="startInlineEdit(${t.id})">編集</button>
-                                <button class="action-sm-btn del" onclick="deleteTransaction(${t.id})">削除</button>
+                                <button class="action-sm-btn" onclick="startInlineEdit(${t.id})" title="編集">編集</button>
+                                <button class="action-sm-btn del" onclick="deleteTransaction(${t.id})" title="削除">削除</button>
                             </div>
                         </td>
                     `;
@@ -677,7 +666,7 @@
             renderTablePage();
         }
 
-        // インライン編集開始
+        // --- インライン編集操作 ---
         function startInlineEdit(id) {
             editingRowId = id;
             renderTablePage();
@@ -688,53 +677,40 @@
             renderTablePage();
         }
 
-        function onInlineTypeChange(id) {
-            const typeVal = document.getElementById(`edit-type-${id}`).value;
-            const catSelect = document.getElementById(`edit-cat-${id}`);
-            catSelect.innerHTML = (categories[typeVal] || []).map(c => `<option value="${c}">${c}</option>`).join('');
-            
-            // 売上に切り替えた場合は按分を1.0にする
-            const ratioInput = document.getElementById(`edit-ratio-${id}`);
-            if (typeVal === '売上') {
-                ratioInput.value = '1.0';
-            } else {
-                ratioInput.value = '0.5'; // 経費デフォルト50%など必要に応じて
-            }
-        }
-
-        // インライン編集保存
         async function saveInlineEdit(id) {
             const item = currentData.find(t => t.id === id);
             if (!item) return;
 
-            const date = document.getElementById(`edit-date-${id}`).value;
-            const type = document.getElementById(`edit-type-${id}`).value;
-            const category = document.getElementById(`edit-cat-${id}`).value;
-            const memo = document.getElementById(`edit-memo-${id}`).value;
-            const payment = document.getElementById(`edit-pay-${id}`).value;
-            const amount = document.getElementById(`edit-amt-${id}`).value;
-            const ratio = (type === '売上') ? 1.0 : Number(item.ratio); // 既存按分率を保持
+            const newDate = document.getElementById(`edit-date-${id}`).value;
+            const newCat = document.getElementById(`edit-cat-${id}`).value;
+            const newMemo = document.getElementById(`edit-memo-${id}`).value;
+            const newPay = document.getElementById(`edit-pay-${id}`).value;
+            const newAmount = document.getElementById(`edit-amt-${id}`).value;
 
-            if (!date || !amount) {
+            if (!newDate || !newAmount) {
                 alert('日付と金額は必須です。');
                 return;
             }
 
-            try {
-                const payload = {
-                    password: API_PASSWORD,
-                    action: 'update',
-                    year: currentSelectedYear,
-                    id: id,
-                    date: date,
-                    type: type,
-                    category: category,
-                    amount: amount,
-                    ratio: ratio,
-                    payment: payment,
-                    memo: memo
-                };
+            // 既存の家事按分率(ratio)を保持しつつ計上額を再計算
+            const ratio = Number(item.ratio) || 1.0;
+            const actualAmount = Math.round(Number(newAmount) * ratio);
 
+            const payload = {
+                password: API_PASSWORD,
+                action: 'update',
+                year: currentSelectedYear,
+                id: id,
+                date: newDate,
+                type: item.type, // 区分は維持
+                category: newCat,
+                amount: newAmount,
+                ratio: ratio,
+                payment: newPay,
+                memo: newMemo
+            };
+
+            try {
                 const response = await fetch(GAS_API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain' },
@@ -743,7 +719,6 @@
                 const result = await response.json();
 
                 if (result.status === 'success') {
-                    alert('更新しました。');
                     editingRowId = null;
                     fetchTransactions();
                 } else {
@@ -774,7 +749,6 @@
                 const result = await response.json();
 
                 if (result.status === 'success') {
-                    alert('削除しました。');
                     if (editingRowId === id) editingRowId = null;
                     fetchTransactions();
                 } else {
@@ -865,7 +839,6 @@
                 const result = await response.json();
 
                 if (result.status === 'success') {
-                    alert('登録が完了しました');
                     document.getElementById('entry-amount').value = '';
                     document.getElementById('entry-memo').value = '';
                     fetchTransactions();
