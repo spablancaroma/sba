@@ -3,7 +3,7 @@
   <!-- トップページ -->
   <url>
     <loc>https://spa-blanc-aroma.com/</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -71,19 +71,12 @@
   <!-- コラム一覧ページ -->
   <url>
     <loc>https://spa-blanc-aroma.com/column.html</loc>
-    <lastmod>2026-10-28</lastmod>
+    <lastmod>2026-11-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- コラム記事詳細 (新規追加) -->
-  <url>
-    <loc>https://spa-blanc-aroma.com/column/therapist-ryosuke.html</loc>
-    <lastmod>2026-10-28</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
+  
   <!-- コラム記事詳細 -->
   <url>
     <loc>https://spa-blanc-aroma.com/column/hygiene-plasmacluster.html</loc>
@@ -145,4 +138,30 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+</urlset><url>
+    <loc>https://spa-blanc-aroma.com/column/bodymake-and-conditioning.html</loc>
+    <lastmod>2026-11-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>
+<url>
+    <loc>https://spa-blanc-aroma.com/column/same-sex-therapist-comfort.html</loc>
+    <lastmod>2026-11-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>
+<url>
+    <loc>https://spa-blanc-aroma.com/column/skin-hunger-and-self-care.html</loc>
+    <lastmod>2026-11-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>
+  <url>
+    <loc>https://spa-blanc-aroma.com/column/therapist-ryosuke.html</loc>
+    <lastmod>2026-10-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
