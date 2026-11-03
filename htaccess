@@ -5,11 +5,12 @@ RewriteCond %{HTTPS} !on
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=302,L]
 </IfModule>
 #SSLREDIRECT
+
 #DOMAINREDIRECT
 <IfModule mod_rewrite.c>
 RewriteEngine On
 RewriteCond %{HTTP_HOST} ^st599405.static.jp
-RewriteRule ^(.*) http://spa-blanc-aroma.com/$1 [R=302,L]
+RewriteRule ^(.*) https://spa-blanc-aroma.com/$1 [R=302,L]
 </IfModule>
 #DOMAINREDIRECT
 
