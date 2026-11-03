@@ -30,17 +30,27 @@ ul {
     right: 15px;
     width: 44px;
     height: 44px;
-    background: #2C3E50;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 22px;
+    background-color: rgba(255, 255, 255, 0.92);
+    border: 1px solid #b39b7d;
+    border-radius: 50%;
+    color: #b39b7d;
+    font-size: 20px;
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 12px rgba(179, 155, 125, 0.15);
     z-index: 1000;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all 0.3s ease;
+    line-height: 1;
+    padding: 0;
+}
+
+.menu-toggle-btn:hover {
+    background-color: #b39b7d;
+    color: #ffffff;
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(179, 155, 125, 0.3);
 }
 
 .sidebar-overlay {
@@ -49,7 +59,7 @@ ul {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0,0,0,0.4);
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
@@ -66,17 +76,17 @@ ul {
     right: -260px;
     width: 260px;
     height: 100%;
-    background: #2C3E50;
+    background: #fdfbf7; /* サロンのトーンに合わせた明るく上質なサンドベージュ調に変更 */
     transition: right 0.3s ease;
     z-index: 1002;
     padding-top: 45px;
     padding-bottom: 15px;
-    box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+    box-shadow: -4px 0 20px rgba(0,0,0,0.1);
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    overflow-y: hidden; /* スクロールを発生させず1画面に収める */
+    overflow-y: hidden;
 }
 .sidebar.is-active {
     right: 0;
@@ -87,7 +97,7 @@ ul {
     right: 15px;
     background: none;
     border: none;
-    color: #fff;
+    color: #3b3530; /* 閉じるボタンの色をダークブラウンに変更 */
     font-size: 24px;
     cursor: pointer;
 }
@@ -99,20 +109,25 @@ ul {
     width: 100%;
 }
 .sidebar-menu li {
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid #f0ede8; /* 上品な区切り線 */
 }
 .sidebar-menu a {
     display: block;
-    padding: 10px 20px; /* 余白をコンパクトに調整して画面内に収める */
-    color: #fff;
+    padding: 12px 20px;
+    color: #3b3530; /* メニュー文字色を落ち着いたダークブラウンに変更 */
     text-decoration: none;
     font-size: 14px;
-    font-weight: bold;
+    font-weight: 500;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+.sidebar-menu a:hover {
+    background: #f2ece4; /* ホバー時にうっすらサンドカラーに */
+    color: #b39b7d;
 }
 .sidebar-menu a.admin-link {
-    color: #f1c40f;
-    border-top: 1px solid rgba(255,255,255,0.15);
-    background: rgba(0, 0, 0, 0.15); /* 最下部の管理者画面を目立たせつつ最下部寄せ */
+    color: #8a6d3b;
+    border-top: 1px solid #e0dcd5;
+    background: #f5f0e6;
 }
 
 /* ヘッダー */
