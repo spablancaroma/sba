@@ -443,7 +443,7 @@
                 <h2>理疗师介绍</h2>
             </div>
             
-<div class="therapist-grid">
+            <div class="therapist-grid">
                 <!-- 理疗师1：Sota -->
                 <div class="therapist-card">
                     <a href="voice/cv_souta.html" class="therapist-voice-link">🗣️ 查看客户评价</a>
@@ -477,6 +477,7 @@
                     </div>
                 </div>
             </div>
+        </div>
     </section>
 
     <!-- 服务内容 & 精油介绍 -->
@@ -521,7 +522,7 @@
         </div>
     </section>
 
-    <!-- 套餐价格 (更新为横排高级卡片网格) -->
+    <!-- 套餐价格 -->
     <section id="menu" class="section bg-sand">
         <div class="container">
             <div class="section-title-area">
@@ -638,7 +639,7 @@
         </div>
     </section>
 
-    <!-- 专栏文章引导 -->
+    <!-- 专栏文章引导（已同步首页最新2篇コラム） -->
     <section id="column" class="section">
         <div class="container text-center">
             <div class="section-title-area">
@@ -647,24 +648,24 @@
             </div>
             
             <div class="column-grid-top">
-                <a href="column/therapist-ryosuke.html" class="column-card-top">
+                <a href="column/same-sex-therapist-comfort.html" class="column-card-top">
                     <div>
-                        <img src="column/ogp-ryosuke.png" alt="新理疗师“凉介”加入！陆上＆游泳部出身的爽快运动型男" class="column-card-top-img">
-                        <span class="column-tag-mini">最新消息·员工</span>
-                        <div class="column-title-top">新理疗师“凉介”加入！陆上＆游泳部出身的爽快运动型男带给您极致精油体验</div>
-                        <div class="column-desc-top">Spa Blanc Aroma迎来新理疗师“凉介”！为您介绍由体育会系爽朗理疗师带来的贴心精油护理魅力。</div>
+                        <img src="column/ogp-same-sex-comfort.png" alt="在同志按摩中将男人的身体交托给彼此的安心感" class="column-card-top-img">
+                        <span class="column-tag-mini">同志沙龙魅力·舒适感</span>
+                        <div class="column-title-top">【当事人之间心领神会】在同志按摩中将“男人的身体”交托给彼此的安心感是什么？</div>
+                        <div class="column-desc-top">详细解说在普通沙龙或整体院无法体验到的、由男性理疗师及同志当事人之间独有的压倒性安心感，以及身体深处彻底放松的理由。</div>
                     </div>
-                    <div class="column-date-top">2026.10.27</div>
+                    <div class="column-date-top">2026.11.03</div>
                 </a>
 
-                <a href="column/hygiene-plasmacluster.html" class="column-card-top">
+                <a href="column/skin-hunger-and-self-care.html" class="column-card-top">
                     <div>
-                        <img src="column/ogp-hygiene.png" alt="【卫生与安心】配备夏普净离子群空气清净机与干衣机，打造洁净私密空间" class="column-card-top-img">
-                        <span class="column-tag-mini">品质·细节·设备</span>
-                        <div class="column-title-top">【卫生与安心】配备夏普净离子群加湿空气清净机与干衣机，打造洁净私密空间</div>
-                        <div class="column-desc-top">全套配备夏普净离子群加湿空气清净机与洗烘一体机。为您介绍 Spa Blanc Aroma 从空气到毛巾细节都绝不妥协的卫生管理。</div>
+                        <img src="column/ogp-skin-hunger.png" alt="通过同志按摩填补肌肤温存与自我肯定感" class="column-card-top-img">
+                        <span class="column-tag-mini">心理护理·身心放松</span>
+                        <div class="column-title-top">【治愈交友软件的疲惫】通过同志按摩填补“肌肤的温存”与自我肯定感</div>
+                        <div class="column-desc-top">致身心疲惫于交友软件或短暂关系的同志男性。不带审视与不求回报的温柔纯手工护理，如何治愈对肌肤触碰的渴求（Skin Hunger）并提升自我肯定感。</div>
                     </div>
-                    <div class="column-date-top">2026.10.15</div>
+                    <div class="column-date-top">2026.11.03</div>
                 </a>
             </div>
 
@@ -736,7 +737,7 @@
 
       function loginAdmin() {
         const pass = prompt("请输入管理员密码:");
-        .if (pass === "blanc2025") {
+        if (pass === "blanc2025") {
           sessionStorage.setItem("adminAuth", "true");
           window.location.href = "admin.html";
         } else if (pass !== null) {
