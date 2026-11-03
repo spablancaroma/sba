@@ -66,7 +66,6 @@
 
         .container { width: 100%; max-width: 1100px; margin: 20px auto; padding: 0 15px; }
 
-        /* 年度選択・月別集計フィルターカード */
         .year-selector-card {
             background: var(--bg-white);
             border: 1px solid var(--border-color);
@@ -107,7 +106,6 @@
         .dash-label { font-size: 0.85rem; color: var(--text-sub); margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center; }
         .dash-value { font-family: var(--font-en); font-size: 1.8rem; font-weight: 600; color: var(--primary-dark); word-break: break-all; }
 
-        /* 月別サマリーカード */
         .monthly-summary-card {
             background: var(--bg-white);
             border: 1px solid var(--border-color);
@@ -145,13 +143,6 @@
         .btn:hover { background-color: var(--accent-gold-hover); }
         .btn-outline { background: transparent; color: var(--accent-gold); border: 1px solid var(--accent-gold); }
         .btn-outline:hover { background: var(--accent-gold); color: #FFFFFF; }
-        
-        .btn-danger { background-color: #E74C3C; }
-        .btn-danger:hover { background-color: #C0392B; }
-        .btn-secondary { background-color: #7F8C8D; }
-        .btn-secondary:hover { background-color: #626D6E; }
-
-        .form-row-buttons { display: flex; gap: 8px; }
 
         .pagination-container { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 15px; font-family: var(--font-en); font-size: 0.9rem; }
         .page-btn { background: var(--bg-sand); border: 1px solid var(--border-color); color: var(--primary-dark); padding: 4px 12px; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
@@ -159,19 +150,24 @@
         .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
         .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.88rem; min-width: 650px; }
-        th, td { padding: 10px 8px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 720px; }
+        th, td { padding: 8px 6px; text-align: left; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
         th { background-color: var(--bg-sand); color: var(--primary-dark); font-weight: 600; white-space: nowrap; }
-        td.amount { font-family: var(--font-en); font-weight: 500; text-align: right; white-space: nowrap; }
 
         .type-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 500; white-space: nowrap; }
         .type-badge.income { background: #E8F8F5; color: #16A085; }
         .type-badge.expense { background: #FDEDEC; color: #E74C3C; }
 
-        .action-btns-cell { display: flex; gap: 4px; }
-        .action-sm-btn { padding: 3px 8px; font-size: 0.75rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-sand); cursor: pointer; font-family: inherit; }
+        .action-btns-cell { display: flex; gap: 4px; justify-content: center; }
+        .action-sm-btn { padding: 4px 8px; font-size: 0.75rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-sand); cursor: pointer; font-family: inherit; white-space: nowrap; }
         .action-sm-btn:hover { background: var(--primary-dark); color: #FFF; border-color: var(--primary-dark); }
-        .action-sm-btn.del:hover { background: #E74C3C; border-color: #E74C3C; }
+        .action-sm-btn.save { background: #16A085; color: #FFF; border-color: #16A085; }
+        .action-sm-btn.save:hover { background: #117a65; }
+        .action-sm-btn.del:hover { background: #E74C3C; border-color: #E74C3C; color: #FFF; }
+
+        /* テーブル内インライン編集用コントロール */
+        .inline-input { width: 100%; padding: 4px 6px; font-size: 0.82rem; border: 1px solid var(--accent-gold); border-radius: 4px; background: #FFF; font-family: inherit; }
+        .inline-select { width: 100%; padding: 4px 4px; font-size: 0.8rem; border: 1px solid var(--accent-gold); border-radius: 4px; background: #FFF; font-family: inherit; }
 
         footer { text-align: center; padding: 20px; font-size: 0.8rem; color: var(--text-sub); font-family: var(--font-en); margin-top: 40px; }
 
@@ -275,14 +271,12 @@
 
             <!-- メイン入力・履歴エリア -->
             <div class="main-grid">
-                <!-- 左側：伝票入力・編集フォーム -->
+                <!-- 左側：新規伝票登録フォーム -->
                 <div class="card">
-                    <span class="section-en" id="form-mode-en">Entry Form</span>
-                    <h2 class="section-title" id="form-title">取引の登録</h2>
+                    <span class="section-en">Entry Form</span>
+                    <h2 class="section-title">新しい取引の登録</h2>
 
                     <form id="accounting-form">
-                        <input type="hidden" id="edit-row-id" value="">
-
                         <div class="form-group">
                             <label for="entry-date">日付</label>
                             <input type="date" id="entry-date" class="form-control" onchange="syncYearWithDate()" required>
@@ -337,14 +331,11 @@
                             <input type="text" id="entry-memo" class="form-control" placeholder="例: 山田様 / Amazon（消耗品）">
                         </div>
 
-                        <div class="form-row-buttons">
-                            <button type="submit" id="submit-btn" class="btn" style="flex: 2;">登録する</button>
-                            <button type="button" id="cancel-edit-btn" class="btn btn-secondary" style="flex: 1; display: none;" onclick="cancelEditMode()">キャンセル</button>
-                        </div>
+                        <button type="submit" id="submit-btn" class="btn">登録する</button>
                     </form>
                 </div>
 
-                <!-- 右側：明細一覧テーブル -->
+                <!-- 右側：明細一覧テーブル（インライン編集対応） -->
                 <div class="card">
                     <span class="section-en">Journal History</span>
                     <h2 class="section-title">
@@ -365,13 +356,13 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th>日付</th>
-                                    <th>区分</th>
+                                    <th style="width: 105px;">日付</th>
+                                    <th style="width: 65px;">区分</th>
                                     <th>科目</th>
-                                    <th>取引先・摘要</th>
-                                    <th>決済</th>
-                                    <th style="text-align: right;">計上額</th>
-                                    <th style="text-align: center; width: 80px;">操作</th>
+                                    <th>摘要・メモ</th>
+                                    <th style="width: 75px;">決済</th>
+                                    <th style="text-align: right; width: 90px;">金額(按分)</th>
+                                    <th style="text-align: center; width: 100px;">操作</th>
                                 </tr>
                             </thead>
                             <tbody id="transaction-list"></tbody>
@@ -397,7 +388,6 @@
         const SYSTEM_PASSWORD = "blanc2025";
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyEir1_W7TDnCGKqCDa32Ta9KlIW_8SvgW_oN1ISpXK7u4_ilZHBHRoIULjTGPN8Hw/exec";
 
-        // ご要望に合わせ「支払手数料」「セラピスト報酬」を追加
         const categories = {
             "売上": ["60分コース", "90分コース", "120分コース", "出張料金オプション", "売上高（その他）"],
             "経費": ["地代家賃", "消耗品費", "水道光熱費", "通信費", "広告宣伝費", "旅費交通費", "接待交際費", "支払手数料", "セラピスト報酬", "新聞図書費", "雑費"]
@@ -417,6 +407,7 @@
         let filteredData = [];
         let currentPage = 1;
         const PAGE_SIZE = 20;
+        let editingRowId = null; // 現在インライン編集中の行ID
 
         function handleAuth(e) {
             e.preventDefault();
@@ -463,8 +454,8 @@
 
         function selectYear(yr) {
             currentSelectedYear = yr;
+            editingRowId = null;
             renderYearTabs();
-            // 年度変更時は月別フィルターをリセット
             document.getElementById('filter-month').value = 'ALL';
             fetchTransactions();
         }
@@ -577,7 +568,6 @@
             const typeFilter = document.getElementById('filter-type').value;
             const keyword = document.getElementById('filter-keyword').value.trim().toLowerCase();
 
-            // 月別フィルターのバッジテキスト表示更新
             const badgeEl = document.getElementById('period-display-badge');
             if (monthFilter === 'ALL') {
                 badgeEl.textContent = `${currentSelectedYear}年度 通年`;
@@ -586,7 +576,6 @@
             }
 
             filteredData = currentData.filter(item => {
-                // 月フィルターチェック (YYYY-MM-DDの形式から月部分を抽出)
                 let matchMonth = true;
                 if (monthFilter !== 'ALL') {
                     const itemMonth = item.date ? item.date.substring(5, 7) : '';
@@ -604,7 +593,7 @@
 
             currentPage = 1;
             renderTablePage();
-            renderSummaryAndChart(filteredData); // 選択中の月（または通年）のデータでダッシュボードを再計算
+            renderSummaryAndChart(filteredData);
         }
 
         function renderTablePage() {
@@ -618,26 +607,63 @@
             const pageData = filteredData.slice(startIndex, startIndex + PAGE_SIZE);
 
             pageData.forEach(t => {
-                const actualAmount = Number(t.actualAmount);
                 const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td style="font-family: var(--font-en);">${t.date}</td>
-                    <td>
-                        <span class="type-badge ${t.type === '売上' ? 'income' : 'expense'}">
-                            ${t.type}
-                        </span>
-                    </td>
-                    <td><strong>${t.category}</strong></td>
-                    <td style="color: var(--text-sub); font-size: 0.85rem;">${t.memo || '-'}</td>
-                    <td style="font-size: 0.8rem; color: var(--primary-dark);">${t.payment || '現金'}</td>
-                    <td class="amount">¥${actualAmount.toLocaleString()}</td>
-                    <td style="text-align: center;">
-                        <div class="action-btns-cell">
-                            <button class="action-sm-btn" onclick="startEdit(${t.id})" title="編集">編集</button>
-                            <button class="action-sm-btn del" onclick="deleteTransaction(${t.id})" title="削除">削除</button>
-                        </div>
-                    </td>
-                `;
+
+                if (editingRowId === t.id) {
+                    // --- インライン編集中の行 ---
+                    const catOptions = (categories[t.type] || []).map(c => `<option value="${c}" ${c === t.category ? 'selected' : ''}>${c}</option>`).join('');
+                    
+                    tr.innerHTML = `
+                        <td><input type="date" id="edit-date-${t.id}" class="inline-input" value="${t.date}"></td>
+                        <td>
+                            <select id="edit-type-${t.id}" class="inline-select" onchange="onInlineTypeChange(${t.id})">
+                                <option value="経費" ${t.type === '経費' ? 'selected' : ''}>経費</option>
+                                <option value="売上" ${t.type === '売上' ? 'selected' : ''}>売上</option>
+                            </select>
+                        </td>
+                        <td><select id="edit-cat-${t.id}" class="inline-select">${catOptions}</select></td>
+                        <td><input type="text" id="edit-memo-${t.id}" class="inline-input" value="${t.memo || ''}"></td>
+                        <td>
+                            <select id="edit-pay-${t.id}" class="inline-select">
+                                <option value="現金" ${t.payment === '現金' ? 'selected' : ''}>現金</option>
+                                <option value="クレジット" ${t.payment === 'クレジット' ? 'selected' : ''}>クレジット</option>
+                                <option value="QR" ${t.payment === 'QR' ? 'selected' : ''}>QR</option>
+                                <option value="電子マネー" ${t.payment === '電子マネー' ? 'selected' : ''}>電子マネー</option>
+                            </select>
+                        </td>
+                        <td style="text-align: right;">
+                            <input type="number" id="edit-amt-${t.id}" class="inline-input" style="text-align: right;" value="${t.amount}" min="0">
+                            <input type="hidden" id="edit-ratio-${t.id}" value="${t.ratio}">
+                        </td>
+                        <td style="text-align: center;">
+                            <div class="action-btns-cell">
+                                <button class="action-sm-btn save" onclick="saveInlineEdit(${t.id})">保存</button>
+                                <button class="action-sm-btn" onclick="cancelInlineEdit()">取消</button>
+                            </div>
+                        </td>
+                    `;
+                } else {
+                    // --- 通常表示行 ---
+                    const actualAmount = Number(t.actualAmount);
+                    tr.innerHTML = `
+                        <td style="font-family: var(--font-en);">${t.date}</td>
+                        <td>
+                            <span class="type-badge ${t.type === '売上' ? 'income' : 'expense'}">
+                                ${t.type}
+                            </span>
+                        </td>
+                        <td><strong>${t.category}</strong></td>
+                        <td style="color: var(--text-sub); font-size: 0.82rem;">${t.memo || '-'}</td>
+                        <td style="font-size: 0.8rem; color: var(--primary-dark);">${t.payment || '現金'}</td>
+                        <td class="amount">¥${actualAmount.toLocaleString()}</td>
+                        <td style="text-align: center;">
+                            <div class="action-btns-cell">
+                                <button class="action-sm-btn" onclick="startInlineEdit(${t.id})">編集</button>
+                                <button class="action-sm-btn del" onclick="deleteTransaction(${t.id})">削除</button>
+                            </div>
+                        </td>
+                    `;
+                }
                 tbody.appendChild(tr);
             });
 
@@ -649,6 +675,115 @@
         function changePage(direction) {
             currentPage += direction;
             renderTablePage();
+        }
+
+        // インライン編集開始
+        function startInlineEdit(id) {
+            editingRowId = id;
+            renderTablePage();
+        }
+
+        function cancelInlineEdit() {
+            editingRowId = null;
+            renderTablePage();
+        }
+
+        function onInlineTypeChange(id) {
+            const typeVal = document.getElementById(`edit-type-${id}`).value;
+            const catSelect = document.getElementById(`edit-cat-${id}`);
+            catSelect.innerHTML = (categories[typeVal] || []).map(c => `<option value="${c}">${c}</option>`).join('');
+            
+            // 売上に切り替えた場合は按分を1.0にする
+            const ratioInput = document.getElementById(`edit-ratio-${id}`);
+            if (typeVal === '売上') {
+                ratioInput.value = '1.0';
+            } else {
+                ratioInput.value = '0.5'; // 経費デフォルト50%など必要に応じて
+            }
+        }
+
+        // インライン編集保存
+        async function saveInlineEdit(id) {
+            const item = currentData.find(t => t.id === id);
+            if (!item) return;
+
+            const date = document.getElementById(`edit-date-${id}`).value;
+            const type = document.getElementById(`edit-type-${id}`).value;
+            const category = document.getElementById(`edit-cat-${id}`).value;
+            const memo = document.getElementById(`edit-memo-${id}`).value;
+            const payment = document.getElementById(`edit-pay-${id}`).value;
+            const amount = document.getElementById(`edit-amt-${id}`).value;
+            const ratio = (type === '売上') ? 1.0 : Number(item.ratio); // 既存按分率を保持
+
+            if (!date || !amount) {
+                alert('日付と金額は必須です。');
+                return;
+            }
+
+            try {
+                const payload = {
+                    password: API_PASSWORD,
+                    action: 'update',
+                    year: currentSelectedYear,
+                    id: id,
+                    date: date,
+                    type: type,
+                    category: category,
+                    amount: amount,
+                    ratio: ratio,
+                    payment: payment,
+                    memo: memo
+                };
+
+                const response = await fetch(GAS_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    alert('更新しました。');
+                    editingRowId = null;
+                    fetchTransactions();
+                } else {
+                    alert('更新エラー: ' + result.message);
+                }
+            } catch (err) {
+                alert('通信エラーが発生しました。');
+                console.error(err);
+            }
+        }
+
+        async function deleteTransaction(id) {
+            if (!confirm('本当にこの明細データを削除しますか？')) return;
+
+            try {
+                const payload = {
+                    password: API_PASSWORD,
+                    action: 'delete',
+                    year: currentSelectedYear,
+                    id: id
+                };
+
+                const response = await fetch(GAS_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    alert('削除しました。');
+                    if (editingRowId === id) editingRowId = null;
+                    fetchTransactions();
+                } else {
+                    alert('削除エラー: ' + result.message);
+                }
+            } catch (err) {
+                alert('通信エラーが発生しました。');
+                console.error(err);
+            }
         }
 
         function renderSummaryAndChart(data) {
@@ -699,100 +834,18 @@
             });
         }
 
-        // --- 編集モード開始 ---
-        function startEdit(id) {
-            const item = currentData.find(t => t.id === id);
-            if (!item) return;
-
-            document.getElementById('edit-row-id').value = item.id;
-            document.getElementById('entry-date').value = item.date;
-            
-            const typeSelect = document.getElementById('entry-type');
-            typeSelect.value = item.type;
-            updateCategories();
-
-            document.getElementById('entry-category').value = item.category;
-            document.getElementById('entry-amount').value = item.amount;
-            document.getElementById('entry-ratio').value = item.ratio;
-            document.getElementById('entry-payment').value = item.payment || '現金';
-            document.getElementById('entry-memo').value = item.memo || '';
-
-            // UIを編集モードに変更
-            document.getElementById('form-mode-en').textContent = 'Edit Form';
-            document.getElementById('form-title').textContent = '取引の編集 (ID: ' + item.id + ')';
-            const submitBtn = document.getElementById('submit-btn');
-            submitBtn.textContent = '更新を保存する';
-            submitBtn.className = 'btn btn-danger'; // 編集中は色を変えてわかりやすく
-            document.getElementById('cancel-edit-btn').style.display = 'block';
-
-            // 画面トップまたはフォームの位置へスクロール
-            window.scrollTo({ top: 400, behavior: 'smooth' });
-        }
-
-        function cancelEditMode() {
-            document.getElementById('edit-row-id').value = '';
-            document.getElementById('accounting-form').reset();
-            document.getElementById('entry-date').valueAsDate = new Date();
-            updateCategories();
-
-            document.getElementById('form-mode-en').textContent = 'Entry Form';
-            document.getElementById('form-title').textContent = '取引の登録';
-            const submitBtn = document.getElementById('submit-btn');
-            submitBtn.textContent = '登録する';
-            submitBtn.className = 'btn';
-            document.getElementById('cancel-edit-btn').style.display = 'none';
-        }
-
-        // --- 削除処理 ---
-        async function deleteTransaction(id) {
-            if (!confirm('本当にこの明細データを削除しますか？')) return;
-
-            try {
-                const payload = {
-                    password: API_PASSWORD,
-                    action: 'delete',
-                    year: currentSelectedYear,
-                    id: id
-                };
-
-                const response = await fetch(GAS_API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain' },
-                    body: JSON.stringify(payload)
-                });
-                const result = await response.json();
-
-                if (result.status === 'success') {
-                    alert('削除しました。');
-                    if (document.getElementById('edit-row-id').value == id) {
-                        cancelEditMode();
-                    }
-                    fetchTransactions();
-                } else {
-                    alert('削除エラー: ' + result.message);
-                }
-            } catch (err) {
-                alert('通信エラーが発生しました。');
-                console.error(err);
-            }
-        }
-
-        // 登録・更新フォーム送信処理
+        // 新規登録フォーム送信処理
         document.getElementById('accounting-form').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const editId = document.getElementById('edit-row-id').value;
-            const isEditing = (editId !== '');
-
             const submitBtn = document.getElementById('submit-btn');
             submitBtn.disabled = true;
-            submitBtn.textContent = isEditing ? '更新中...' : '送信中...';
+            submitBtn.textContent = '送信中...';
 
             const payload = {
                 password: API_PASSWORD,
-                action: isEditing ? 'update' : 'add',
+                action: 'add',
                 year: currentSelectedYear,
-                id: editId,
                 date: document.getElementById('entry-date').value,
                 type: document.getElementById('entry-type').value,
                 category: document.getElementById('entry-category').value,
@@ -812,18 +865,19 @@
                 const result = await response.json();
 
                 if (result.status === 'success') {
-                    alert(isEditing ? '更新が完了しました' : '登録が完了しました');
-                    cancelEditMode();
+                    alert('登録が完了しました');
+                    document.getElementById('entry-amount').value = '';
+                    document.getElementById('entry-memo').value = '';
                     fetchTransactions();
                 } else {
-                    alert('処理エラー: ' + result.message);
+                    alert('登録エラー: ' + result.message);
                 }
             } catch (error) {
                 alert('通信エラーが発生しました');
                 console.error(error);
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.textContent = isEditing ? '更新を保存する' : '登録する';
+                submitBtn.textContent = '登録する';
             }
         });
 
