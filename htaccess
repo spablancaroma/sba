@@ -17,9 +17,8 @@ RewriteRule ^(.*) https://spa-blanc-aroma.com/$1 [R=302,L]
 #EXTENSIONLESS (拡張子なし表示の設定)
 <IfModule mod_rewrite.c>
 RewriteEngine On
-# 1. 存在するフォルダ（ディレクトリ）へのアクセスはそのまま通す
 RewriteCond %{REQUEST_FILENAME} !-d
-# 2. URLの末尾に「.html」をつけたファイルが実際に存在する場合のみ、内部でマッピングする
+RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME}.html -f
 RewriteRule ^(.*)$ $1.html [L]
 </IfModule>
