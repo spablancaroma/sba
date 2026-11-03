@@ -1,3 +1,6 @@
+# 拡張子の競合やMultiViewsによるエラーを防ぐ
+Options -MultiViews
+
 #SSLREDIRECT
 <IfModule mod_rewrite.c>
 RewriteEngine On
