@@ -35,6 +35,19 @@
     }
     .column-card:hover { transform: translateY(-3px); border-color: #b39b7d; box-shadow: 0 6px 20px rgba(179, 155, 125, 0.15); }
     
+    /* 固定カード（おすすめ・お客様の声用）スタイル */
+    .column-card.pinned-card {
+      background: #faf8f5;
+      border: 1.5px solid #b39b7d;
+      box-shadow: 0 4px 18px rgba(179, 155, 125, 0.12);
+      margin-bottom: 25px;
+    }
+    .column-card.pinned-card .column-card-tag {
+      background: #b39b7d;
+      color: #fff;
+      border: none;
+    }
+
     .column-card-img {
       width: 220px;
       height: 130px;
@@ -115,6 +128,7 @@
         <li><a href="index.html">トップ</a></li>
         <li><a href="reservation.html">予約・空き状況確認</a></li>
         <li><a href="column.html">コラム一覧</a></li>
+        <li><a href="voice/customer_voice.html">お客様の声</a></li>
         <li><a href="news.html">お知らせ</a></li>
         <li><a href="about.html">店舗概要</a></li>
         <li><a href="recruit.html">セラピスト募集</a></li>
@@ -147,9 +161,24 @@
     </div>
 
     <div class="container">
+
+      <!-- 固定表示カード（お客様の声へのリンク） -->
+      <a href="voice/customer_voice.html" class="column-card pinned-card">
+        <img src="voice/customer_voice.png" alt="お客様の声・口コミ一覧" class="column-card-img">
+        <div class="column-card-content">
+          <div class="column-card-meta">
+            <span class="column-card-tag">RECOMMEND</span>
+            <span class="column-card-tag" style="background:#f8f6f2; color:#b39b7d; border:1px solid #e0dcd5;">口コミ・評判</span>
+          </div>
+          <div class="column-card-title">【お客様の声・ご感想】Spa Blanc Aromaをご利用いただいた皆様のリアルな口コミをご紹介</div>
+          <div class="column-card-desc">当サロンを実際に体験されたお客様から寄せられた貴重なご感想・レビューをまとめています。初めてのご利用で施術の雰囲気や満足度を知りたい方はぜひご覧ください。</div>
+        </div>
+      </a>
+
+      <!-- 通常のコラム一覧（JavaScriptでページネーション制御） -->
       <div class="column-list" id="columnList">
         
-        <!-- 記事14 (新規追加：当事者だから通じ合える安心感) -->
+        <!-- 記事14 (当事者だから通じ合える安心感) -->
         <a href="column/same-sex-therapist-comfort.html" class="column-card">
           <img src="column/ogp-same-sex-comfort.png" alt="ゲイマッサージで男の身体を任せる安心感" class="column-card-img">
           <div class="column-card-content">
@@ -162,7 +191,7 @@
           </div>
         </a>
 
-        <!-- 記事13 (新規追加：肌の温もりと自己肯定感) -->
+        <!-- 記事13 (肌の温もりと自己肯定感) -->
         <a href="column/skin-hunger-and-self-care.html" class="column-card">
           <img src="column/ogp-skin-hunger.png" alt="ゲイマッサージで満たす肌の温もりと自己肯定感" class="column-card-img">
           <div class="column-card-content">
@@ -175,7 +204,7 @@
           </div>
         </a>
 
-        <!-- 記事12 (新規追加：筋トレ・コンディショニング) -->
+        <!-- 記事12 (筋トレ・コンディショニング) -->
         <a href="column/bodymake-and-conditioning.html" class="column-card">
           <img src="column/ogp-bodymake.png" alt="トレーニーこそゲイマッサージでコンディショニングすべき理由" class="column-card-img">
           <div class="column-card-content">

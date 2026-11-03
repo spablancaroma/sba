@@ -8,7 +8,67 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>お客様の声・ご感想一覧 - Spa Blanc Aroma</title>
-  <meta name="description" content="大阪・淡路のゲイ向けアロママッサージサロン「Spa Blanc Aroma」に来店されたお客様からのご感想・口コミ一覧。セラピスト（そうた・りょうすけ）別の施術の感想や満足度をご紹介しています。">
+  
+  <!-- SEO / AIO / LLMO メタタグ -->
+  <meta name="description" content="大阪・淡路のゲイ向けアロママッサージサロン「Spa Blanc Aroma」に来店されたお客様からのリアルなご感想・口コミ一覧。セラピスト（そうた・りょうすけ）別の施術の感想や満足度、初めての方向けの初心者ガイドをご紹介しています。">
+  <meta name="keywords" content="Spa Blanc Aroma, お客様の声, 口コミ, 評判, ゲイマッサージ, 大阪, 淡路, 新大阪, セラピスト, そうた, りょうすけ">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://spa-blanc-aroma.com/voice/customer_voice.html">
+
+  <!-- OGP (Open Graph Protocol) -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="お客様の声・ご感想一覧 - Spa Blanc Aroma">
+  <meta property="og:description" content="大阪・淡路のゲイ向けアロママッサージサロン「Spa Blanc Aroma」に来店されたお客様からのリアルなご感想・口コミ一覧。">
+  <meta property="og:site_name" content="Spa Blanc Aroma">
+  <meta property="og:url" content="https://spa-blanc-aroma.com/voice/customer_voice.html">
+  <meta property="og:image" content="https://spa-blanc-aroma.com/ogp-main.png">
+  <meta property="og:locale" content="ja_JP">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="お客様の声・ご感想一覧 - Spa Blanc Aroma">
+  <meta name="twitter:description" content="大阪・淡路のゲイ向けアロママッサージサロン「Spa Blanc Aroma」に来店されたお客様からのリアルなご感想・口コミ一覧。">
+  <meta name="twitter:image" content="https://spa-blanc-aroma.com/ogp-main.png">
+
+  <!-- JSON-LD 構造化データ (BreadcrumbList & CollectionPage) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "ホーム",
+            "item": "https://spa-blanc-aroma.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "お客様の声・ご感想一覧",
+            "item": "https://spa-blanc-aroma.com/voice/customer_voice.html"
+          }
+        ]
+      },
+      {
+        "@type": "CollectionPage",
+        "@id": "https://spa-blanc-aroma.com/voice/customer_voice.html#webpage",
+        "url": "https://spa-blanc-aroma.com/voice/customer_voice.html",
+        "name": "お客様の声・ご感想一覧 - Spa Blanc Aroma",
+        "description": "大阪・淡路のゲイ向けアロママッサージサロン「Spa Blanc Aroma」に来店されたお客様からのご感想・口コミ一覧。",
+        "isPartOf": {
+          "@type": "WebSite",
+          "@id": "https://spa-blanc-aroma.com/#website",
+          "name": "Spa Blanc Aroma",
+          "url": "https://spa-blanc-aroma.com/"
+        }
+      }
+    ]
+  }
+  </script>
+
   <link rel="stylesheet" href="../style.css">
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -35,6 +95,19 @@
     }
     .column-card:hover { transform: translateY(-3px); border-color: #b39b7d; box-shadow: 0 6px 20px rgba(179, 155, 125, 0.15); }
     
+    /* 固定カード（おすすめ・初心者ガイド用）スタイル */
+    .column-card.pinned-card {
+      background: #faf8f5;
+      border: 1.5px solid #b39b7d;
+      box-shadow: 0 4px 18px rgba(179, 155, 125, 0.12);
+      margin-top: 25px;
+    }
+    .column-card.pinned-card .column-card-tag {
+      background: #b39b7d;
+      color: #fff;
+      border: none;
+    }
+
     .column-card-img {
       width: 220px;
       height: 130px;
@@ -109,7 +182,9 @@
     </div>
 
     <div class="container">
-      <div class="column-list">
+
+      <!-- セラピスト別口コミ一覧 -->
+      <div class="column-list" style="margin-top: 0;">
         
         <!-- りょうすけのお客様の声 -->
         <a href="cv_ryosuke.html" class="column-card">
@@ -136,6 +211,20 @@
         </a>
 
       </div>
+
+      <!-- 固定表示カード（初心者ガイドへのリンク：最下部配置） -->
+      <a href="../column/gay-massage-guide.html" class="column-card pinned-card">
+        <img src="../column/ogp-guide.png" alt="初めてのゲイマッサージ初心者ガイド" class="column-card-img">
+        <div class="column-card-content">
+          <div class="column-card-meta">
+            <span class="column-card-tag">RECOMMEND</span>
+            <span class="column-card-tag" style="background:#f8f6f2; color:#b39b7d; border:1px solid #e0dcd5;">初めての方へ</span>
+          </div>
+          <div class="column-card-title">【初心者ガイド】初めてのゲイマッサージ利用の流れ・マナー・準備まとめ</div>
+          <div class="column-card-desc">初めてサロンを利用される方向けの完全ガイド。Web予約から当日のカウンセリング、持ち物や利用マナーまで分かりやすくまとめています。ご来店前の不安解消にぜひご覧ください。</div>
+        </div>
+      </a>
+
     </div>
 
     <!-- フッター -->
