@@ -1,28 +1,19 @@
-# 拡張子の競合やMultiViewsによるエラーを防ぐ
 Options -MultiViews
 
-#SSLREDIRECT
 <IfModule mod_rewrite.c>
 RewriteEngine On
+
+# 1. HTTPからHTTPSへの強制リダイレクト
 RewriteCond %{HTTPS} !on
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=302,L]
-</IfModule>
-#SSLREDIRECT
 
-#DOMAINREDIRECT
-<IfModule mod_rewrite.c>
-RewriteEngine On
-RewriteCond %{HTTP_HOST} ^st599405.static.jp
-RewriteRule ^(.*) https://spa-blanc-aroma.com/$1 [R=302,L]
-</IfModule>
-#DOMAINREDIRECT
+# 2. 旧ドメインからのリダイレクト
+RewriteCond %{HTTP_HOST} ^st599405\.static\.jp [NC]
+RewriteRule ^(.*)$ https://spa-blanc-aroma.com/$1 [R=302,L]
 
-#EXTENSIONLESS (拡張子なし表示の設定)
-<IfModule mod_rewrite.c>
-RewriteEngine On
+# 3. 拡張子なしURLの内部処理（reservation -> reservation.html）
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME}.html -f
 RewriteRule ^(.*)$ $1.html [L]
 </IfModule>
-#EXTENSIONLESS
