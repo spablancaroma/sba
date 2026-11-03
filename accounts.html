@@ -408,7 +408,7 @@
         let filteredData = [];
         let currentPage = 1;
         const PAGE_SIZE = 20;
-        let editingRowId = null; // 現在インライン編集中の行ID
+        let editingRowId = null;
 
         function handleAuth(e) {
             e.preventDefault();
@@ -612,18 +612,25 @@
                 const isEditing = (editingRowId === t.id);
 
                 if (isEditing) {
-                    // --- インライン編集中の行表示 ---
+                    // 日付フォーマットを確実に yyyy-mm-dd に正規化（タイムゾーンやISO文字列対策）
+                    let formattedDate = t.date || '';
+                    if (formattedDate.includes('T')) {
+                        formattedDate = formattedDate.split('T')[0];
+                    } else if (formattedDate.includes('/')) {
+                        formattedDate = formattedDate.replace(/\//g, '-');
+                    }
+
                     const catList = categories[t.type] || categories["経費"];
                     const catOptions = catList.map(c => `<option value="${c}" ${c === t.category ? 'selected' : ''}>${c}</option>`).join('');
                     const payOptions = ["現金", "クレジット", "QR", "電子マネー"].map(p => `<option value="${p}" ${p === t.payment ? 'selected' : ''}>${p}</option>`).join('');
 
                     tr.innerHTML = `
-                        <td><input type="date" id="edit-date-${t.id}" class="inline-input" value="${t.date}"></td>
+                        <td><input type="date" id="edit-date-${t.id}" class="inline-input" value="${formattedDate}" required></td>
                         <td><span class="type-badge ${t.type === '売上' ? 'income' : 'expense'}">${t.type}</span></td>
                         <td><select id="edit-cat-${t.id}" class="inline-select">${catOptions}</select></td>
                         <td><input type="text" id="edit-memo-${t.id}" class="inline-input" value="${t.memo || ''}"></td>
                         <td><select id="edit-pay-${t.id}" class="inline-select">${payOptions}</select></td>
-                        <td><input type="number" id="edit-amt-${t.id}" class="inline-input" style="text-align:right;" value="${t.amount}" min="0"></td>
+                        <td><input type="number" id="edit-amt-${t.id}" class="inline-input" style="text-align:right;" value="${t.amount}" min="0" required></td>
                         <td style="text-align: center;">
                             <div class="action-btns-cell">
                                 <button class="action-sm-btn save" onclick="saveInlineEdit(${t.id})" title="保存">保存</button>
@@ -632,7 +639,6 @@
                         </td>
                     `;
                 } else {
-                    // --- 通常の行表示 ---
                     const actualAmount = Number(t.actualAmount);
                     tr.innerHTML = `
                         <td style="font-family: var(--font-en);">${t.date}</td>
@@ -666,7 +672,6 @@
             renderTablePage();
         }
 
-        // --- インライン編集操作 ---
         function startInlineEdit(id) {
             editingRowId = id;
             renderTablePage();
@@ -692,7 +697,6 @@
                 return;
             }
 
-            // 既存の家事按分率(ratio)を保持しつつ計上額を再計算
             const ratio = Number(item.ratio) || 1.0;
             const actualAmount = Math.round(Number(newAmount) * ratio);
 
@@ -702,7 +706,7 @@
                 year: currentSelectedYear,
                 id: id,
                 date: newDate,
-                type: item.type, // 区分は維持
+                type: item.type,
                 category: newCat,
                 amount: newAmount,
                 ratio: ratio,
@@ -808,7 +812,6 @@
             });
         }
 
-        // 新規登録フォーム送信処理
         document.getElementById('accounting-form').addEventListener('submit', async (e) => {
             e.preventDefault();
 
