@@ -18,7 +18,7 @@
             background-color: #555;
             font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
             color: #3b3530;
-            line-height: 1.5;
+            line-height: 1.4;
         }
 
         /* --- PDF出力ボタン --- */
@@ -48,7 +48,7 @@
             width: 210mm;
             height: 297mm;
             margin: 10mm auto;
-            padding: 12mm 15mm 10mm 15mm;
+            padding: 8mm 12mm 6mm 12mm;
             box-shadow: 0 0 15px rgba(0,0,0,0.3);
             page-break-after: always;
             break-after: page;
@@ -59,7 +59,7 @@
             overflow: hidden;
         }
 
-        /* --- 表紙ページスタイル（中央配置） --- */
+        /* --- 表紙ページスタイル --- */
         .cover-page {
             background-color: #f2ece4;
             padding: 18mm 15mm 14mm 15mm;
@@ -134,23 +134,23 @@
             line-height: 1.5;
         }
 
-        /* --- 通常ページのコンテンツ分配コンテナ --- */
+        /* --- 通常ページのコンテナ --- */
         .page-body {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             flex-grow: 1;
-            margin: 4px 0;
+            margin: 2px 0;
         }
 
         /* --- セクション＆ボックス構造 --- */
         .page-header {
-            font-size: 1.1rem;
+            font-size: 0.98rem;
             font-weight: bold;
             color: #3b3530;
             border-left: 4px solid #b39b7d;
             padding-left: 8px;
-            margin-bottom: 6px;
+            margin-bottom: 3px;
             letter-spacing: 0.02em;
         }
 
@@ -158,14 +158,11 @@
             background-color: #faf8f5;
             border: 1px solid #eee5dc;
             border-radius: 5px;
-            padding: 10px 14px;
+            padding: 6px 10px;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
-        }
-        .section-box + .section-box {
-            margin-top: 8px;
         }
 
         .manual-list {
@@ -174,11 +171,11 @@
         }
         .manual-list li {
             position: relative;
-            padding-left: 16px;
-            font-size: 0.92rem;
+            padding-left: 12px;
+            font-size: 0.82rem;
             color: #444;
-            margin-bottom: 4px;
-            line-height: 1.48;
+            margin-bottom: 2px;
+            line-height: 1.38;
         }
         .manual-list li::before {
             content: "•";
@@ -186,76 +183,131 @@
             left: 0;
             color: #b39b7d;
             font-weight: bold;
-            font-size: 1.1rem;
+            font-size: 0.95rem;
+        }
+
+        /* --- フローチャート --- */
+        .flow-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #ffffff;
+            border: 1px solid #e6ded5;
+            border-radius: 5px;
+            padding: 6px 4px;
+            margin-bottom: 6px;
+        }
+        .flow-step {
+            flex: 1;
+            background-color: #f2ece4;
+            border-radius: 4px;
+            padding: 4px 2px;
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: #3b3530;
+            border: 1px solid #dcd5cc;
+        }
+        .flow-step span {
+            display: block;
+            font-size: 0.65rem;
+            color: #b39b7d;
+            font-weight: normal;
+        }
+        .flow-arrow {
+            font-size: 0.85rem;
+            color: #b39b7d;
+            padding: 0 3px;
+            font-weight: bold;
+        }
+
+        /* --- メールSVG表示コンテナ --- */
+        .email-view-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 4px;
+        }
+        .email-card {
+            background-color: #ffffff;
+            border: 1px solid #e6ded5;
+            border-radius: 4px;
+            padding: 4px;
+            text-align: center;
+        }
+        .email-card-title {
+            font-size: 0.76rem;
+            font-weight: bold;
+            color: #b39b7d;
+            margin-bottom: 3px;
         }
 
         /* --- コースグリッド --- */
         .course-grid {
             display: flex;
-            gap: 8px;
-            margin-top: 6px;
+            gap: 6px;
+            margin-top: 3px;
         }
         .course-card {
             flex: 1;
             background-color: #ffffff;
             border: 1px solid #e6ded5;
             border-radius: 4px;
-            padding: 6px 8px;
+            padding: 3px 5px;
             text-align: center;
         }
         .course-title {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             font-weight: bold;
             color: #b39b7d;
-            margin-bottom: 2px;
         }
         .course-desc {
-            font-size: 0.82rem;
+            font-size: 0.74rem;
             color: #444;
         }
 
         /* --- スマートロック案内用レイアウト --- */
         .smart-lock-row {
             display: flex;
-            gap: 12px;
+            gap: 8px;
             align-items: center;
         }
         .smart-lock-img {
-            width: 65px;
-            height: 65px;
+            width: 48px;
+            height: 48px;
             object-fit: cover;
             border-radius: 4px;
             border: 1px solid #e6ded5;
             flex-shrink: 0;
         }
 
-        /* --- 精算手順専用の横並びカードレイアウト --- */
+        /* --- 精算手順4列レイアウト（上揃え修正） --- */
         .settlement-container {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 6px;
             margin-top: 4px;
         }
         .settlement-card {
             background-color: #faf8f5;
             border: 1px solid #eee5dc;
             border-radius: 5px;
-            padding: 10px 12px;
+            padding: 6px 8px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: flex-start; /* 上揃えに固定 */
         }
         .settlement-svg {
             background-color: #ffffff;
             border: 1px solid #e6ded5;
             border-radius: 4px;
-            padding: 4px;
+            padding: 2px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 110px;
-            margin-bottom: 8px;
+            height: 95px;
+            margin-bottom: 6px;
         }
         .settlement-svg svg {
             width: 100%;
@@ -263,18 +315,18 @@
             object-fit: contain;
         }
         .settlement-title {
-            font-size: 0.9rem;
+            font-size: 0.82rem;
             font-weight: bold;
             color: #3b3530;
             border-bottom: 1px dashed #dcd5cc;
-            padding-bottom: 4px;
+            padding-bottom: 2px;
             margin-bottom: 6px;
             text-align: center;
         }
         .settlement-text {
-            font-size: 0.82rem;
+            font-size: 0.74rem;
             color: #444;
-            line-height: 1.42;
+            line-height: 1.35;
         }
 
         /* --- 施術カード (SVG＋解説) --- */
@@ -282,36 +334,36 @@
             background-color: #faf8f5;
             border: 1px solid #eee5dc;
             border-radius: 5px;
-            padding: 8px 12px;
+            padding: 6px 10px;
             flex-grow: 1;
             display: grid;
-            grid-template-columns: 130px 1fr;
-            gap: 12px;
+            grid-template-columns: 120px 1fr;
+            gap: 10px;
             align-items: center;
         }
         .procedure-card + .procedure-card {
-            margin-top: 6px;
+            margin-top: 4px;
         }
         .svg-container {
             background-color: #ffffff;
             border-radius: 4px;
-            padding: 4px;
+            padding: 2px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             border: 1px solid #eee5dc;
-            height: 95px;
+            height: 85px;
         }
         .svg-container svg {
             width: 100%;
-            height: 70px;
+            height: 62px;
             object-fit: contain;
         }
         .svg-caption {
-            font-size: 0.74rem;
+            font-size: 0.7rem;
             color: #666;
-            margin-top: 3px;
+            margin-top: 2px;
             text-align: center;
             font-weight: bold;
         }
@@ -320,38 +372,38 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
             border-bottom: 1px dashed #dcd5cc;
-            padding-bottom: 2px;
+            padding-bottom: 1px;
         }
         .proc-title {
-            font-size: 0.96rem;
+            font-size: 0.9rem;
             font-weight: bold;
             color: #3b3530;
         }
         .proc-tag {
             background-color: #f2ece4;
             color: #3b3530;
-            font-size: 0.78rem;
-            padding: 1px 5px;
-            border-radius: 4px;
+            font-size: 0.75rem;
+            padding: 1px 4px;
+            border-radius: 3px;
             font-weight: bold;
         }
         .proc-steps {
-            font-size: 0.88rem;
+            font-size: 0.82rem;
             color: #444;
-            line-height: 1.45;
+            line-height: 1.38;
         }
         .proc-steps p {
-            margin-bottom: 2px;
+            margin-bottom: 1px;
         }
         .proc-caution {
             background-color: #fdf4f2;
             border-left: 2.5px solid #c86b5a;
-            padding: 2px 6px;
-            font-size: 0.83rem;
+            padding: 1px 5px;
+            font-size: 0.76rem;
             color: #c86b5a;
-            margin-top: 3px;
+            margin-top: 2px;
             border-radius: 0 3px 3px 0;
             font-weight: bold;
         }
@@ -359,11 +411,11 @@
         /* --- フッター --- */
         .footer {
             text-align: center;
-            font-size: 0.78rem;
+            font-size: 0.74rem;
             color: #888;
             border-top: 1px solid #f0ede8;
-            padding-top: 4px;
-            margin-top: 3px;
+            padding-top: 2px;
+            margin-top: 2px;
         }
 
         /* --- 印刷設定 --- */
@@ -404,7 +456,7 @@
             </div>
             
             <div class="cover-desc">
-                サロンの基本運営ルールから実務推奨標準手順、そして精算方法までを網羅したスタッフ共通の総合マニュアルです。
+                サロンの基本運営ルールからWEB予約システム連携、実務推奨標準手順、そして精算・アフターフォローまでを網羅した総合マニュアルです。
             </div>
 
             <div class="cover-disclaimer">
@@ -421,40 +473,100 @@
     </div>
 
     <!-- ==========================================
-         【1ページ目】 基本運営ルール (1〜4)
+         【1ページ目】 基本運営ルール & WEB予約システム運用
          ========================================== -->
     <div class="a4-page">
         <div class="page-body">
+            <!-- 1. シフト・個室 -->
             <div>
-                <div class="page-header">1. シフト登録の仕方 & 個室入室方法</div>
-                <div class="section-box" style="padding: 12px 16px;">
+                <div class="page-header">1. シフト登録 & 個室入室方法</div>
+                <div class="section-box">
                     <div class="smart-lock-row">
                         <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3rDaZOce5oR7yb3SqqDIKuSBtyynK9JvpgnWnbjdQLA&s=10" alt="スマートロック" class="smart-lock-img">
                         <ul class="manual-list" style="flex-grow: 1;">
-                            <li><b>管理者画面ログイン:</b> メニュー等の「管理者画面」よりパスワードを用いてログインしてください。</li>
-                            <li><b>シフト・営業日登録:</b> ご出勤日およびご予約受付時間枠（例: 10:00〜19:00）を正確に設定し保存をお願いいたします。</li>
-                            <li><b>個室入室:</b> 個室ドアのスマートキーに指定の暗証番号を入力してご入室ください。オートロック仕様のため、施錠の確認を徹底してください。</li>
+                            <li><b>管理者画面ログイン:</b> サイトメニューの「管理者画面」よりパスワード（blanc2025）でログイン。</li>
+                            <li><b>シフト登録:</b> 出勤日および受付時間枠（例: 10:00〜19:00）を正確に設定し保存をお願いします。</li>
+                            <li><b>個室入室:</b> 個室ドアのスマートキーに暗証番号を入力してご入室ください（オートロック徹底）。</li>
                         </ul>
                     </div>
                 </div>
             </div>
 
+            <!-- 2. 予約システム運用＆メール画像 -->
             <div>
-                <div class="page-header">2. 入店条件 & ウェルカムドリンク</div>
-                <div class="section-box" style="padding: 12px 16px;">
+                <div class="page-header">2. WEB予約対応フロー・時間調整・メールイメージ</div>
+                <div class="section-box">
+                    <!-- フローチャート -->
+                    <div class="flow-container">
+                        <div class="flow-step">① リクエスト<span>メール/店舗通知</span></div>
+                        <div class="flow-arrow">➔</div>
+                        <div class="flow-step">② 管理者画面<span>調整または判定</span></div>
+                        <div class="flow-arrow">➔</div>
+                        <div class="flow-step">③ 承認 / 却下<span>自動確定メール</span></div>
+                        <div class="flow-arrow">➔</div>
+                        <div class="flow-step">④ 施術実施<span>店舗または出張</span></div>
+                        <div class="flow-arrow">➔</div>
+                        <div class="flow-step">⑤ お礼メール<span>ワンクリック送信</span></div>
+                    </div>
+
                     <ul class="manual-list">
-                        <li><b>入店条件:</b> 未成年者のご利用は固くお断りしております。また、泥酔状態のお客様、発熱・体調不良が見受けられる方、過度な要求が予想される場合は、即時退店および入店拒否の対応をとってください。</li>
-                        <li><b>ドリンク提供:</b> ホワイトボードをご提示し、お客様にお好きなお飲み物をお選びいただきます。ドルチェグストまたはアイスティー（濃いめ抽出・氷急冷）をご用意ください。ご使用後のグラスは速やかに洗浄をお願いいたします。</li>
+                        <li><b>リクエスト通知:</b> お客様からリクエストが入ると、スタッフメールに通知が届きます。通知内の<b>「管理者画面（こちら）」</b>リンク（<a href="https://spa-blanc-aroma.com/admin.html" target="_blank" style="color: #b39b7d; font-weight: bold; text-decoration: underline;">https://spa-blanc-aroma.com/admin.html</a>）をクリックして調整画面を開きます。</li>
+                        <li><b>承認 / 時間調整 / 却下操作:</b>
+                            <br>・<b>【承認】:</b> 日時・コースを確認し「承認する」を押すと、お客様に<b>【確定】メール</b>が届きGoogleカレンダーへ自動同期されます。
+                            <br>・<b>【時間調整】:</b> カード内の「調整日時」欄にご提案日時（例: <code>2026-11-06 14:00</code>）を入力し「時間調整依頼メールを送信」を押すとお客様に変更依頼メールが飛びます。合意後、その日時を入れたまま「承認する」を押すと新日時で確定されます。
+                            <br>・<b>【却下】:</b> 「却下する」を押すと自動的にお断りメールが送信されます。</li>
                     </ul>
+
+                    <!-- メール画面イメージ SVG -->
+                    <div class="email-view-container">
+                        <!-- 通知＆承認メールSVG -->
+                        <div class="email-card">
+                            <div class="email-card-title">▼ 予約確定メール（統一デザイン）</div>
+                            <svg viewBox="0 0 200 110" preserveAspectRatio="xMidYMid meet">
+                                <rect x="2" y="2" width="196" height="106" fill="#FFF" stroke="#E0DCD5" rx="4"/>
+                                <rect x="2" y="2" width="196" height="24" fill="#F2ECE4" rx="4"/>
+                                <text x="100" y="11" font-size="5" fill="#B39B7D" text-anchor="middle" font-family="Montserrat">RESERVATION CONFIRMED</text>
+                                <text x="100" y="20" font-size="7" fill="#3B3530" text-anchor="middle" font-weight="bold">ご予約が確定いたしました</text>
+                                <text x="10" y="34" font-size="5.5" fill="#333" font-weight="bold">山田 太郎 様</text>
+                                <rect x="10" y="40" width="180" height="42" fill="#FAF8F5" stroke="#EEE5DC" rx="3"/>
+                                <text x="15" y="50" font-size="5" fill="#555">担当セラピスト: <tspan fill="#B39B7D" font-weight="bold">そうた</tspan></text>
+                                <line x1="15" y1="53" x2="185" y2="53" stroke="#F0EDE8"/>
+                                <text x="15" y="62" font-size="5" fill="#555">ご予約日時: 11月6日(金) 14:00～</text>
+                                <line x1="15" y1="65" x2="185" y2="65" stroke="#F0EDE8"/>
+                                <text x="15" y="74" font-size="5" fill="#555">コース: 90分 (12,000円)</text>
+                                <rect x="2" y="90" width="196" height="18" fill="#222" rx="0"/>
+                                <text x="100" y="101" font-size="5" fill="#AAA" text-anchor="middle" font-family="Montserrat">© Spa Blanc Aroma All Rights Reserved.</text>
+                            </svg>
+                        </div>
+                        <!-- 却下・時間調整メールSVG -->
+                        <div class="email-card">
+                            <div class="email-card-title">▼ 時間調整・却下通知イメージ</div>
+                            <svg viewBox="0 0 200 110" preserveAspectRatio="xMidYMid meet">
+                                <rect x="2" y="2" width="196" height="106" fill="#FFF" stroke="#E0DCD5" rx="4"/>
+                                <rect x="2" y="2" width="196" height="24" fill="#F2ECE4" rx="4"/>
+                                <text x="100" y="11" font-size="5" fill="#B39B7D" text-anchor="middle" font-family="Montserrat">RESERVATION NOTIFICATION</text>
+                                <text x="100" y="20" font-size="7" fill="#3B3530" text-anchor="middle" font-weight="bold">ご予約日時変更のお願い</text>
+                                <text x="10" y="34" font-size="5.5" fill="#333" font-weight="bold">山田 太郎 様</text>
+                                <text x="10" y="44" font-size="4.8" fill="#444">ご希望日時でのご調整が難しいため以下を提案します</text>
+                                <rect x="10" y="50" width="180" height="18" fill="#FAF8F5" stroke="#EEE5DC" rx="3"/>
+                                <text x="15" y="62" font-size="5.5" fill="#B39B7D" font-weight="bold">【ご提案日時】 11月6日(金) 16:00～</text>
+                                <rect x="55" y="74" width="90" height="12" fill="#B39b7d" rx="6"/>
+                                <text x="100" y="82" font-size="5" fill="#FFF" text-anchor="middle" font-weight="bold">管理者画面で調整・承認</text>
+                                <rect x="2" y="90" width="196" height="18" fill="#222" rx="0"/>
+                                <text x="100" y="101" font-size="5" fill="#AAA" text-anchor="middle" font-family="Montserrat">© Spa Blanc Aroma All Rights Reserved.</text>
+                            </svg>
+                        </div>
+                    </div>
                 </div>
             </div>
 
+            <!-- 3. 入店条件・接客 -->
             <div>
-                <div class="page-header">3. カウンセリング & 施術フロー</div>
-                <div class="section-box" style="padding: 12px 16px;">
+                <div class="page-header">3. 入店条件 & カウンセリング・施術フロー</div>
+                <div class="section-box">
                     <ul class="manual-list">
-                        <li><b>準備・演出:</b> 体調のヒアリングとオイルの香り選びを行います。ディフューザーとオイルの香りを統一し、アレクサにてBGMを再生してリラックス空間を演出します。</li>
-                        <li><b>施術フロー:</b> ドリンク提供 ➜ カウンセリング ➜ シャワー＆準備 ➜ 各コース施術 ➜ シャワー＆アフタードリンク ➜ お見送り。</li>
+                        <li><b>入店条件:</b> 未成年、泥酔者、体調不良者、過度な要求者は即時退店対応をとってください。</li>
+                        <li><b>ドリンク & 演出:</b> ホワイトボードでドリンクをお選びいただき提供。ディフューザーとアレクサBGMで空間演出。</li>
                     </ul>
                     <div class="course-grid">
                         <div class="course-card">
@@ -473,13 +585,13 @@
                 </div>
             </div>
 
+            <!-- 4. 片付け・禁止事項 -->
             <div>
                 <div class="page-header">4. 片付け & 禁止事項</div>
-                <div class="section-box" style="padding: 12px 16px;">
+                <div class="section-box">
                     <ul class="manual-list">
-                        <li><b>片付け:</b> タオル類は洗濯機にて「洗乾標準モード」で回してください。オイルなどの備品はすべて元の位置に戻し、お部屋の換気および掃除機掛けを行います。退室時には公式LINEへ「終了しました。現金だったので茶封筒に入れています。／クレジットだったので報酬はPayPayで送金お願いします。」とご報告ください。室内のゴミはすべて持ち出し、マンション前のゴミ置き場に廃棄して完了となります。</li>
-                        <li><b>近隣対応:</b> 万が一、近隣の方からお声掛けがあった場合は「社宅なので分かりません」とお伝えいただき、速やかに店舗へご報告ください。</li>
-                        <li><b>禁止事項:</b> 性交は厳禁です。お客様との連絡先交換、および他店へのセラピストの引き抜き行為は一切禁止としております。万が一、性感染症に罹患された場合は、速やかにオーナーへご報告いただき指示を仰いでください。</li>
+                        <li><b>片付け:</b> タオル洗濯（洗乾標準）、備品整理、掃除機、ゴミ出しを行い、LINEで報告を送信。</li>
+                        <li><b>禁止事項:</b> 性交厳禁。お客様との連絡先交換・他店への引き抜き行為は固く禁止です。</li>
                     </ul>
                 </div>
             </div>
@@ -599,14 +711,14 @@
     </div>
 
     <!-- ==========================================
-         【3ページ目】 背面・腹部施術 ＆ 精算方法
+         【3ページ目】 背面・腹部施術 ＆ 精算方法（上揃え対応）
          ========================================== -->
     <div class="a4-page">
         <div class="page-body" style="justify-content: space-between;">
-            <div class="page-header" style="margin-bottom: 2px;">6. 施術技術: 背面・腹部フェーズ ＆ 精算方法</div>
+            <div class="page-header" style="margin-bottom: 2px;">6. 施術技術: 背面・腹部フェーズ ＆ 精算・アフターフォロー</div>
             
-            <div class="procedure-card" style="padding: 6px 10px;">
-                <div class="svg-container" style="height: 72px;">
+            <div class="procedure-card" style="padding: 5px 8px;">
+                <div class="svg-container" style="height: 68px;">
                     <svg viewBox="0 0 100 120">
                         <path d="M 20 115 L 20 40 L 10 25 L 30 10 L 70 10 L 90 25 L 80 40 L 80 115 Z" fill="#D6CEB9" stroke="#7A726B" stroke-width="1.5"/>
                         <line x1="42" y1="110" x2="42" y2="20" stroke="#3A3532" stroke-width="2"/>
@@ -620,15 +732,15 @@
                         <span class="proc-title" style="font-size: 0.85rem;">5. BACK & SHOULDER (背中・肩甲骨)</span>
                         <span class="proc-tag">うつ伏せ / オイル</span>
                     </div>
-                    <div class="proc-steps" style="font-size: 0.78rem;">
+                    <div class="proc-steps" style="font-size: 0.76rem;">
                         <p><b>① 直線性流し:</b> 腰から首元・肩口へ脊柱両脇を直線状に滑らせる。</p>
                         <p><b>② 肩甲骨ストレッチ:</b> 腕を持ち上げ、背中側へ引き出し内縁をほぐす。</p>
                     </div>
                 </div>
             </div>
 
-            <div class="procedure-card" style="padding: 6px 10px;">
-                <div class="svg-container" style="height: 72px;">
+            <div class="procedure-card" style="padding: 5px 8px;">
+                <div class="svg-container" style="height: 68px;">
                     <svg viewBox="0 0 100 120">
                         <path d="M 15 60 C 15 20 85 20 85 60 C 85 100 15 100 15 60 Z" fill="#D6CEB9" stroke="#7A726B" stroke-width="1.5"/>
                         <rect x="22" y="45" width="24" height="30" rx="5" fill="#A39382" opacity="0.8"/>
@@ -641,15 +753,15 @@
                         <span class="proc-title" style="font-size: 0.85rem;">6. HIP TREATMENT (臀部・お尻オイル)</span>
                         <span class="proc-tag">四つん場・伏せ</span>
                     </div>
-                    <div class="proc-steps" style="font-size: 0.78rem;">
+                    <div class="proc-steps" style="font-size: 0.76rem;">
                         <p><b>① 姿勢調整:</b> 体勢を調整してお尻の筋肉を刺激する。</p>
                         <p><b>② 前腕面の活用:</b> 肘下までオイルを塗り、前腕全体の面を密着させて包み込むように流す。</p>
                     </div>
                 </div>
             </div>
 
-            <div class="procedure-card" style="padding: 6px 10px;">
-                <div class="svg-container" style="height: 72px;">
+            <div class="procedure-card" style="padding: 5px 8px;">
+                <div class="svg-container" style="height: 68px;">
                     <svg viewBox="0 0 100 120">
                         <ellipse cx="50" cy="60" rx="35" ry="45" fill="#D6CEB9" stroke="#7A726B" stroke-width="1.5"/>
                         <path d="M 50 25 A 30 30 0 1 1 49 25" fill="none" stroke="#3A3532" stroke-width="2" stroke-dasharray="3,2"/>
@@ -662,18 +774,18 @@
                         <span class="proc-title" style="font-size: 0.85rem;">7. ABDOMEN & FINISH (腹部ケア・仕上げ)</span>
                         <span class="proc-tag">仰向け / オイル</span>
                     </div>
-                    <div class="proc-steps" style="font-size: 0.78rem;">
+                    <div class="proc-steps" style="font-size: 0.76rem;">
                         <p><b>① 時計回り流し:</b> 仰向けへ誘導し、お腹全体に時計回りに馴染ませる。</p>
                         <p><b>② 集血イメージ:</b> 下腹部に血液を集めるイメージで上から下へ流す。</p>
                     </div>
                 </div>
             </div>
 
-            <!-- 精算方法 -->
+            <!-- 7. 精算方法 ＆ お礼メールボタン操作（4列上揃えカード） -->
             <div>
-                <div class="page-header" style="font-size: 0.98rem;">7. セラピスト精算方法 (詳細)</div>
-                <div class="section-box" style="padding: 6px 10px;">
-                    <p style="font-size: 0.78rem; font-weight: bold; color: #3b3530; margin-bottom: 2px;">■ 精算フロー (報酬金額 ＋ 店舗分3,000円 ＝ コース金額)</p>
+                <div class="page-header" style="font-size: 0.95rem;">7. セラピスト精算方法 ＆ お礼メール送信フロー</div>
+                <div class="section-box" style="padding: 6px 8px;">
+                    <p style="font-size: 0.75rem; font-weight: bold; color: #3b3530; margin-bottom: 2px;">■ 精算・業務完了フロー (報酬金額 ＋ 店舗分3,000円 ＝ コース金額)</p>
                     <div class="settlement-container">
                         <!-- ①縦長茶封筒 -->
                         <div class="settlement-card">
@@ -689,7 +801,7 @@
                             </div>
                             <div class="settlement-text">
                                 • <b>名・日・コース・金額</b>を記入。<br>
-                                (例: そうた 10/31 90分 ¥12.000 / キャッシュレス時は決済方法も)
+                                (例: そうた 10/31 90分 ¥12,000)
                             </div>
                         </div>
 
@@ -701,7 +813,7 @@
                                     <rect x="5" y="5" width="90" height="65" fill="#FFF" stroke="#8C7A6B" stroke-width="1.5" rx="1"/>
                                     <text x="36" y="16" font-size="7.5" fill="#333" font-weight="bold">領 収 証</text>
                                     <text x="10" y="26" font-size="6" fill="#444">宛名: Spa BlancAroma</text>
-                                    <text x="10" y="35" font-size="6" fill="#444">金額: 9,000円 (内訳:90分ｺｰｽ)</text>
+                                    <text x="10" y="35" font-size="6" fill="#444">金額: 9,000円 (90分)</text>
                                     <text x="50" y="54" font-size="6" fill="#444">松本大暉</text>
                                     <circle cx="80" cy="51" r="8" fill="none" stroke="#C86B5A" stroke-width="1"/>
                                     <text x="74" y="53" font-size="5" fill="#C86B5A" font-weight="bold">松本</text>
@@ -709,7 +821,7 @@
                             </div>
                             <div class="settlement-text">
                                 • 宛名: <b>Spa BlancAroma</b><br>
-                                • 金額: <b>コース-3,000円</b> (例:9,000円)<br>
+                                • 金額: <b>コース-3,000円</b><br>
                                 • 発行者: <b>本名 ＋ 印鑑</b>
                             </div>
                         </div>
@@ -727,8 +839,28 @@
                             </div>
                             <div class="settlement-text">
                                 • <b>領収証と3,000円</b>を封入。<br>
-                                • <b>封緘シール</b>を貼りかごへ。<br>
-                                (報酬領収証 ＋ 3,000円 ＝ コース金額)
+                                • <b>封緘シール</b>を貼りかごへ。
+                            </div>
+                        </div>
+
+                        <!-- ④ お礼メール送信ボタン -->
+                        <div class="settlement-card">
+                            <div class="settlement-title">④ お礼メール送信</div>
+                            <div class="settlement-svg">
+                                <svg viewBox="0 0 110 85" preserveAspectRatio="xMidYMid meet">
+                                    <rect x="3" y="3" width="104" height="79" fill="#FFF" stroke="#E0DCD5" rx="4"/>
+                                    <text x="10" y="15" font-size="6" fill="#3B3530" font-weight="bold">予約管理 (管理者画面)</text>
+                                    <rect x="8" y="22" width="94" height="25" fill="#FAF8F5" stroke="#EEE5DC" rx="2"/>
+                                    <text x="12" y="32" font-size="5.5" fill="#333" font-weight="bold">山田太郎 様 (確定)</text>
+                                    <rect x="12" y="37" width="86" height="7" fill="#EAE5DF" rx="1"/>
+                                    <!-- ボタン -->
+                                    <rect x="8" y="52" width="94" height="20" fill="#B39B7D" rx="10"/>
+                                    <text x="55" y="64" font-size="5.5" fill="#FFF" text-anchor="middle" font-weight="bold">💌 ご来店お礼メールを送る</text>
+                                </svg>
+                            </div>
+                            <div class="settlement-text">
+                                • 管理者画面の予約管理を開く。<br>
+                                • 対象予約の<b>「💌 ご来店お礼メールを送る」</b>を押して自動送信。
                             </div>
                         </div>
                     </div>
@@ -739,7 +871,7 @@
     </div>
 
     <!-- ==========================================
-         【4ページ目】 身だしなみ & オーナーからのメッセージ（独立してゆったり）
+         【4ページ目】 身だしなみ & オーナーからのメッセージ
          ========================================== -->
     <div class="a4-page">
         <div class="page-body" style="justify-content: flex-start; gap: 20px;">
