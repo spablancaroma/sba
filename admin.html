@@ -633,13 +633,13 @@
             <p style="margin: 0 0 6px 0; font-size: 0.88rem; color: #666;"><strong>指名:</strong> ${r.therapist} / <strong>連絡先:</strong> ${r.tel} (${r.email})</p>
             
             <div style="margin: 12px 0; padding: 10px; background: #f8f6f2; border-radius: 6px; border: 1px solid #e0dcd5;">
-              <label style="font-size: 0.85rem; margin-bottom: 4px; color: #b39b7d;">▼ 時間調整を提案する場合の日時</label>
+              <label style="font-size: 0.85rem; margin-bottom: 4px; color: #b39b7d;">▼ 調整日時（この日時を指定して「承認する」と、その変更後日時で予約確定できます）</label>
               <input type="datetime-local" id="newDt_${r.id}" style="margin-bottom: 8px; padding: 8px; font-size: 0.9rem; width:100%; box-sizing:border-box;">
               <button class="btn" style="background: #2980B9; padding: 10px; font-size: 0.85rem; margin-bottom: 0;" onclick="sendTimeAdjustment('${r.id}')">時間調整依頼メールを送信</button>
             </div>
 
             <div style="display: flex; gap: 10px; margin-top: 10px;">
-              <button class="btn" style="background: #b39b7d; width: 48%; padding: 10px; font-size: 0.85rem; margin-bottom: 0;" onclick="approveReservation('${r.id}')">承認する</button>
+              <button class="btn" style="background: #b39b7d; width: 48%; padding: 10px; font-size: 0.85rem; margin-bottom: 0;" onclick="approveReservation('${r.id}')">承認する（調整日時で確定も可）</button>
               <button class="btn" style="background: #E74C3C; width: 48%; padding: 10px; font-size: 0.85rem; margin-bottom: 0;" onclick="rejectReservation('${r.id}')">却下する</button>
             </div>
 
@@ -653,7 +653,8 @@
 
   function approveReservation(id) {
     const newDtVal = document.getElementById('newDt_' + id) ? document.getElementById('newDt_' + id).value : "";
-    if (confirm(newDtVal ? '調整後の日時で承認しますか？' : 'この予約を承認しますか？')) {
+    const msg = newDtVal ? '指定された調整日時（' + newDtVal.replace('T', ' ') + '）に変更して予約を承認・確定しますか？' : 'この予約を承認しますか？';
+    if (confirm(msg)) {
       postApi({ action: 'approve', id: id, newDatetime: newDtVal }).then(res => {
         alert(res.message);
         loadReservationList();
