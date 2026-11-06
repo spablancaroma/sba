@@ -60,7 +60,6 @@
     select, input[type="text"], input[type="password"], textarea { width: 100%; padding: 14px; box-sizing: border-box; border: 1px solid #e0dcd5; border-radius: 6px; font-size: 0.95rem; background: #fff; font-family: inherit; }
     select:focus, input:focus, textarea:focus { outline: none; border-color: #b39b7d; }
     
-    /* お知らせ専用の入力・テキストエリアのサイズ感と見た目 */
     textarea { height: 160px; resize: vertical; line-height: 1.6; }
 
     /* ボタン類 */
@@ -151,33 +150,36 @@
       </select>
     </div>
 
-    <!-- 選択中セラピストのスプレッドシートリンク -->
-    <div style="margin-top: -10px; margin-bottom: 20px; text-align: right;">
+    <!-- 選択中セラピストのスプレッドシートリンク ＆ デフォルト時間設定ボタン（横並び） -->
+    <div style="margin-top: -10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+      <button id="defaultShiftToggleBtn" class="manual-btn" onclick="toggleDefaultShiftMode()" style="background: #f8f6f2; cursor: pointer;">
+        ⚙️ デフォルト時間設定
+      </button>
       <a id="therapistSheetLink" href="#" target="_blank" rel="noopener noreferrer" class="manual-btn" style="display: inline-flex;">
         📊 選択中のスプレッドシートを開く
       </a>
     </div>
 
-    <!-- 週移動ナビゲーション -->
-    <div class="week-nav">
+    <!-- 週移動ナビゲーション（デフォルトモード時は非表示） -->
+    <div class="week-nav" id="weekNavContainer">
       <button onclick="changeWeek(-1)">&lt; 前週</button>
       <span id="currentWeekRange">読み込み中...</span>
       <button onclick="changeWeek(1)">次週 &gt;</button>
     </div>
-    <div style="text-align: right; margin-bottom: 10px;">
+    <div style="text-align: right; margin-bottom: 10px;" id="todayResetContainer">
       <button onclick="resetToToday()" style="background: none; border: none; color: #b39b7d; cursor: pointer; font-size: 0.85rem; text-decoration: underline;">今週（本日）へ戻る</button>
     </div>
 
     <!-- 上部保存ボタン -->
-    <button class="btn btn-save" id="saveTopBtn" onclick="saveWeeklyData()" style="margin-bottom: 20px;">この週の内容をまとめて保存する</button>
+    <button class="btn btn-save" id="saveTopBtn" onclick="saveCurrentData()" style="margin-bottom: 20px;">この週の内容をまとめて保存する</button>
 
-    <!-- 週間リスト表示エリア -->
+    <!-- 週間 / デフォルトスケジュールリスト表示エリア -->
     <div id="weeklyScheduleList">
       <p style="text-align:center; color:#888;">読み込み中...</p>
     </div>
 
     <!-- 下部保存ボタン -->
-    <button class="btn btn-save" id="saveBottomBtn" onclick="saveWeeklyData()" style="margin-top: 10px;">この週の内容をまとめて保存する</button>
+    <button class="btn btn-save" id="saveBottomBtn" onclick="saveCurrentData()" style="margin-top: 10px;">この週の内容をまとめて保存する</button>
   </div>
 
   <!-- 予約管理タブエリア -->
@@ -230,12 +232,17 @@
     document.getElementById('overlay').classList.remove('is-active');
   }
 
+  // 管理者ログイン・認証関数
   async function loginAdmin() {
-    const pass = prompt("管理者用パスワードを入力してください:");
-    if (pass === null) {
-      window.location.href = "index.html";
+    // sessionStorageに認証済みフラグがある場合は、パスワード入力をスキップして直接管理者画面へ
+    if (sessionStorage.getItem("adminAuth") === "true") {
+      document.getElementById('adminApp').style.display = 'block';
+      initAdminData();
       return;
     }
+
+    const pass = prompt("管理者用パスワードを入力してください:");
+    if (pass === null) return;
 
     try {
       const res = await jsonp('verifyPassword', { pass: pass });
@@ -249,22 +256,22 @@
       }
     } catch (err) {
       alert("認証通信エラーが発生しました: " + err.message);
-      window.location.href = "index.html";
     }
   }
 
   const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzINJ6cRRGnjW4n1n1zW42LDRqziMAkOKwDZrwMhMWnNdmO74K815ld_gbcnB94eh8/exec";
   
-  // セラピストごとのスプレッドシートURLマップ
   const THERAPIST_SHEET_URLS = {
     "そうた": "https://docs.google.com/spreadsheets/d/1BA9CMGEitNnrlTiotiSd5ciUUiA5Tq5RKik6j2VYQJs/edit?gid=1099326092#gid=1099326092",
     "りょうすけ": "https://docs.google.com/spreadsheets/d/1BA9CMGEitNnrlTiotiSd5ciUUiA5Tq5RKik6j2VYQJs/edit?gid=1102718110#gid=1102718110"
   };
 
   let scheduleCache = {}; 
+  let defaultShiftsCache = [];
   let currentTherapist = "";
   let rawReservationList = [];
   let currentWeekStartDate = new Date();
+  let isDefaultShiftMode = false;
 
   function generateTimeOptions(selectedVal) {
     let options = '<option value="">---</option>';
@@ -348,9 +355,11 @@
     return execute(0);
   }
 
+  // ページ読み込み時の初期化
   window.onload = function() {
     resetToToday();
 
+    // キャッシュ（sessionStorage）がある場合はパスワード入力をスキップして即時表示
     if (sessionStorage.getItem("adminAuth") === "true") {
       document.getElementById('adminApp').style.display = 'block';
       initAdminData();
@@ -365,7 +374,7 @@
     d.setDate(d.getDate() - day);
     d.setHours(0,0,0,0);
     currentWeekStartDate = d;
-    if (currentTherapist) {
+    if (currentTherapist && !isDefaultShiftMode) {
       loadAllSchedules(() => renderWeeklyView());
     }
   }
@@ -373,6 +382,35 @@
   function changeWeek(offset) {
     currentWeekStartDate.setDate(currentWeekStartDate.getDate() + (offset * 7));
     loadAllSchedules(() => renderWeeklyView());
+  }
+
+  function toggleDefaultShiftMode() {
+    isDefaultShiftMode = !isDefaultShiftMode;
+    const btn = document.getElementById('defaultShiftToggleBtn');
+    const weekNav = document.getElementById('weekNavContainer');
+    const todayReset = document.getElementById('todayResetContainer');
+    const saveTop = document.getElementById('saveTopBtn');
+    const saveBottom = document.getElementById('saveBottomBtn');
+
+    if (isDefaultShiftMode) {
+      btn.style.background = '#b39b7d';
+      btn.style.color = '#fff';
+      btn.innerText = '📅 週間スケジュール管理に戻る';
+      weekNav.style.display = 'none';
+      todayReset.style.display = 'none';
+      saveTop.innerText = '曜日別デフォルト時間を保存する';
+      saveBottom.innerText = '曜日別デフォルト時間を保存する';
+      loadDefaultShifts(() => renderDefaultShiftView());
+    } else {
+      btn.style.background = '#f8f6f2';
+      btn.style.color = '#b39b7d';
+      btn.innerText = '⚙️ デフォルト時間設定';
+      weekNav.style.display = 'flex';
+      todayReset.style.display = 'block';
+      saveTop.innerText = 'この週の内容をまとめて保存する';
+      saveBottom.innerText = 'この週の内容をまとめて保存する';
+      loadAllSchedules(() => renderWeeklyView());
+    }
   }
 
   function initAdminData() {
@@ -401,9 +439,11 @@
       
       updateTherapistSheetLink();
 
-      loadAllSchedules(() => {
-        renderWeeklyView();
-      });
+      if (isDefaultShiftMode) {
+        loadDefaultShifts(() => renderDefaultShiftView());
+      } else {
+        loadAllSchedules(() => renderWeeklyView());
+      }
     }).catch(err => {
       alert("データの取得に失敗しました: " + err.message);
     });
@@ -425,9 +465,11 @@
   function onAdminTherapistChange() {
     currentTherapist = document.getElementById('adminTherapistSelect').value;
     updateTherapistSheetLink();
-    loadAllSchedules(() => {
-      renderWeeklyView();
-    });
+    if (isDefaultShiftMode) {
+      loadDefaultShifts(() => renderDefaultShiftView());
+    } else {
+      loadAllSchedules(() => renderWeeklyView());
+    }
   }
 
   function switchTab(tabName) {
@@ -450,6 +492,15 @@
       if (callback) callback(); 
     }).catch(err => {
       alert("スケジュールデータの取得に失敗しました: " + err.message);
+    });
+  }
+
+  function loadDefaultShifts(callback) {
+    jsonp('getDefaultShifts', { therapist: currentTherapist }).then(data => {
+      defaultShiftsCache = data || [];
+      if (callback) callback();
+    }).catch(err => {
+      alert("デフォルトシフトの取得に失敗しました: " + err.message);
     });
   }
 
@@ -507,6 +558,38 @@
     document.getElementById('weeklyScheduleList').innerHTML = html;
   }
 
+  function renderDefaultShiftView() {
+    let html = '<p style="font-size:0.9rem; color:#666; margin-bottom:15px;">曜日ごとのデフォルト営業時間を設定します。個別設定がない日はこの設定が自動適用されます。</p>';
+    
+    defaultShiftsCache.forEach(item => {
+      const isHol = item.isHoliday;
+      let workActive = !isHol ? 'active-work' : '';
+      let holActive = isHol ? 'active-hol' : '';
+
+      html += `
+        <div class="schedule-card" id="card_day_${item.dayIndex}">
+          <div class="schedule-card-header">
+            <span class="schedule-date">${item.dayName}（毎週）</span>
+            <div class="status-btns">
+              <button type="button" class="s-btn ${workActive}" onclick="setDefaultStatus(${item.dayIndex}, 'work')">出勤</button>
+              <button type="button" class="s-btn ${holActive}" onclick="setDefaultStatus(${item.dayIndex}, 'hol')">休み</button>
+            </div>
+          </div>
+          <div class="time-row" id="timerow_day_${item.dayIndex}" style="${isHol ? 'display:none;' : 'display:flex;'}">
+            <select id="def_start_${item.dayIndex}">
+              ${generateTimeOptions(item.start || '10:00')}
+            </select>
+            <span>〜</span>
+            <select id="def_end_${item.dayIndex}">
+              ${generateTimeOptions(item.end || '19:00')}
+            </select>
+          </div>
+        </div>
+      `;
+    });
+    document.getElementById('weeklyScheduleList').innerHTML = html;
+  }
+
   function setStatus(dateKey, type) {
     const timeRow = document.getElementById(`timerow_${dateKey}`);
     const workBtn = document.querySelector(`#card_${dateKey} .s-btn:nth-child(1)`);
@@ -521,6 +604,69 @@
       workBtn.className = 's-btn';
       holBtn.className = 's-btn active-hol';
     }
+  }
+
+  function setDefaultStatus(dayIndex, type) {
+    const timeRow = document.getElementById(`timerow_day_${dayIndex}`);
+    const workBtn = document.querySelector(`#card_day_${dayIndex} .s-btn:nth-child(1)`);
+    const holBtn = document.querySelector(`#card_day_${dayIndex} .s-btn:nth-child(2)`);
+
+    if (type === 'work') {
+      timeRow.style.display = 'flex';
+      workBtn.className = 's-btn active-work';
+      holBtn.className = 's-btn';
+    } else {
+      timeRow.style.display = 'none';
+      workBtn.className = 's-btn';
+      holBtn.className = 's-btn active-hol';
+    }
+  }
+
+  function saveCurrentData() {
+    if (isDefaultShiftMode) {
+      saveDefaultShiftData();
+    } else {
+      saveWeeklyData();
+    }
+  }
+
+  function saveDefaultShiftData() {
+    const btnTop = document.getElementById('saveTopBtn');
+    const btnBottom = document.getElementById('saveBottomBtn');
+    btnTop.disabled = true; btnTop.innerText = "保存中...";
+    btnBottom.disabled = true; btnBottom.innerText = "保存中...";
+
+    let shiftsToSave = [];
+    for (let i = 0; i < 7; i++) {
+      const card = document.getElementById(`card_day_${i}`);
+      if (!card) continue;
+
+      const isHoliday = card.querySelector('.s-btn:nth-child(2)').classList.contains('active-hol');
+      const startVal = document.getElementById(`def_start_${i}`).value;
+      const endVal = document.getElementById(`def_end_${i}`).value;
+
+      shiftsToSave.push({
+        dayIndex: i,
+        start: startVal,
+        end: endVal,
+        isHoliday: isHoliday
+      });
+    }
+
+    postApi({
+      action: 'updateDefaultShifts',
+      therapist: currentTherapist,
+      shifts: shiftsToSave
+    }).then(() => {
+      btnTop.disabled = false; btnTop.innerText = "曜日別デフォルト時間を保存する";
+      btnBottom.disabled = false; btnBottom.innerText = "曜日別デフォルト時間を保存する";
+      showToast("曜日別デフォルト時間を保存しました！");
+      loadDefaultShifts(() => renderDefaultShiftView());
+    }).catch(err => {
+      alert("保存に失敗しました: " + err.message);
+      btnTop.disabled = false; btnTop.innerText = "曜日別デフォルト時間を保存する";
+      btnBottom.disabled = false; btnBottom.innerText = "曜日別デフォルト時間を保存する";
+    });
   }
 
   function saveWeeklyData() {

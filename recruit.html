@@ -429,15 +429,30 @@
         document.getElementById('overlay').classList.remove('is-active');
       }
 
-      function loginAdmin() {
-        const pass = prompt("管理者用パスワードを入力してください:");
-        if (pass === "blanc2025") {
-          sessionStorage.setItem("adminAuth", "true");
-          window.location.href = "admin.html";
-        } else if (pass !== null) {
-          alert("パスワードが正しくありません。");
-        }
+async function loginAdmin() {
+    // sessionStorageに認証済みフラグがある場合は、パスワード入力をスキップして直接管理者画面へ遷移
+    if (sessionStorage.getItem("adminAuth") === "true") {
+      window.location.href = "admin.html";
+      return;
+    }
+
+    const pass = prompt("管理者用パスワードを入力してください:");
+    if (pass === null) return;
+
+    try {
+      // GASのAPI（verifyPassword）にパスワードを送信して検証（コード内にパスワードを残さない）
+      const res = await jsonp('verifyPassword', { pass: pass });
+      
+      if (res === true || res.success === true || res === "true") {
+        sessionStorage.setItem("adminAuth", "true");
+        window.location.href = "admin.html";
+      } else {
+        alert("パスワードが正しくありません。");
       }
+    } catch (err) {
+      alert("認証通信エラーが発生しました: " + err.message);
+    }
+  }
     </script>
 </body>
 </html>

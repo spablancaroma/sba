@@ -372,7 +372,7 @@
         <p>&copy; Spa Blanc Aroma All Rights Reserved.</p>
     </footer>
 
-    <script>
+<script>
       function openNav() {
         document.getElementById('sidebar').classList.add('is-active');
         document.getElementById('overlay').classList.add('is-active');
@@ -383,13 +383,58 @@
         document.getElementById('overlay').classList.remove('is-active');
       }
 
-      function loginAdmin() {
-        const pass = prompt("管理者用パスワードを入力してください:");
-        if (pass === "blanc2025") {
-          sessionStorage.setItem("adminAuth", "true");
+      // GASと非同期通信するためのjsonp関数
+      function jsonp(action, params = {}) {
+        return new Promise((resolve, reject) => {
+          const callbackName = 'jsonp_' + Math.random().toString(36).substr(2, 9);
+          const script = document.createElement('script');
+          const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzINJ6cRRGnjW4n1n1zW42LDRqziMAkOKwDZrwMhMWnNdmO74K815ld_gbcnB94eh8/exec";
+          
+          const timer = setTimeout(() => {
+            delete window[callbackName];
+            if (script.parentNode) document.body.removeChild(script);
+            reject(new Error('通信タイムアウトが発生しました'));
+          }, 15000);
+
+          window[callbackName] = function(data) {
+            clearTimeout(timer);
+            delete window[callbackName];
+            if (script.parentNode) document.body.removeChild(script);
+            resolve(data);
+          };
+
+          const query = new URLSearchParams({ action, callback: callbackName, ...params }).toString();
+          script.src = `${GAS_API_URL}?${query}`;
+          script.onerror = () => {
+            clearTimeout(timer);
+            delete window[callbackName];
+            if (script.parentNode) document.body.removeChild(script);
+            reject(new Error('通信エラーが発生しました'));
+          };
+          document.body.appendChild(script);
+        });
+      }
+
+      // 管理者ログイン関数
+      async function loginAdmin() {
+        if (sessionStorage.getItem("adminAuth") === "true") {
           window.location.href = "admin.html";
-        } else if (pass !== null) {
-          alert("パスワードが正しくありません。");
+          return;
+        }
+
+        const pass = prompt("管理者用パスワードを入力してください:");
+        if (pass === null) return;
+
+        try {
+          const res = await jsonp('verifyPassword', { pass: pass });
+          if (res === true || res.success === true || res === "true") {
+            sessionStorage.setItem("adminAuth", "true");
+            window.location.href = "admin.html";
+          } else {
+            alert("パスワードが正しくありません。");
+          }
+        } catch (err) {
+          alert("認証通信エラーが発生しました: " + err.message);
         }
       }
 
