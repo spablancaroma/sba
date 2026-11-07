@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- ファビコンの設定 -->
+<link rel="icon" href="logo.ico" type="image/x-icon">
+<link rel="shortcut icon" href="logo.ico" type="image/x-icon">
+<link rel="apple-touch-icon" href="logo.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理者画面 - Spa Blanc Aroma</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    .page-header { text-align: center; padding: 120px 20px 30px; background-color: #f2ece4; }
+    .page-header h1 { font-size: 2rem; font-weight: 500; color: #3b3530; letter-spacing: 0.05em; }
+    .container { max-width: 650px; margin: 40px auto; padding: 30px; background: #fff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #f0ede8; }
+    
+    /* タブ切り替えボタン */
+    .tab-group { display: flex; margin-bottom: 25px; border-radius: 6px; overflow: hidden; border: 1px solid #b39b7d; }
+    .tab-btn { flex: 1; padding: 12px 2px; background: #fff; color: #b39b7d; border: none; font-size: 0.82rem; font-weight: 500; cursor: pointer; transition: all 0.3s; white-space: nowrap; text-align: center; }
+    .tab-btn.active { background: #b39b7d; color: #fff; }
+    
+    /* マニュアル・スプレッドシートへの誘導リンクボタン */
+    .manual-link-container { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+    .manual-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 0.85rem; color: #b39b7d; text-decoration: none; background: #f8f6f2; padding: 6px 14px; border-radius: 20px; border: 1px solid #e0dcd5; transition: all 0.3s ease; font-weight: 500; }
+    .manual-btn:hover { background: #b39b7d; color: #fff; border-color: #b39b7d; }
+
+    /* 見出しデザイン */
+    h2 { border-left: 4px solid #b39b7d; padding-left: 15px; color: #3b3530; font-size: 1.2rem; margin-bottom: 20px; font-weight: 500; text-align: left; }
+    
+    /* 週間ナビゲーション */
+    .week-nav { display: flex; justify-content: space-between; align-items: center; background: #f8f6f2; padding: 12px 15px; border-radius: 8px; border: 1px solid #e0dcd5; margin-bottom: 20px; }
+    .week-nav button { background: #fff; border: 1px solid #b39b7d; color: #b39b7d; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; font-weight: 500; transition: 0.2s; }
+    .week-nav button:hover { background: #b39b7d; color: #fff; }
+    .week-nav span { font-weight: 500; color: #3b3530; font-size: 0.95rem; }
+
+    /* 週間スケジュールカード */
+    .schedule-card { background: #fdfbf9; border: 1px solid #f0ede8; border-radius: 8px; padding: 15px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; }
+    .schedule-card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0ede8; padding-bottom: 8px; }
+    .schedule-date { font-weight: bold; color: #3b3530; font-size: 0.95rem; }
+    
+    /* ステータス切替ボタン群 */
+    .status-btns { display: flex; gap: 5px; }
+    .s-btn { padding: 6px 10px; font-size: 0.75rem; border: 1px solid #e0dcd5; background: #fff; color: #666; border-radius: 4px; cursor: pointer; }
+    .s-btn.active-work { background: #b39b7d; color: #fff; border-color: #b39b7d; }
+    .s-btn.active-hol { background: #888; color: #fff; border-color: #888; }
+    .s-btn.active-off { background: #d9534f; color: #fff; border-color: #d9534f; }
+
+    /* 時間セレクトボックス行 */
+    .time-row { display: flex; align-items: center; gap: 8px; }
+    .time-row select { flex: 1; padding: 8px; border: 1px solid #e0dcd5; border-radius: 4px; background: #fff; font-size: 0.9rem; }
+    .time-row input[type="text"] { flex: 1.5; padding: 8px; border: 1px solid #e0dcd5; border-radius: 4px; background: #fff; font-size: 0.9rem; }
+
+    /* フォーム要素共通 */
+    .form-group { margin-bottom: 20px; }
+    label { font-weight: 500; color: #555; display: block; margin-bottom: 8px; font-size: 0.95rem; }
+    select, input[type="text"], input[type="password"], textarea { width: 100%; padding: 14px; box-sizing: border-box; border: 1px solid #e0dcd5; border-radius: 6px; font-size: 0.95rem; background: #fff; font-family: inherit; }
+    select:focus, input:focus, textarea:focus { outline: none; border-color: #b39b7d; }
+    
+    textarea { height: 160px; resize: vertical; line-height: 1.6; }
+
+    /* ボタン類 */
+    .btn { width: 100%; padding: 14px; color: #fff; border: none; border-radius: 30px; font-size: 0.95rem; cursor: pointer; font-weight: 500; transition: 0.3s; }
+    .btn-save { background: #b39b7d; }
+    .btn-save:hover:not(:disabled) { background: #9c8263; }
+    .btn-save:disabled { background: #ccc; cursor: not-allowed; }
+
+    /* 予約管理用カードスタイル */
+    .reservation-item { background: #fff; border: 1px solid #f0ede8; padding: 20px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+    .reservation-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.85rem; color: #666; font-family: 'Montserrat', sans-serif; }
+    .status-badge { padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; }
+    .status-badge.pending { background: #FFF3E0; color: #E67E22; border: 1px solid #FFE0B2; }
+    .status-badge.confirmed { background: #E8F8F5; color: #16A085; border: 1px solid #A3E4D7; }
+    .status-badge.adjusting { background: #EBF5FB; color: #2980B9; border: 1px solid #AED6F1; }
+    .status-badge.rejected { background: #FFD2D2; color: #C0392B; border: 1px solid #F5B7B1; }
+    
+    .news-item { background: #fff; border: 1px solid #f0ede8; padding: 20px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+    
+    .toast-notice { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background-color: #27AE60; color: #fff; padding: 12px 28px; border-radius: 25px; font-weight: 500; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(0,0,0,0.15); z-index: 9999; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
+    .toast-notice.show { opacity: 1; visibility: visible; }
+  </style>
+</head>
+<body>
+    <!-- ハンバーガーボタン & サイドバー -->
+    <button class="menu-toggle-btn" onclick="openNav()" aria-label="メニューを開く">☰</button>
+
+    <div class="sidebar-overlay" id="overlay" onclick="closeNav()"></div>
+
+    <aside class="sidebar" id="sidebar">
+      <button class="close-btn" onclick="closeNav()" aria-label="メニューを閉じる">✕</button>
+      <ul class="sidebar-menu">
+        <li><a href="index.html">トップ</a></li>
+        <li><a href="reservation.html">予約・空き状況確認</a></li>
+<li><a href="schedule.html">週間スケジュール</a></li> <!-- ★ここを追加 -->
+        <li><a href="column.html">コラム一覧</a></li>
+        <li><a href="news.html">お知らせ</a></li>
+        <li><a href="about.html">店舗概要</a></li>
+        <li><a href="recruit.html">セラピスト募集</a></li>
+        <li><a href="javascript:void(0);" onclick="loginAdmin()" class="admin-link">🔒 管理者画面</a></li>
+      </ul>
+    </aside>
+
+    <header class="site-header">
+        <div class="logo">
+          <a href="index.html">
+            <img src="logo.png" alt="Spa Blanc Aroma 店舗ロゴ" class="header-logo-img">
+            <span>Spa Blanc Aroma</span>
+          </a>
+        </div>
+        <nav class="nav-menu">
+            <a href="index.html#about">About</a>
+            <a href="index.html#therapist">Therapist</a>
+            <a href="index.html#service">Service</a>
+            <a href="index.html#menu">Price</a>
+            <a href="index.html#flow">Flow</a>
+            <a href="index.html#faq">FAQ</a>
+            <a href="column.html">Column</a>
+            <a href="reservation.html" class="nav-btn">ご予約</a>
+        </nav>
+    </header>
+
+    <div class="page-header">
+      <span class="section-en">Admin Panel</span>
+      <h1>管理者専用サイト</h1>
+    </div>
+
+<div class="container" id="adminApp" style="display:none;">
+  <!-- マニュアルへのリンクボタン -->
+  <div class="manual-link-container">
+    <a href="/admin/manual.html" target="_blank" rel="noopener noreferrer" class="manual-btn">
+      📖 セラピストマニュアルを見る
+    </a>
+  </div>
+
+  <!-- タブグループ -->
+  <div class="tab-group">
+    <button onclick="switchTab('schedule')" id="tabSchedule" class="tab-btn active">📅 スケジュール</button>
+    <button onclick="switchTab('reservation')" id="tabReservation" class="tab-btn">📋 予約管理</button>
+    <button onclick="switchTab('news')" id="tabNews" class="tab-btn">📰 お知らせ</button>
+  </div>
+  
+  <!-- スケジュールタブエリア -->
+  <div id="scheduleArea">
+    <h2>セラピスト・週間スケジュール管理</h2>
+    <div class="form-group">
+      <label for="adminTherapistSelect">対象セラピストを選択</label>
+      <select id="adminTherapistSelect" onchange="onAdminTherapistChange()">
+      </select>
+    </div>
+
+    <!-- 選択中セラピストのスプレッドシートリンク ＆ デフォルト時間設定ボタン（横並び） -->
+    <div style="margin-top: -10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+      <button id="defaultShiftToggleBtn" class="manual-btn" onclick="toggleDefaultShiftMode()" style="background: #f8f6f2; cursor: pointer;">
+        ⚙️ デフォルト時間設定
+      </button>
+      <a id="therapistSheetLink" href="#" target="_blank" rel="noopener noreferrer" class="manual-btn" style="display: inline-flex;">
+        📊 選択中のスプレッドシートを開く
+      </a>
+    </div>
+
+    <!-- 週移動ナビゲーション（デフォルトモード時は非表示） -->
+    <div class="week-nav" id="weekNavContainer">
+      <button onclick="changeWeek(-1)">&lt; 前週</button>
+      <span id="currentWeekRange">読み込み中...</span>
+      <button onclick="changeWeek(1)">次週 &gt;</button>
+    </div>
+    <div style="text-align: right; margin-bottom: 10px;" id="todayResetContainer">
+      <button onclick="resetToToday()" style="background: none; border: none; color: #b39b7d; cursor: pointer; font-size: 0.85rem; text-decoration: underline;">今週（本日）へ戻る</button>
+    </div>
+
+    <!-- 上部保存ボタン -->
+    <button class="btn btn-save" id="saveTopBtn" onclick="saveCurrentData()" style="margin-bottom: 20px;">この週の内容をまとめて保存する</button>
+
+    <!-- 週間 / デフォルトスケジュールリスト表示エリア -->
+    <div id="weeklyScheduleList">
+      <p style="text-align:center; color:#888;">読み込み中...</p>
+    </div>
+
+    <!-- 下部保存ボタン -->
+    <button class="btn btn-save" id="saveBottomBtn" onclick="saveCurrentData()" style="margin-top: 10px;">この週の内容をまとめて保存する</button>
+  </div>
+
+  <!-- 予約管理タブエリア -->
+  <div id="reservationArea" style="display:none;" class="detail-area" style="background:#fdfbf9; padding:25px; border-radius:8px; border:1px solid #f0ede8;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
+      <h2 style="margin-bottom: 0;">📋 予約リクエスト・管理</h2>
+      <select id="reservationSortOrder" onchange="renderReservationList()" style="width: auto; padding: 6px 12px; font-size: 0.85rem;">
+        <option value="latest">新着順 (受付日時順・最新5件)</option>
+        <option value="upcoming">予約日時が近い順 (直近5件)</option>
+      </select>
+    </div>
+    <p style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">届いた予約リクエストの承認、却下、時間調整、および終了後のお礼メール送信を行います。</p>
+    <div id="reservationListAdmin">読み込み中...</div>
+  </div>
+
+  <!-- お知らせ管理タブエリア -->
+  <div id="newsArea" style="display:none;" class="detail-area" style="background:#fdfbf9; padding:25px; border-radius:8px; border:1px solid #f0ede8;">
+    <h2>📰 新規お知らせ投稿</h2>
+    <div class="form-group">
+      <label for="newsSubject">件名</label>
+      <input type="text" id="newsSubject" placeholder="お知らせの件名を入力">
+    </div>
+    <div class="form-group">
+      <label for="newsBody">本文</label>
+      <textarea id="newsBody" placeholder="お知らせの本文を入力してください"></textarea>
+    </div>
+    <button class="btn btn-save" id="postNewsBtn" onclick="submitNews()">お知らせを投稿する</button>
+    
+    <hr style="margin: 30px 0; border: 0; border-top: 1px solid #f0ede8;">
+    <h2>📝 投稿済み一覧・編集</h2>
+    <div id="newsListAdmin">読み込み中...</div>
+  </div>
+</div>
+
+<div id="toastNotice" class="toast-notice">登録しました</div>
+
+<!-- フッター -->
+<footer>
+    <p>&copy; Spa Blanc Aroma All Rights Reserved.</p>
+</footer>
+
+<script>
+  function openNav() {
+    document.getElementById('sidebar').classList.add('is-active');
+    document.getElementById('overlay').classList.add('is-active');
+  }
+
+  function closeNav() {
+    document.getElementById('sidebar').classList.remove('is-active');
+    document.getElementById('overlay').classList.remove('is-active');
+  }
+
+  // 管理者ログイン・認証関数
+  async function loginAdmin() {
+    if (sessionStorage.getItem("adminAuth") === "true") {
+      document.getElementById('adminApp').style.display = 'block';
+      initAdminData();
+      return;
+    }
+
+    const pass = prompt("管理者用パスワードを入力してください:");
+    if (pass === null) return;
+
+    try {
+      const res = await jsonp('verifyPassword', { pass: pass });
+      if (res === true || res.success === true || res === "true") {
+        sessionStorage.setItem("adminAuth", "true");
+        document.getElementById('adminApp').style.display = 'block';
+        initAdminData();
+      } else {
+        alert("パスワードが正しくありません。");
+        loginAdmin();
+      }
+    } catch (err) {
+      alert("認証通信エラーが発生しました: " + err.message);
+    }
+  }
+
+  const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzINJ6cRRGnjW4n1n1zW42LDRqziMAkOKwDZrwMhMWnNdmO74K815ld_gbcnB94eh8/exec";
+  
+  const THERAPIST_SHEET_URLS = {
+    "そうた": "https://docs.google.com/spreadsheets/d/1BA9CMGEitNnrlTiotiSd5ciUUiA5Tq5RKik6j2VYQJs/edit?gid=1099326092#gid=1099326092",
+    "りょうすけ": "https://docs.google.com/spreadsheets/d/1BA9CMGEitNnrlTiotiSd5ciUUiA5Tq5RKik6j2VYQJs/edit?gid=1102718110#gid=1102718110"
+  };
+
+  let scheduleCache = {}; 
+  let defaultShiftsCache = [];
+  let currentTherapist = "";
+  let rawReservationList = [];
+  let currentWeekStartDate = new Date();
+  let isDefaultShiftMode = false;
+
+  function generateTimeOptions(selectedVal) {
+    let options = '<option value="">---</option>';
+    const hours = [
+      "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", 
+      "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", 
+      "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", 
+      "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", 
+      "22:00", "22:30", "23:00", "23:30", 
+      "24:00", "24:30", "25:00", "25:30", "26:00", "26:30", 
+      "27:00", "27:30", "28:00", "29:00"
+    ];
+    hours.forEach(h => {
+      const displayLabel = h.startsWith("2") && parseInt(h.split(":")[0]) >= 24 ? `翌${String(parseInt(h.split(":")[0])-24).padStart(2,'0')}:${h.split(":")[1]}` : h;
+      const isSel = (selectedVal === h || selectedVal === displayLabel) ? 'selected' : '';
+      options += `<option value="${h}" ${isSel}>${displayLabel}</option>`;
+    });
+    return options;
+  }
+
+  function showToast(msg) {
+    const toast = document.getElementById('toastNotice');
+    if (toast) {
+      toast.innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => { toast.classList.remove('show'); }, 2000);
+    }
+  }
+
+  function jsonp(action, params = {}) {
+    return new Promise((resolve, reject) => {
+      const callbackName = 'jsonp_' + Math.random().toString(36).substr(2, 9);
+      const script = document.createElement('script');
+      
+      const timer = setTimeout(() => {
+        delete window[callbackName];
+        if (script.parentNode) document.body.removeChild(script);
+        reject(new Error('通信タイムアウトが発生しました'));
+      }, 15000);
+
+      window[callbackName] = function(data) {
+        clearTimeout(timer);
+        delete window[callbackName];
+        if (script.parentNode) document.body.removeChild(script);
+        resolve(data);
+      };
+
+      const query = new URLSearchParams({ action, callback: callbackName, ...params }).toString();
+      script.src = `${GAS_API_URL}?${query}`;
+      script.onerror = () => {
+        clearTimeout(timer);
+        delete window[callbackName];
+        if (script.parentNode) document.body.removeChild(script);
+        reject(new Error('通信エラーが発生しました'));
+      };
+      document.body.appendChild(script);
+    });
+  }
+
+  function postApi(data, retries = 2, delay = 1000) {
+    const execute = async (attempt) => {
+      try {
+        const res = await fetch(GAS_API_URL, {
+          method: 'POST',
+          mode: 'cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error('サーバーエラーが発生しました');
+        const resData = await res.json();
+        if (resData.error || resData.success === false) {
+          throw new Error(resData.error || resData.message || 'エラーが発生しました');
+        }
+        return resData;
+      } catch (err) {
+        if (attempt >= retries) throw err;
+        await new Promise(res => setTimeout(res, delay * (attempt + 1)));
+        return execute(attempt + 1);
+      }
+    };
+    return execute(0);
+  }
+
+  window.onload = function() {
+    resetToToday();
+
+    if (sessionStorage.getItem("adminAuth") === "true") {
+      document.getElementById('adminApp').style.display = 'block';
+      initAdminData();
+    } else {
+      loginAdmin();
+    }
+  };
+
+  function resetToToday() {
+    const d = new Date();
+    const day = d.getDay();
+    d.setDate(d.getDate() - day);
+    d.setHours(0,0,0,0);
+    currentWeekStartDate = d;
+    if (currentTherapist && !isDefaultShiftMode) {
+      loadAllSchedules(() => renderWeeklyView());
+    }
+  }
+
+  function changeWeek(offset) {
+    currentWeekStartDate.setDate(currentWeekStartDate.getDate() + (offset * 7));
+    loadAllSchedules(() => renderWeeklyView());
+  }
+
+  function toggleDefaultShiftMode() {
+    isDefaultShiftMode = !isDefaultShiftMode;
+    const btn = document.getElementById('defaultShiftToggleBtn');
+    const weekNav = document.getElementById('weekNavContainer');
+    const todayReset = document.getElementById('todayResetContainer');
+    const saveTop = document.getElementById('saveTopBtn');
+    const saveBottom = document.getElementById('saveBottomBtn');
+
+    if (isDefaultShiftMode) {
+      btn.style.background = '#b39b7d';
+      btn.style.color = '#fff';
+      btn.innerText = '📅 週間スケジュール管理に戻る';
+      weekNav.style.display = 'none';
+      todayReset.style.display = 'none';
+      saveTop.innerText = '曜日別デフォルト時間を保存する';
+      saveBottom.innerText = '曜日別デフォルト時間を保存する';
+      loadDefaultShifts(() => renderDefaultShiftView());
+    } else {
+      btn.style.background = '#f8f6f2';
+      btn.style.color = '#b39b7d';
+      btn.innerText = '⚙️ デフォルト時間設定';
+      weekNav.style.display = 'flex';
+      todayReset.style.display = 'block';
+      saveTop.innerText = 'この週の内容をまとめて保存する';
+      saveBottom.innerText = 'この週の内容をまとめて保存する';
+      loadAllSchedules(() => renderWeeklyView());
+    }
+  }
+
+  function initAdminData() {
+    Promise.all([
+      jsonp('getTherapistList'),
+      loadNewsList(),
+      loadReservationList()
+    ]).then(([therapists]) => {
+      const select = document.getElementById('adminTherapistSelect');
+      select.innerHTML = "";
+      if (therapists && therapists.length > 0) {
+        therapists.forEach(t => {
+          const opt = document.createElement('option');
+          opt.value = t;
+          opt.innerText = t;
+          select.appendChild(opt);
+        });
+        currentTherapist = therapists[0];
+      } else {
+        const opt = document.createElement('option');
+        opt.value = "そうた";
+        opt.innerText = "そうた";
+        select.appendChild(opt);
+        currentTherapist = "そうた";
+      }
+      
+      updateTherapistSheetLink();
+
+      if (isDefaultShiftMode) {
+        loadDefaultShifts(() => renderDefaultShiftView());
+      } else {
+        loadAllSchedules(() => renderWeeklyView());
+      }
+    }).catch(err => {
+      alert("データの取得に失敗しました: " + err.message);
+    });
+  }
+
+  function updateTherapistSheetLink() {
+    const linkElem = document.getElementById('therapistSheetLink');
+    if (!linkElem) return;
+    const url = THERAPIST_SHEET_URLS[currentTherapist];
+    if (url) {
+      linkElem.href = url;
+      linkElem.style.display = 'inline-flex';
+      linkElem.innerText = `📊 ${currentTherapist} のスプレッドシートを開く`;
+    } else {
+      linkElem.style.display = 'none';
+    }
+  }
+
+  function onAdminTherapistChange() {
+    currentTherapist = document.getElementById('adminTherapistSelect').value;
+    updateTherapistSheetLink();
+    if (isDefaultShiftMode) {
+      loadDefaultShifts(() => renderDefaultShiftView());
+    } else {
+      loadAllSchedules(() => renderWeeklyView());
+    }
+  }
+
+  function switchTab(tabName) {
+    document.getElementById('scheduleArea').style.display = tabName === 'schedule' ? 'block' : 'none';
+    document.getElementById('reservationArea').style.display = tabName === 'reservation' ? 'block' : 'none';
+    document.getElementById('newsArea').style.display = tabName === 'news' ? 'block' : 'none';
+    
+    document.getElementById('tabSchedule').className = tabName === 'schedule' ? 'tab-btn active' : 'tab-btn';
+    document.getElementById('tabReservation').className = tabName === 'reservation' ? 'tab-btn active' : 'tab-btn';
+    document.getElementById('tabNews').className = tabName === 'news' ? 'tab-btn active' : 'tab-btn';
+
+    if (tabName === 'reservation') {
+      loadReservationList();
+    }
+  }
+
+  function loadAllSchedules(callback) {
+    jsonp('getAllSchedules', { therapist: currentTherapist }).then(data => {
+      scheduleCache = data || {}; 
+      if (callback) callback(); 
+    }).catch(err => {
+      alert("スケジュールデータの取得に失敗しました: " + err.message);
+    });
+  }
+
+  function loadDefaultShifts(callback) {
+    jsonp('getDefaultShifts', { therapist: currentTherapist }).then(data => {
+      defaultShiftsCache = data || [];
+      if (callback) callback();
+    }).catch(err => {
+      alert("デフォルトシフトの取得に失敗しました: " + err.message);
+    });
+  }
+
+  function renderWeeklyView() {
+    const startDate = new Date(currentWeekStartDate);
+    const endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + 6);
+
+    const formatDateStr = (d) => `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`;
+    document.getElementById('currentWeekRange').innerText = `${formatDateStr(startDate)} 〜 ${formatDateStr(endDate)}`;
+
+    const weekDaysNames = ["日", "月", "火", "水", "木", "金", "土"];
+    let html = '';
+
+    for (let i = 0; i < 7; i++) {
+      const targetD = new Date(startDate);
+      targetD.setDate(targetD.getDate() + i);
+      
+      const y = targetD.getFullYear();
+      const m = String(targetD.getMonth() + 1).padStart(2, '0');
+      const d = String(targetD.getDate()).padStart(2, '0');
+      const dateKey = `${y}-${m}-${d}`;
+      const dayOfWeek = weekDaysNames[targetD.getDay()];
+
+      const sch = scheduleCache[dateKey] || { exists: false, start: '10:00', end: '19:00', notes: '' };
+      
+      let status = 'work';
+      if (sch.start === '受付終了') status = 'closed';
+      else if (sch.start === '休み' || sch.start === '') status = 'hol';
+      
+      let workActive = status === 'work' ? 'active-work' : '';
+      let closedActive = status === 'closed' ? 'active-off' : '';
+      let holActive = status === 'hol' ? 'active-hol' : '';
+
+      html += `
+        <div class="schedule-card" id="card_${dateKey}">
+          <div class="schedule-card-header">
+            <span class="schedule-date">${m}/${d} (${dayOfWeek})</span>
+            <div class="status-btns">
+              <button type="button" class="s-btn ${workActive}" onclick="setStatus('${dateKey}', 'work')">出勤</button>
+              <button type="button" class="s-btn ${closedActive}" onclick="setStatus('${dateKey}', 'closed')">受付終了</button>
+              <button type="button" class="s-btn ${holActive}" onclick="setStatus('${dateKey}', 'hol')">休み</button>
+            </div>
+          </div>
+          <div class="time-row" id="timerow_${dateKey}" style="${status !== 'work' ? 'display:none;' : 'display:flex;'}">
+            <select id="start_${dateKey}">
+              ${generateTimeOptions(status === 'work' ? sch.start : '10:00')}
+            </select>
+            <span>〜</span>
+            <select id="end_${dateKey}">
+              ${generateTimeOptions(status === 'work' ? sch.end : '19:00')}
+            </select>
+          </div>
+          <div class="time-row">
+            <input type="text" id="notes_${dateKey}" value="${sch.notes || ''}" placeholder="備考（例: 出張のため など）">
+          </div>
+        </div>
+      `;
+    }
+    document.getElementById('weeklyScheduleList').innerHTML = html;
+  }
+
+  function renderDefaultShiftView() {
+    let html = '<p style="font-size:0.9rem; color:#666; margin-bottom:15px;">曜日ごとのデフォルト営業時間を設定します。個別設定がない日はこの設定が自動適用されます。</p>';
+    
+    defaultShiftsCache.forEach(item => {
+      const isHol = item.isHoliday;
+      let workActive = !isHol ? 'active-work' : '';
+      let holActive = isHol ? 'active-hol' : '';
+
+      html += `
+        <div class="schedule-card" id="card_day_${item.dayIndex}">
+          <div class="schedule-card-header">
+            <span class="schedule-date">${item.dayName}（毎週）</span>
+            <div class="status-btns">
+              <button type="button" class="s-btn ${workActive}" onclick="setDefaultStatus(${item.dayIndex}, 'work')">出勤</button>
+              <button type="button" class="s-btn ${holActive}" onclick="setDefaultStatus(${item.dayIndex}, 'hol')">休み</button>
+            </div>
+          </div>
+          <div class="time-row" id="timerow_day_${item.dayIndex}" style="${isHol ? 'display:none;' : 'display:flex;'}">
+            <select id="def_start_${item.dayIndex}">
+              ${generateTimeOptions(item.start || '10:00')}
+            </select>
+            <span>〜</span>
+            <select id="def_end_${item.dayIndex}">
+              ${generateTimeOptions(item.end || '19:00')}
+            </select>
+          </div>
+        </div>
+      `;
+    });
+    document.getElementById('weeklyScheduleList').innerHTML = html;
+  }
+
+  function setStatus(dateKey, type) {
+    const timeRow = document.getElementById(`timerow_${dateKey}`);
+    const workBtn = document.querySelector(`#card_${dateKey} .s-btn:nth-child(1)`);
+    const closedBtn = document.querySelector(`#card_${dateKey} .s-btn:nth-child(2)`);
+    const holBtn = document.querySelector(`#card_${dateKey} .s-btn:nth-child(3)`);
+
+    workBtn.className = 's-btn' + (type === 'work' ? ' active-work' : '');
+    closedBtn.className = 's-btn' + (type === 'closed' ? ' active-off' : '');
+    holBtn.className = 's-btn' + (type === 'hol' ? ' active-hol' : '');
+
+    if (type === 'work') {
+      timeRow.style.display = 'flex';
+    } else {
+      timeRow.style.display = 'none';
+    }
+  }
+
+  function setDefaultStatus(dayIndex, type) {
+    const timeRow = document.getElementById(`timerow_day_${dayIndex}`);
+    const workBtn = document.querySelector(`#card_day_${dayIndex} .s-btn:nth-child(1)`);
+    const holBtn = document.querySelector(`#card_day_${dayIndex} .s-btn:nth-child(2)`);
+
+    if (type === 'work') {
+      timeRow.style.display = 'flex';
+      workBtn.className = 's-btn active-work';
+      holBtn.className = 's-btn';
+    } else {
+      timeRow.style.display = 'none';
+      workBtn.className = 's-btn';
+      holBtn.className = 's-btn active-hol';
+    }
+  }
+
+  function saveCurrentData() {
+    if (isDefaultShiftMode) {
+      saveDefaultShiftData();
+    } else {
+      saveWeeklyData();
+    }
+  }
+
+  function saveDefaultShiftData() {
+    const btnTop = document.getElementById('saveTopBtn');
+    const btnBottom = document.getElementById('saveBottomBtn');
+    btnTop.disabled = true; btnTop.innerText = "保存中...";
+    btnBottom.disabled = true; btnBottom.innerText = "保存中...";
+
+    let shiftsToSave = [];
+    for (let i = 0; i < 7; i++) {
+      const card = document.getElementById(`card_day_${i}`);
+      if (!card) continue;
+
+      const isHoliday = card.querySelector('.s-btn:nth-child(2)').classList.contains('active-hol');
+      const startVal = document.getElementById(`def_start_${i}`).value;
+      const endVal = document.getElementById(`def_end_${i}`).value;
+
+      shiftsToSave.push({
+        dayIndex: i,
+        start: startVal,
+        end: endVal,
+        isHoliday: isHoliday
+      });
+    }
+
+    postApi({
+      action: 'updateDefaultShifts',
+      therapist: currentTherapist,
+      shifts: shiftsToSave
+    }).then(() => {
+      btnTop.disabled = false; btnTop.innerText = "曜日別デフォルト時間を保存する";
+      btnBottom.disabled = false; btnBottom.innerText = "曜日別デフォルト時間を保存する";
+      showToast("曜日別デフォルト時間を保存しました！");
+      loadDefaultShifts(() => renderDefaultShiftView());
+    }).catch(err => {
+      alert("保存に失敗しました: " + err.message);
+      btnTop.disabled = false; btnTop.innerText = "曜日別デフォルト時間を保存する";
+      btnBottom.disabled = false; btnBottom.innerText = "曜日別デフォルト時間を保存する";
+    });
+  }
+
+  function saveWeeklyData() {
+    const btnTop = document.getElementById('saveTopBtn');
+    const btnBottom = document.getElementById('saveBottomBtn');
+    btnTop.disabled = true; btnTop.innerText = "保存中...";
+    btnBottom.disabled = true; btnBottom.innerText = "保存中...";
+
+    const startDate = new Date(currentWeekStartDate);
+    let promises = [];
+
+    for (let i = 0; i < 7; i++) {
+      const targetD = new Date(startDate);
+      targetD.setDate(targetD.getDate() + i);
+      const y = targetD.getFullYear();
+      const m = String(targetD.getMonth() + 1).padStart(2, '0');
+      const d = String(targetD.getDate()).padStart(2, '0');
+      const dateKey = `${y}-${m}-${d}`;
+
+      const card = document.getElementById(`card_${dateKey}`);
+      if (!card) continue;
+
+      const isClosed = card.querySelector('.s-btn:nth-child(2)').classList.contains('active-off');
+      const isHoliday = card.querySelector('.s-btn:nth-child(3)').classList.contains('active-hol');
+      const startVal = document.getElementById(`start_${dateKey}`).value;
+      const endVal = document.getElementById(`end_${dateKey}`).value;
+      const notesVal = document.getElementById(`notes_${dateKey}`).value;
+
+      let writeStart = startVal;
+      let writeEnd = endVal;
+      if (isClosed) { writeStart = '受付終了'; writeEnd = '受付終了'; }
+      else if (isHoliday) { writeStart = '休み'; writeEnd = '休み'; }
+
+      promises.push(
+        postApi({
+          action: 'updateSchedule',
+          therapist: currentTherapist,
+          date: dateKey,
+          start: writeStart,
+          end: writeEnd,
+          isHoliday: isHoliday,
+          notes: notesVal
+        })
+      );
+    }
+
+    Promise.all(promises).then(() => {
+      btnTop.disabled = false; btnTop.innerText = "この週の内容をまとめて保存する";
+      btnBottom.disabled = false; btnBottom.innerText = "この週の内容をまとめて保存する";
+      showToast("今週のスケジュールを保存しました！");
+      loadAllSchedules(() => renderWeeklyView());
+    }).catch(err => {
+      alert("保存に失敗しました: " + err.message);
+      btnTop.disabled = false; btnTop.innerText = "この週の内容をまとめて保存する";
+      btnBottom.disabled = false; btnBottom.innerText = "この週の内容をまとめて保存する";
+    });
+  }
+
+  function loadReservationList() {
+    return jsonp('getReservationList').then(list => {
+      rawReservationList = list || [];
+      renderReservationList();
+    }).catch(err => {
+      document.getElementById('reservationListAdmin').innerHTML = '<p style="text-align:center; color:red;">予約リストの読み込みに失敗しました</p>';
+    });
+  }
+
+  function renderReservationList() {
+    const sortOrder = document.getElementById('reservationSortOrder').value;
+    let list = [...rawReservationList];
+
+    if (list.length > 0) {
+      if (sortOrder === 'upcoming') {
+        const nowTime = new Date().getTime();
+        list.sort((a, b) => {
+          const timeA = a.datetime ? new Date(a.datetime).getTime() : 0;
+          const timeB = b.datetime ? new Date(b.datetime).getTime() : 0;
+          return Math.abs(nowTime - timeA) - Math.abs(nowTime - timeB);
+        });
+      } else {
+        list.sort((a, b) => String(b.id).localeCompare(String(a.id)));
+      }
+      list = list.slice(0, 5);
+    }
+
+    let html = '';
+    if (list.length > 0) {
+      list.forEach(r => {
+        let badgeClass = 'pending';
+        let badgeText = r.status || 'リクエスト中';
+        if (r.status === '予約確定') { badgeClass = 'confirmed'; }
+        else if (r.status === '時間調整中') { badgeClass = 'adjusting'; }
+        else if (r.status === '却下') { badgeClass = 'rejected'; }
+
+        let displayDt = r.datetime;
+        try {
+          const dObj = new Date(r.datetime);
+          if (!isNaN(dObj.getTime())) {
+            const y = dObj.getFullYear();
+            const m = String(dObj.getMonth() + 1).padStart(2, '0');
+            const day = String(dObj.getDate()).padStart(2, '0');
+            const hh = String(dObj.getHours()).padStart(2, '0');
+            const mm = String(dObj.getMinutes()).padStart(2, '0');
+            displayDt = `${y}-${m}-${day} ${hh}:${mm}`;
+          }
+        } catch(e) {}
+
+        html += `
+          <div class="reservation-item">
+            <div class="reservation-meta">
+              <span>ID: ${r.id}</span>
+              <span class="status-badge ${badgeClass}">${badgeText}</span>
+            </div>
+            <p style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: bold; color: #3b3530;">${r.name} 様 (${r.course})</p>
+            <p style="margin: 0 0 6px 0; font-size: 0.9rem; color: #555;"><strong>予約日時:</strong> ${displayDt}</p>
+            <p style="margin: 0 0 6px 0; font-size: 0.88rem; color: #666;"><strong>指名:</strong> ${r.therapist} / <strong>連絡先:</strong> ${r.tel} (${r.email})</p>
+            
+            <div style="margin: 12px 0; padding: 10px; background: #f8f6f2; border-radius: 6px; border: 1px solid #e0dcd5;">
+              <label style="font-size: 0.85rem; margin-bottom: 4px; color: #b39b7d;">▼ 調整日時（この日時を指定して「承認する」と、その変更後日時で予約確定できます）</label>
+              <input type="datetime-local" id="newDt_${r.id}" style="margin-bottom: 8px; padding: 8px; font-size: 0.9rem; width:100%; box-sizing:border-box;">
+              <button class="btn" style="background: #2980B9; padding: 10px; font-size: 0.85rem; margin-bottom: 0;" onclick="sendTimeAdjustment('${r.id}')">時間調整依頼メールを送信</button>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+              <button class="btn" style="background: #b39b7d; width: 48%; padding: 10px; font-size: 0.85rem; margin-bottom: 0;" onclick="approveReservation('${r.id}')">承認する（調整日時で確定も可）</button>
+              <button class="btn" style="background: #E74C3C; width: 48%; padding: 10px; font-size: 0.85rem; margin-bottom: 0;" onclick="rejectReservation('${r.id}')">却下する</button>
+            </div>
+
+            <button class="btn" style="background: #27AE60; width: 100%; padding: 10px; font-size: 0.85rem; margin-top: 8px;" onclick="sendThankYouEmail('${r.id}')">💌 ご来店お礼メールを送る</button>
+          </div>
+        `;
+      });
+    }
+    document.getElementById('reservationListAdmin').innerHTML = html || '<p style="text-align:center; color:#888;">予約リクエストはありません</p>';
+  }
+
+  function approveReservation(id) {
+    const newDtVal = document.getElementById('newDt_' + id) ? document.getElementById('newDt_' + id).value : "";
+    const msg = newDtVal ? '指定された調整日時（' + newDtVal.replace('T', ' ') + '）に変更して予約を承認・確定しますか？' : 'この予約を承認しますか？';
+    if (confirm(msg)) {
+      postApi({ action: 'approve', id: id, newDatetime: newDtVal }).then(res => {
+        alert(res.message);
+        loadReservationList();
+      }).catch(err => alert("エラー: " + err.message));
+    }
+  }
+
+  function rejectReservation(id) {
+    if (confirm('この予約を却下しますか？')) {
+      postApi({ action: 'reject', id: id }).then(res => {
+        alert(res.message);
+        loadReservationList();
+      }).catch(err => alert("エラー: " + err.message));
+    }
+  }
+
+  function sendTimeAdjustment(id) {
+    const newDtVal = document.getElementById('newDt_' + id).value;
+    if (!newDtVal) { alert('変更ご提案日時を入力してください。'); return; }
+    if (confirm('時間調整依頼メールを送信しますか？')) {
+      postApi({ action: 'sendTimeAdjustment', id: id, newDatetime: newDtVal }).then(res => {
+        alert(res.message);
+        loadReservationList();
+      }).catch(err => alert("エラー: " + err.message));
+    }
+  }
+
+  function sendThankYouEmail(id) {
+    if (confirm('ご来店お礼メールを送信しますか？')) {
+      postApi({ action: 'sendThankYouEmail', id: id }).then(res => {
+        alert(res.message);
+      }).catch(err => alert("エラー: " + err.message));
+    }
+  }
+
+  function submitNews() {
+    const sub = document.getElementById('newsSubject').value;
+    const bod = document.getElementById('newsBody').value;
+    if(!sub || !bod) return alert('件名と本文を入力してください');
+    
+    postApi({ action: 'postNews', subject: sub, body: bod }).then(() => {
+      alert("投稿しました！");
+      document.getElementById('newsSubject').value = ""; document.getElementById('newsBody').value = "";
+      loadNewsList();
+    }).catch(err => alert("投稿失敗: " + err.message));
+  }
+
+  function loadNewsList() {
+    return jsonp('getNewsList').then(list => {
+      let html = '';
+      if (list && list.length > 0) {
+        list.forEach(n => {
+          html += `
+            <div class="news-item">
+              <p style="margin: 0 0 8px 0; font-size:0.8rem; color:#666;">投稿日: ${n.date}</p>
+              <div class="form-group" style="margin-bottom:10px;">
+                <input type="text" id="sub_${n.index}" value="${n.subject}">
+              </div>
+              <div class="form-group" style="margin-bottom:10px;">
+                <textarea id="bod_${n.index}" style="height:100px;">${n.body}</textarea>
+              </div>
+              <div style="display:flex; gap: 10px;">
+                <button class="btn" style="background:#b39b7d; width:48%; padding:10px; font-size:0.85rem;" onclick="updateNews(${n.index})">内容を更新</button>
+                <button class="btn" style="background:#E74C3C; width:48%; padding:10px; font-size:0.85rem;" onclick="delNews(${n.index})">削除する</button>
+              </div>
+            </div>
+          `;
+        });
+      }
+      document.getElementById('newsListAdmin').innerHTML = html || '<p style="text-align:center; color:#888;">お知らせがありません</p>';
+    }).catch(err => {});
+  }
+
+  function delNews(idx) {
+    if(confirm('本当に削除しますか？')) {
+      postApi({ action: 'deleteNews', index: idx }).then(loadNewsList).catch(err => alert("削除失敗: " + err.message));
+    }
+  }
+
+  function updateNews(idx) {
+    const sub = document.getElementById('sub_'+idx).value;
+    const bod = document.getElementById('bod_'+idx).value;
+    postApi({ action: 'updateNews', index: idx, subject: sub, body: bod }).then(() => {
+      alert('更新しました');
+      loadNewsList();
+    }).catch(err => alert("更新失敗: " + err.message));
+  }
+</script>
+</body>
+</html>

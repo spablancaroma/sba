@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- ファビコンの設定 -->
+  <link rel="icon" href="logo.ico" type="image/x-icon">
+  <link rel="shortcut icon" href="logo.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" href="logo.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>週間スケジュール - Spa Blanc Aroma</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    .page-header { text-align: center; padding: 120px 20px 30px; background-color: #f2ece4; }
+    .page-header h1 { font-size: 2rem; font-weight: 500; color: #3b3530; letter-spacing: 0.05em; }
+    .container-sched { max-width: 900px; margin: 40px auto; padding: 20px; }
+    
+    .schedule-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-top: 20px; }
+    .schedule-table th, .schedule-table td { padding: 14px 10px; border-bottom: 1px solid #f0ede8; text-align: center; font-size: 0.9rem; }
+    .schedule-table th { background: #f8f6f2; color: #3b3530; font-weight: 500; }
+    
+    .badge-work { background: #e8f5e9; color: #2e7d32; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; display: block; margin-bottom: 4px; }
+    .badge-closed { background: #fbe9e7; color: #d84315; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; display: block; }
+    .badge-off { background: #f5f5f5; color: #888; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; display: block; }
+    
+    .reserve-link-btn { display: inline-block; margin-top: 4px; font-size: 0.75rem; color: #b39b7d; text-decoration: underline; font-weight: bold; }
+    
+    /* サイドバー内の多言語切り替え用スタイル */
+    .sidebar-lang-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+      width: 100%;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+    <!-- ハンバーガーボタン & サイドバー -->
+    <button class="menu-toggle-btn" onclick="openNav()" aria-label="メニューを開く">☰</button>
+
+    <div class="sidebar-overlay" id="overlay" onclick="closeNav()"></div>
+
+    <aside class="sidebar" id="sidebar">
+      <button class="close-btn" onclick="closeNav()" aria-label="メニューを閉じる">✕</button>
+      <ul class="sidebar-menu">
+        <li><a href="index.html">トップ</a></li>
+        <li><a href="reservation.html">予約・空き状況確認</a></li>
+        <li><a href="schedule.html">週間スケジュール</a></li>
+        <li><a href="column.html">コラム一覧</a></li>
+        <li><a href="voice/customer_voice.html">お客様の声</a></li>
+        <li><a href="news.html">お知らせ</a></li>
+        <li><a href="about.html">店舗概要</a></li>
+        <li><a href="recruit.html">セラピスト募集</a></li>
+        <!-- サイドバー内の多言語切り替え -->
+        <li style="border-top: 1px solid #eee; margin-top: 15px; padding-top: 15px; text-align: center;">
+          <div class="sidebar-lang-container" style="font-size: 12px; font-weight: bold;">
+            <span style="color: #b39b7d;">日本語</span>
+            <span style="color: #ccc; font-weight: normal;">|</span>
+            <a href="english.html" style="color: #555; text-decoration: none;">English</a>
+            <span style="color: #ccc; font-weight: normal;">|</span>
+            <a href="chinese.html" style="color: #555; text-decoration: none;">中文</a>
+          </div>
+        </li>
+        <li style="margin-top: 5px;"><a href="javascript:void(0);" onclick="loginAdmin()" class="admin-link">🔒 管理者画面</a></li>
+      </ul>
+    </aside>
+
+    <!-- ヘッダー -->
+    <header class="site-header">
+        <div class="logo">
+          <a href="index.html">
+            <img src="logo.png" alt="Spa Blanc Aroma 店舗ロゴ" class="header-logo-img">
+            <span>Spa Blanc Aroma</span>
+          </a>
+        </div>
+        <nav class="nav-menu">
+            <a href="index.html#therapist">Therapist</a>
+            <a href="schedule.html" class="active">Schedule</a>
+            <a href="index.html#service">Service</a>
+            <a href="index.html#menu">Price</a>
+            <a href="index.html#flow">Flow</a>
+            <a href="index.html#faq">FAQ</a>
+            <!-- ヘッダー側の多言語切り替え -->
+            <div class="lang-switch" style="display: flex; gap: 6px; align-items: center; font-size: 12px; margin-left: 5px; padding-left: 10px; border-left: 1px solid #ddd; white-space: nowrap;">
+                <span style="font-weight: bold; color: #b39b7d;">JP</span>
+                <span style="color: #ccc;">|</span>
+                <a href="english.html" style="color: #666; text-decoration: none;">EN</a>
+                <span style="color: #ccc;">|</span>
+                <a href="chinese.html" style="color: #666; text-decoration: none;">中文</a>
+            </div>
+            <a href="reservation.html" class="nav-btn">ご予約</a>
+        </nav>
+    </header>
+
+    <div class="page-header">
+      <span class="section-en">Weekly Schedule</span>
+      <h1>セラピスト週間スケジュール</h1>
+    </div>
+
+    <div class="container-sched">
+      <p style="text-align: center; color: #666; font-size: 0.95rem;">今週の各セラピストの出勤予定一覧です。ご希望の日時を選択してご予約いただけます。</p>
+      <div id="scheduleTableContainer">
+        <p style="text-align: center; color: #888; padding: 30px;">最新のスケジュールを読み込んでいます...</p>
+      </div>
+    </div>
+
+    <!-- フッター -->
+    <footer>
+        <p>&copy; Spa Blanc Aroma All Rights Reserved.</p>
+    </footer>
+
+<script>
+  function openNav() {
+    document.getElementById('sidebar').classList.add('is-active');
+    document.getElementById('overlay').classList.add('is-active');
+  }
+
+  function closeNav() {
+    document.getElementById('sidebar').classList.remove('is-active');
+    document.getElementById('overlay').classList.remove('is-active');
+  }
+
+  const API_URL = "https://script.google.com/macros/s/AKfycbzINJ6cRRGnjW4n1n1zW42LDRqziMAkOKwDZrwMhMWnNdmO74K815ld_gbcnB94eh8/exec";
+  
+  function jsonp(action, params = {}) {
+    return new Promise((resolve, reject) => {
+      const callbackName = 'jsonp_' + Math.random().toString(36).substr(2, 9);
+      const script = document.createElement('script');
+      
+      const timer = setTimeout(() => {
+        delete window[callbackName];
+        if (script.parentNode) document.body.removeChild(script);
+        reject(new Error('通信タイムアウトが発生しました'));
+      }, 15000);
+
+      window[callbackName] = function(data) {
+        clearTimeout(timer);
+        delete window[callbackName];
+        if (script.parentNode) document.body.removeChild(script);
+        resolve(data);
+      };
+
+      const query = new URLSearchParams({ action, callback: callbackName, ...params }).toString();
+      script.src = `${API_URL}?${query}`;
+      script.onerror = () => {
+        clearTimeout(timer);
+        delete window[callbackName];
+        if (script.parentNode) document.body.removeChild(script);
+        reject(new Error('通信エラーが発生しました'));
+      };
+      document.body.appendChild(script);
+    });
+  }
+
+  async function loginAdmin() {
+    if (sessionStorage.getItem("adminAuth") === "true") {
+      window.location.href = "admin.html";
+      return;
+    }
+
+    const pass = prompt("管理者用パスワードを入力してください:");
+    if (pass === null) return;
+
+    try {
+      const res = await jsonp('verifyPassword', { pass: pass });
+      if (res === true || res.success === true || res === "true") {
+        sessionStorage.setItem("adminAuth", "true");
+        window.location.href = "admin.html";
+      } else {
+        alert("パスワードが正しくありません。");
+      }
+    } catch (err) {
+      alert("認証通信エラーが発生しました: " + err.message);
+    }
+  }
+
+  // 日付を YYYY-MM-DD 形式に正確に変換するヘルパー関数
+  function formatDateKey(dateObj) {
+    const y = dateObj.getFullYear();
+    const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const d = String(dateObj.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  window.onload = async function() {
+    try {
+      const therapists = await jsonp('getTherapistList');
+      const schedules = {};
+      
+      for (let t of therapists) {
+        const res = await jsonp('getAllSchedules', { therapist: t });
+        schedules[t] = res || {};
+      }
+
+      const days = [];
+      const daysNames = ["日", "月", "火", "水", "木", "金", "土"];
+      const today = new Date();
+
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(today);
+        d.setDate(today.getDate() + i);
+        const key = formatDateKey(d);
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        
+        days.push({
+          key: key,
+          display: `${m}/${day} (${daysNames[d.getDay()]})`
+        });
+      }
+
+      let html = '<table class="schedule-table"><thead><tr><th>日付</th>';
+      therapists.forEach(t => html += `<th>${t}</th>`);
+      html += '</tr></thead><tbody>';
+
+      days.forEach(d => {
+        html += `<tr><td><strong>${d.display}</strong></td>`;
+        therapists.forEach(t => {
+          const tSched = schedules[t] || {};
+          const sch = tSched[d.key];
+
+          if (!sch || sch.start === '休み' || !sch.start || sch.start.trim() === '') {
+            html += `<td><span class="badge-off">お休み</span></td>`;
+          } else if (sch.start === '受付終了') {
+            html += `<td><span class="badge-closed">受付終了</span></td>`;
+          } else {
+            const timeRange = sch.end ? `${sch.start}〜${sch.end}` : sch.start;
+            html += `<td>
+              <span class="badge-work">${timeRange}</span>
+              <a href="reservation.html?therapist=${encodeURIComponent(t)}" class="reserve-link-btn">予約へ</a>
+            </td>`;
+          }
+        });
+        html += '</tr>';
+      });
+      html += '</tbody></table>';
+
+      document.getElementById('scheduleTableContainer').innerHTML = html;
+    } catch(e) {
+      document.getElementById('scheduleTableContainer').innerHTML = '<p style="color:red; text-align:center;">スケジュールの取得に失敗しました。</p>';
+    }
+  };
+</script>
+</body>
+</html>

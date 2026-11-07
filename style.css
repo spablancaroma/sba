@@ -76,17 +76,17 @@ ul {
     right: -260px;
     width: 260px;
     height: 100%;
-    background: #fdfbf7; /* サロンのトーンに合わせた明るく上質なサンドベージュ調に変更 */
+    background: #fdfbf7;
     transition: right 0.3s ease;
     z-index: 1002;
-    padding-top: 45px;
+    padding-top: 40px;
     padding-bottom: 15px;
     box-shadow: -4px 0 20px rgba(0,0,0,0.1);
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    overflow-y: hidden;
+    overflow-y: auto; /* ★ 画面に収まらない場合に縦スクロール可能へ変更 */
 }
 .sidebar.is-active {
     right: 0;
@@ -97,7 +97,7 @@ ul {
     right: 15px;
     background: none;
     border: none;
-    color: #3b3530; /* 閉じるボタンの色をダークブラウンに変更 */
+    color: #3b3530;
     font-size: 24px;
     cursor: pointer;
 }
@@ -109,19 +109,19 @@ ul {
     width: 100%;
 }
 .sidebar-menu li {
-    border-bottom: 1px solid #f0ede8; /* 上品な区切り線 */
+    border-bottom: 1px solid #f0ede8;
 }
 .sidebar-menu a {
     display: block;
-    padding: 12px 20px;
-    color: #3b3530; /* メニュー文字色を落ち着いたダークブラウンに変更 */
+    padding: 9px 20px; /* ★ 上下余白を 12px から 9px に詰めてコンパクト化 */
+    color: #3b3530;
     text-decoration: none;
-    font-size: 14px;
+    font-size: 13.5px;
     font-weight: 500;
     transition: background 0.2s ease, color 0.2s ease;
 }
 .sidebar-menu a:hover {
-    background: #f2ece4; /* ホバー時にうっすらサンドカラーに */
+    background: #f2ece4;
     color: #b39b7d;
 }
 .sidebar-menu a.admin-link {
