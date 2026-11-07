@@ -48,6 +48,7 @@
     .s-btn.active-work { background: #b39b7d; color: #fff; border-color: #b39b7d; }
     .s-btn.active-hol { background: #888; color: #fff; border-color: #888; }
     .s-btn.active-off { background: #d9534f; color: #fff; border-color: #d9534f; }
+    .s-btn.active-pending { background: #e67e22; color: #fff; border-color: #e67e22; }
 
     /* 時間セレクトボックス行 */
     .time-row { display: flex; align-items: center; gap: 8px; }
@@ -94,7 +95,7 @@
       <ul class="sidebar-menu">
         <li><a href="index.html">トップ</a></li>
         <li><a href="reservation.html">予約・空き状況確認</a></li>
-<li><a href="schedule.html">週間スケジュール</a></li> <!-- ★ここを追加 -->
+        <li><a href="schedule.html">週間スケジュール</a></li>
         <li><a href="column.html">コラム一覧</a></li>
         <li><a href="news.html">お知らせ</a></li>
         <li><a href="about.html">店舗概要</a></li>
@@ -168,7 +169,7 @@
       <button onclick="changeWeek(1)">次週 &gt;</button>
     </div>
     <div style="text-align: right; margin-bottom: 10px;" id="todayResetContainer">
-      <button onclick="resetToToday()" style="background: none; border: none; color: #b39b7d; cursor: pointer; font-size: 0.85rem; text-decoration: underline;">今週（本日）へ戻る</button>
+      <button onclick="resetToToday()" style="background: none; border: none; color: #b39b7d; cursor: pointer; font-size: 0.85rem; text-decoration: underline;">今日（本日）へ戻る</button>
     </div>
 
     <!-- 上部保存ボタン -->
@@ -368,8 +369,6 @@
 
   function resetToToday() {
     const d = new Date();
-    const day = d.getDay();
-    d.setDate(d.getDate() - day);
     d.setHours(0,0,0,0);
     currentWeekStartDate = d;
     if (currentTherapist && !isDefaultShiftMode) {
@@ -502,7 +501,7 @@
     });
   }
 
-  function renderWeeklyView() {
+function renderWeeklyView() {
     const startDate = new Date(currentWeekStartDate);
     const endDate = new Date(startDate);
     endDate.setDate(endDate.getDate() + 6);
@@ -521,35 +520,48 @@
       const m = String(targetD.getMonth() + 1).padStart(2, '0');
       const d = String(targetD.getDate()).padStart(2, '0');
       const dateKey = `${y}-${m}-${d}`;
-      const dayOfWeek = weekDaysNames[targetD.getDay()];
+      const dayIdx = targetD.getDay();
+      const dayOfWeek = weekDaysNames[dayIdx];
 
-      const sch = scheduleCache[dateKey] || { exists: false, start: '10:00', end: '19:00', notes: '' };
+      const sch = scheduleCache[dateKey] || { exists: false, start: '未定', end: '未定', notes: '' };
       
-      let status = 'work';
+      let status = 'pending';
       if (sch.start === '受付終了') status = 'closed';
-      else if (sch.start === '休み' || sch.start === '') status = 'hol';
+      else if (sch.start === '休み') status = 'hol';
+      else if (sch.start === '未定' || sch.start === '' || !sch.start) status = 'pending';
+      else status = 'work';
       
       let workActive = status === 'work' ? 'active-work' : '';
       let closedActive = status === 'closed' ? 'active-off' : '';
       let holActive = status === 'hol' ? 'active-hol' : '';
+      let pendingActive = status === 'pending' ? 'active-pending' : '';
+
+      // 曜日別の規定デフォルト時間（GASのH2:I8が空の場合のフォールバック）
+      // そうた用：日・土は10:00〜23:00、平日（月〜金）は20:00〜23:00
+      let fallbackDefStart = (dayIdx === 0 || dayIdx === 6) ? '10:00' : '20:00';
+      let fallbackDefEnd = '23:00';
+
+      const defStart = (sch.defaultStart && sch.defaultStart !== '未定' && sch.defaultStart !== '休み') ? sch.defaultStart : fallbackDefStart;
+      const defEnd = (sch.defaultEnd && sch.defaultEnd !== '未定' && sch.defaultEnd !== '休み') ? sch.defaultEnd : fallbackDefEnd;
 
       html += `
-        <div class="schedule-card" id="card_${dateKey}">
+        <div class="schedule-card" id="card_${dateKey}" data-def-start="${defStart}" data-def-end="${defEnd}">
           <div class="schedule-card-header">
             <span class="schedule-date">${m}/${d} (${dayOfWeek})</span>
             <div class="status-btns">
               <button type="button" class="s-btn ${workActive}" onclick="setStatus('${dateKey}', 'work')">出勤</button>
               <button type="button" class="s-btn ${closedActive}" onclick="setStatus('${dateKey}', 'closed')">受付終了</button>
               <button type="button" class="s-btn ${holActive}" onclick="setStatus('${dateKey}', 'hol')">休み</button>
+              <button type="button" class="s-btn ${pendingActive}" onclick="setStatus('${dateKey}', 'pending')">未定</button>
             </div>
           </div>
           <div class="time-row" id="timerow_${dateKey}" style="${status !== 'work' ? 'display:none;' : 'display:flex;'}">
             <select id="start_${dateKey}">
-              ${generateTimeOptions(status === 'work' ? sch.start : '10:00')}
+              ${generateTimeOptions(status === 'work' ? sch.start : defStart)}
             </select>
             <span>〜</span>
             <select id="end_${dateKey}">
-              ${generateTimeOptions(status === 'work' ? sch.end : '19:00')}
+              ${generateTimeOptions(status === 'work' ? sch.end : defEnd)}
             </select>
           </div>
           <div class="time-row">
@@ -560,7 +572,6 @@
     }
     document.getElementById('weeklyScheduleList').innerHTML = html;
   }
-
   function renderDefaultShiftView() {
     let html = '<p style="font-size:0.9rem; color:#666; margin-bottom:15px;">曜日ごとのデフォルト営業時間を設定します。個別設定がない日はこの設定が自動適用されます。</p>';
     
@@ -594,17 +605,29 @@
   }
 
   function setStatus(dateKey, type) {
+    const card = document.getElementById(`card_${dateKey}`);
     const timeRow = document.getElementById(`timerow_${dateKey}`);
+    const startSelect = document.getElementById(`start_${dateKey}`);
+    const endSelect = document.getElementById(`end_${dateKey}`);
+
     const workBtn = document.querySelector(`#card_${dateKey} .s-btn:nth-child(1)`);
     const closedBtn = document.querySelector(`#card_${dateKey} .s-btn:nth-child(2)`);
     const holBtn = document.querySelector(`#card_${dateKey} .s-btn:nth-child(3)`);
+    const pendingBtn = document.querySelector(`#card_${dateKey} .s-btn:nth-child(4)`);
 
     workBtn.className = 's-btn' + (type === 'work' ? ' active-work' : '');
     closedBtn.className = 's-btn' + (type === 'closed' ? ' active-off' : '');
     holBtn.className = 's-btn' + (type === 'hol' ? ' active-hol' : '');
+    pendingBtn.className = 's-btn' + (type === 'pending' ? ' active-pending' : '');
 
     if (type === 'work') {
       timeRow.style.display = 'flex';
+      // 出勤に切り替えた際は、常にカードが保持しているデフォルト時間（曜日ごとの設定）を自動セット
+      const defStart = card.getAttribute('data-def-start') || '10:00';
+      const defEnd = card.getAttribute('data-def-end') || '19:00';
+      
+      startSelect.value = defStart;
+      endSelect.value = defEnd;
     } else {
       timeRow.style.display = 'none';
     }
@@ -695,6 +718,7 @@
 
       const isClosed = card.querySelector('.s-btn:nth-child(2)').classList.contains('active-off');
       const isHoliday = card.querySelector('.s-btn:nth-child(3)').classList.contains('active-hol');
+      const isPending = card.querySelector('.s-btn:nth-child(4)').classList.contains('active-pending');
       const startVal = document.getElementById(`start_${dateKey}`).value;
       const endVal = document.getElementById(`end_${dateKey}`).value;
       const notesVal = document.getElementById(`notes_${dateKey}`).value;
@@ -703,6 +727,7 @@
       let writeEnd = endVal;
       if (isClosed) { writeStart = '受付終了'; writeEnd = '受付終了'; }
       else if (isHoliday) { writeStart = '休み'; writeEnd = '休み'; }
+      else if (isPending) { writeStart = '未定'; writeEnd = '未定'; }
 
       promises.push(
         postApi({

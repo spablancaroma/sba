@@ -266,6 +266,11 @@
         color: #d84315;
         border: 1px solid #ffccbc;
       }
+      .status-pending {
+        background: #fff3e0;
+        color: #e67e22;
+        border: 1px solid #ffe0b2;
+      }
       .today-time-display {
         font-size: 0.95rem;
         color: #3b3530;
@@ -916,7 +921,7 @@
           data.forEach(staff => {
             const targetBadge = staff.name === "そうた" ? "status-badge-souta" : (staff.name === "りょうすけ" ? "status-badge-ryosuke" : null);
             const targetTime = staff.name === "そうた" ? "today-time-souta" : (staff.name === "りょうすけ" ? "today-time-ryosuke" : null);
-            const targetBtn = staff.name === "そうた" ? "reserve-btn-souta" : (staff.name === "りょうすけ" ? "reserve-btn-ryosuke" : null);
+            const targetBtn = staff.name === "そうた" ? "reserve-btn-souta" : (staff.name === "ryosuke" ? "reserve-btn-ryosuke" : null);
             
             if (targetBadge && targetTime && targetBtn) {
               const badgeEl = document.getElementById(targetBadge);
@@ -936,6 +941,13 @@
                   badgeEl.className = "status-badge status-closed";
                   timeEl.innerText = "本日の受付は終了しました";
                   btnEl.innerText = "明日以降の空き状況";
+                  btnEl.className = "therapist-action-btn btn-secondary";
+                  btnEl.href = "schedule.html";
+                } else if (staff.status === "未定") {
+                  badgeEl.innerText = "未定";
+                  badgeEl.className = "status-badge status-pending";
+                  timeEl.innerText = "本日の出勤は未定です";
+                  btnEl.innerText = "今後の空き状況";
                   btnEl.className = "therapist-action-btn btn-secondary";
                   btnEl.href = "schedule.html";
                 } else {
