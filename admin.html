@@ -94,6 +94,7 @@
       <ul class="sidebar-menu">
         <li><a href="index.html">トップ</a></li>
         <li><a href="reservation.html">予約・空き状況確認</a></li>
+<li><a href="schedule.html">週間スケジュール</a></li> <!-- ★ここを追加 -->
         <li><a href="column.html">コラム一覧</a></li>
         <li><a href="news.html">お知らせ</a></li>
         <li><a href="about.html">店舗概要</a></li>
@@ -234,7 +235,6 @@
 
   // 管理者ログイン・認証関数
   async function loginAdmin() {
-    // sessionStorageに認証済みフラグがある場合は、パスワード入力をスキップして直接管理者画面へ
     if (sessionStorage.getItem("adminAuth") === "true") {
       document.getElementById('adminApp').style.display = 'block';
       initAdminData();
@@ -355,11 +355,9 @@
     return execute(0);
   }
 
-  // ページ読み込み時の初期化
   window.onload = function() {
     resetToToday();
 
-    // キャッシュ（sessionStorage）がある場合はパスワード入力をスキップして即時表示
     if (sessionStorage.getItem("adminAuth") === "true") {
       document.getElementById('adminApp').style.display = 'block';
       initAdminData();
@@ -526,10 +524,14 @@
       const dayOfWeek = weekDaysNames[targetD.getDay()];
 
       const sch = scheduleCache[dateKey] || { exists: false, start: '10:00', end: '19:00', notes: '' };
-      const isHol = (sch.start === '休み' || sch.start === '');
       
-      let workActive = !isHol ? 'active-work' : '';
-      let holActive = isHol ? 'active-hol' : '';
+      let status = 'work';
+      if (sch.start === '受付終了') status = 'closed';
+      else if (sch.start === '休み' || sch.start === '') status = 'hol';
+      
+      let workActive = status === 'work' ? 'active-work' : '';
+      let closedActive = status === 'closed' ? 'active-off' : '';
+      let holActive = status === 'hol' ? 'active-hol' : '';
 
       html += `
         <div class="schedule-card" id="card_${dateKey}">
@@ -537,16 +539,17 @@
             <span class="schedule-date">${m}/${d} (${dayOfWeek})</span>
             <div class="status-btns">
               <button type="button" class="s-btn ${workActive}" onclick="setStatus('${dateKey}', 'work')">出勤</button>
+              <button type="button" class="s-btn ${closedActive}" onclick="setStatus('${dateKey}', 'closed')">受付終了</button>
               <button type="button" class="s-btn ${holActive}" onclick="setStatus('${dateKey}', 'hol')">休み</button>
             </div>
           </div>
-          <div class="time-row" id="timerow_${dateKey}" style="${isHol ? 'display:none;' : 'display:flex;'}">
+          <div class="time-row" id="timerow_${dateKey}" style="${status !== 'work' ? 'display:none;' : 'display:flex;'}">
             <select id="start_${dateKey}">
-              ${generateTimeOptions(sch.start && sch.start !== '休み' ? sch.start : '10:00')}
+              ${generateTimeOptions(status === 'work' ? sch.start : '10:00')}
             </select>
             <span>〜</span>
             <select id="end_${dateKey}">
-              ${generateTimeOptions(sch.end && sch.end !== '休み' ? sch.end : '19:00')}
+              ${generateTimeOptions(status === 'work' ? sch.end : '19:00')}
             </select>
           </div>
           <div class="time-row">
@@ -593,16 +596,17 @@
   function setStatus(dateKey, type) {
     const timeRow = document.getElementById(`timerow_${dateKey}`);
     const workBtn = document.querySelector(`#card_${dateKey} .s-btn:nth-child(1)`);
-    const holBtn = document.querySelector(`#card_${dateKey} .s-btn:nth-child(2)`);
+    const closedBtn = document.querySelector(`#card_${dateKey} .s-btn:nth-child(2)`);
+    const holBtn = document.querySelector(`#card_${dateKey} .s-btn:nth-child(3)`);
+
+    workBtn.className = 's-btn' + (type === 'work' ? ' active-work' : '');
+    closedBtn.className = 's-btn' + (type === 'closed' ? ' active-off' : '');
+    holBtn.className = 's-btn' + (type === 'hol' ? ' active-hol' : '');
 
     if (type === 'work') {
       timeRow.style.display = 'flex';
-      workBtn.className = 's-btn active-work';
-      holBtn.className = 's-btn';
     } else {
       timeRow.style.display = 'none';
-      workBtn.className = 's-btn';
-      holBtn.className = 's-btn active-hol';
     }
   }
 
@@ -689,18 +693,24 @@
       const card = document.getElementById(`card_${dateKey}`);
       if (!card) continue;
 
-      const isHoliday = card.querySelector('.s-btn:nth-child(2)').classList.contains('active-hol');
+      const isClosed = card.querySelector('.s-btn:nth-child(2)').classList.contains('active-off');
+      const isHoliday = card.querySelector('.s-btn:nth-child(3)').classList.contains('active-hol');
       const startVal = document.getElementById(`start_${dateKey}`).value;
       const endVal = document.getElementById(`end_${dateKey}`).value;
       const notesVal = document.getElementById(`notes_${dateKey}`).value;
+
+      let writeStart = startVal;
+      let writeEnd = endVal;
+      if (isClosed) { writeStart = '受付終了'; writeEnd = '受付終了'; }
+      else if (isHoliday) { writeStart = '休み'; writeEnd = '休み'; }
 
       promises.push(
         postApi({
           action: 'updateSchedule',
           therapist: currentTherapist,
           date: dateKey,
-          start: isHoliday ? '休み' : startVal,
-          end: isHoliday ? '休み' : endVal,
+          start: writeStart,
+          end: writeEnd,
           isHoliday: isHoliday,
           notes: notesVal
         })

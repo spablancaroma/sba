@@ -261,6 +261,11 @@
         color: #888;
         border: 1px solid #e0e0e0;
       }
+      .status-closed {
+        background: #fbe9e7;
+        color: #d84315;
+        border: 1px solid #ffccbc;
+      }
       .today-time-display {
         font-size: 0.95rem;
         color: #3b3530;
@@ -428,6 +433,7 @@
       <ul class="sidebar-menu">
         <li><a href="index.html">トップ</a></li>
         <li><a href="reservation.html">予約・空き状況確認</a></li>
+<li><a href="schedule.html">週間スケジュール</a></li> <!-- ★ここを追加 -->
         <li><a href="column.html">コラム一覧</a></li>
         <li><a href="voice/customer_voice.html">お客様の声</a></li>
         <li><a href="news.html">お知らせ</a></li>
@@ -832,7 +838,6 @@
         document.getElementById('overlay').classList.remove('is-active');
       }
 
-      // GASと非同期通信するためのjsonp関数
       function jsonp(action, params = {}) {
         return new Promise((resolve, reject) => {
           const callbackName = 'jsonp_' + Math.random().toString(36).substr(2, 9);
@@ -864,7 +869,6 @@
         });
       }
 
-      // 管理者ログイン関数
       async function loginAdmin() {
         if (sessionStorage.getItem("adminAuth") === "true") {
           window.location.href = "admin.html";
@@ -887,11 +891,9 @@
         }
       }
 
-      // 本日の出勤情報を取得して各セラピストカードに自動反映するスクリプト
       document.addEventListener("DOMContentLoaded", function() {
         const API_URL = "https://script.google.com/macros/s/AKfycbzINJ6cRRGnjW4n1n1zW42LDRqziMAkOKwDZrwMhMWnNdmO74K815ld_gbcnB94eh8/exec";
         
-        // 日付表示
         const today = new Date();
         const month = today.getMonth() + 1;
         const date = today.getDate();
@@ -902,7 +904,6 @@
           dateDisplayEl.innerText = `📅 ${month}月${date}日 (${dayStr}) のスケジュール`;
         }
 
-        // JSONP取得
         const callbackName = 'jsonp_today_' + Math.random().toString(36).substr(2, 9);
         const script = document.createElement('script');
         
@@ -913,7 +914,6 @@
           if (!data || data.length === 0) return;
 
           data.forEach(staff => {
-            const isOn = staff.status === "出勤";
             const targetBadge = staff.name === "そうた" ? "status-badge-souta" : (staff.name === "りょうすけ" ? "status-badge-ryosuke" : null);
             const targetTime = staff.name === "そうた" ? "today-time-souta" : (staff.name === "りょうすけ" ? "today-time-ryosuke" : null);
             const targetBtn = staff.name === "そうた" ? "reserve-btn-souta" : (staff.name === "りょうすけ" ? "reserve-btn-ryosuke" : null);
@@ -924,12 +924,18 @@
               const btnEl = document.getElementById(targetBtn);
 
               if (badgeEl && timeEl && btnEl) {
-                if (isOn) {
+                if (staff.status === "出勤") {
                   badgeEl.innerText = "本日出勤";
                   badgeEl.className = "status-badge status-on";
                   timeEl.innerText = `${staff.start} 〜 ${staff.end}`;
                   btnEl.innerText = `${staff.name}を予約する`;
                   btnEl.className = "therapist-action-btn";
+                } else if (staff.status === "受付終了") {
+                  badgeEl.innerText = "受付終了";
+                  badgeEl.className = "status-badge status-closed";
+                  timeEl.innerText = "本日の受付は終了しました";
+                  btnEl.innerText = "明日以降の空き状況";
+                  btnEl.className = "therapist-action-btn btn-secondary";
                 } else {
                   badgeEl.innerText = "本日お休み";
                   badgeEl.className = "status-badge status-off";
