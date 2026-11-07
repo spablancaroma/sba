@@ -433,7 +433,7 @@
       <ul class="sidebar-menu">
         <li><a href="index.html">トップ</a></li>
         <li><a href="reservation.html">予約・空き状況確認</a></li>
-<li><a href="schedule.html">週間スケジュール</a></li> <!-- ★ここを追加 -->
+        <li><a href="schedule.html">週間スケジュール</a></li>
         <li><a href="column.html">コラム一覧</a></li>
         <li><a href="voice/customer_voice.html">お客様の声</a></li>
         <li><a href="news.html">お知らせ</a></li>
@@ -930,18 +930,21 @@
                   timeEl.innerText = `${staff.start} 〜 ${staff.end}`;
                   btnEl.innerText = `${staff.name}を予約する`;
                   btnEl.className = "therapist-action-btn";
+                  btnEl.href = "reservation.html";
                 } else if (staff.status === "受付終了") {
                   badgeEl.innerText = "受付終了";
                   badgeEl.className = "status-badge status-closed";
                   timeEl.innerText = "本日の受付は終了しました";
                   btnEl.innerText = "明日以降の空き状況";
                   btnEl.className = "therapist-action-btn btn-secondary";
+                  btnEl.href = "schedule.html";
                 } else {
                   badgeEl.innerText = "本日お休み";
                   badgeEl.className = "status-badge status-off";
                   timeEl.innerText = "お休み";
                   btnEl.innerText = "明日以降の空き状況";
                   btnEl.className = "therapist-action-btn btn-secondary";
+                  btnEl.href = "schedule.html";
                 }
               }
             }
