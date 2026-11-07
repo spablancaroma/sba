@@ -268,7 +268,7 @@
       <ul class="sidebar-menu">
         <li><a href="index.html">トップ</a></li>
         <li><a href="reservation.html">予約・空き状況確認</a></li>
-<li><a href="schedule.html">週間スケジュール</a></li> <!-- ★ここを追加 -->
+        <li><a href="schedule.html">週間スケジュール</a></li>
         <li><a href="column.html">コラム一覧</a></li>
         <li><a href="news.html">お知らせ</a></li>
         <li><a href="about.html">店舗概要</a></li>
@@ -449,8 +449,7 @@
     document.getElementById('overlay').classList.remove('is-active');
   }
 
-async function loginAdmin() {
-    // sessionStorageに認証済みフラグがある場合は、パスワード入力をスキップして直接管理者画面へ遷移
+  async function loginAdmin() {
     if (sessionStorage.getItem("adminAuth") === "true") {
       window.location.href = "admin.html";
       return;
@@ -460,7 +459,6 @@ async function loginAdmin() {
     if (pass === null) return;
 
     try {
-      // GASのAPI（verifyPassword）にパスワードを送信して検証（コード内にパスワードを残さない）
       const res = await jsonp('verifyPassword', { pass: pass });
       
       if (res === true || res.success === true || res === "true") {
@@ -593,7 +591,13 @@ async function loginAdmin() {
   async function initApp() {
     showProgressLoading("データを読み込み中...");
     try {
-      const initData = await jsonp('getAppInitData', { therapist: '指名なし' });
+      // URLパラメータから therapist を取得
+      const urlParams = new URLSearchParams(window.location.search);
+      const paramTherapist = urlParams.get('therapist');
+
+      // パラメータ指定があれば対象のセラピスト、無ければ '指名なし'
+      const targetTherapist = paramTherapist || '指名なし';
+      const initData = await jsonp('getAppInitData', { therapist: targetTherapist });
 
       if (initData.news && initData.news.subject) {
         const news = initData.news;
@@ -620,11 +624,25 @@ async function loginAdmin() {
       }
 
       if (initData.schedule) {
-        scheduleCache['指名なし'] = initData.schedule;
+        scheduleCache[targetTherapist] = initData.schedule;
       }
 
       hideProgressLoading();
-      document.getElementById('step0').style.display = 'block';
+
+      // パラメータ指定がある場合、STEP 0（セラピスト選択）を自動でスキップして STEP 1（日付選択）を表示
+      if (paramTherapist && (paramTherapist === '指名なし' || (initData.therapists && initData.therapists.includes(paramTherapist)))) {
+        select.value = paramTherapist;
+        selTherapist = paramTherapist;
+        const res = scheduleCache[selTherapist];
+        bizDays = res ? (res.bizDays || []) : [];
+        booked = res ? (res.booked || []) : [];
+        document.getElementById('step0').style.display = 'none';
+        document.getElementById('step1').style.display = 'block';
+        document.getElementById('selectedTherapistText').innerText = "担当セラピスト: " + selTherapist;
+        initCalendar();
+      } else {
+        document.getElementById('step0').style.display = 'block';
+      }
     } catch (err) {
       showErrorWithRetry(err.message, 'initApp');
     }
