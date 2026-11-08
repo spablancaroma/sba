@@ -5,6 +5,7 @@ Allow: /
 # 管理画面などインデックス不要なページの除外
 Disallow: /admin.html
 Disallow: /accounts.html
+Disallow: /approve.html
 Disallow: /admin/manual.html
 
 # サイトマップの指定

@@ -454,7 +454,7 @@
             <a href="chinese.html" style="color: #555; text-decoration: none;">中文</a>
           </div>
         </li>
-        <li style="margin-top: 5px;"><a href="javascript:void(0);" onclick="loginAdmin()" class="admin-link">🔒 管理者画面</a></li>
+        <li style="margin-top: 5px;"><a href="admin.html" class="admin-link">🔒 管理者画面</a></li>
       </ul>
     </aside>
 
@@ -852,8 +852,8 @@
           const timer = setTimeout(() => {
             delete window[callbackName];
             if (script.parentNode) document.body.removeChild(script);
-            reject(new Error('通信タイムアウトが発生しました'));
-          }, 15000);
+            reject(new Error('通信タイムアウトが発生しました。再度お試しください。'));
+          }, 25000);
 
           window[callbackName] = function(data) {
             clearTimeout(timer);
@@ -868,32 +868,10 @@
             clearTimeout(timer);
             delete window[callbackName];
             if (script.parentNode) document.body.removeChild(script);
-            reject(new Error('通信エラーが発生しました'));
+            reject(new Error('通信エラーが発生しました。ブラウザのセキュリティ機能やコンテンツブロック等を解除してお試しください。'));
           };
           document.body.appendChild(script);
         });
-      }
-
-      async function loginAdmin() {
-        if (sessionStorage.getItem("adminAuth") === "true") {
-          window.location.href = "admin.html";
-          return;
-        }
-
-        const pass = prompt("管理者用パスワードを入力してください:");
-        if (pass === null) return;
-
-        try {
-          const res = await jsonp('verifyPassword', { pass: pass });
-          if (res === true || res.success === true || res === "true") {
-            sessionStorage.setItem("adminAuth", "true");
-            window.location.href = "admin.html";
-          } else {
-            alert("パスワードが正しくありません。");
-          }
-        } catch (err) {
-          alert("認証通信エラーが発生しました: " + err.message);
-        }
       }
 
       document.addEventListener("DOMContentLoaded", function() {
@@ -921,7 +899,7 @@
           data.forEach(staff => {
             const targetBadge = staff.name === "そうた" ? "status-badge-souta" : (staff.name === "りょうすけ" ? "status-badge-ryosuke" : null);
             const targetTime = staff.name === "そうた" ? "today-time-souta" : (staff.name === "りょうすけ" ? "today-time-ryosuke" : null);
-            const targetBtn = staff.name === "そうた" ? "reserve-btn-souta" : (staff.name === "ryosuke" ? "reserve-btn-ryosuke" : null);
+            const targetBtn = staff.name === "そうた" ? "reserve-btn-souta" : (staff.name === "りょうすけ" ? "reserve-btn-ryosuke" : null);
             
             if (targetBadge && targetTime && targetBtn) {
               const badgeEl = document.getElementById(targetBadge);

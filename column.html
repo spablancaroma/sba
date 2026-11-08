@@ -127,13 +127,13 @@
       <ul class="sidebar-menu">
         <li><a href="index.html">トップ</a></li>
         <li><a href="reservation.html">予約・空き状況確認</a></li>
-<li><a href="schedule.html">週間スケジュール</a></li> <!-- ★ここを追加 -->
+        <li><a href="schedule.html">週間スケジュール</a></li>
         <li><a href="column.html">コラム一覧</a></li>
         <li><a href="voice/customer_voice.html">お客様の声</a></li>
         <li><a href="news.html">お知らせ</a></li>
         <li><a href="about.html">店舗概要</a></li>
         <li><a href="recruit.html">セラピスト募集</a></li>
-        <li><a href="javascript:void(0);" onclick="loginAdmin()" class="admin-link">🔒 管理者画面</a></li>
+        <li><a href="admin.html" class="admin-link">🔒 管理者画面</a></li>
       </ul>
     </aside>
 
@@ -414,29 +414,6 @@
           };
           document.body.appendChild(script);
         });
-      }
-
-      // 管理者ログイン関数
-      async function loginAdmin() {
-        if (sessionStorage.getItem("adminAuth") === "true") {
-          window.location.href = "admin.html";
-          return;
-        }
-
-        const pass = prompt("管理者用パスワードを入力してください:");
-        if (pass === null) return;
-
-        try {
-          const res = await jsonp('verifyPassword', { pass: pass });
-          if (res === true || res.success === true || res === "true") {
-            sessionStorage.setItem("adminAuth", "true");
-            window.location.href = "admin.html";
-          } else {
-            alert("パスワードが正しくありません。");
-          }
-        } catch (err) {
-          alert("認証通信エラーが発生しました: " + err.message);
-        }
       }
 
       // --- ページネーション処理 ---

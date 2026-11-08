@@ -7,25 +7,38 @@
 <link rel="apple-touch-icon" href="logo.png">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>管理者画面 - Spa Blanc Aroma</title>
+  <title>マイページ・管理画面 - Spa Blanc Aroma</title>
   <link rel="stylesheet" href="style.css">
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
-    .page-header { text-align: center; padding: 120px 20px 30px; background-color: #f2ece4; }
-    .page-header h1 { font-size: 2rem; font-weight: 500; color: #3b3530; letter-spacing: 0.05em; }
-    .container { max-width: 650px; margin: 40px auto; padding: 30px; background: #fff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #f0ede8; }
+    .page-header { text-align: center; padding: 110px 20px 25px; background-color: #f2ece4; }
+    .page-header h1 { font-size: 1.8rem; font-weight: 500; color: #3b3530; letter-spacing: 0.05em; }
+    .container { max-width: 650px; margin: 30px auto 50px; padding: 30px; background: #fff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #f0ede8; }
     
+    /* ログイン画面スタイル */
+    .login-box { max-width: 400px; margin: 40px auto; padding: 35px 25px; background: #fff; border-radius: 12px; border: 1px solid #f0ede8; box-shadow: 0 4px 20px rgba(0,0,0,0.05); text-align: center; }
+    .login-box img { width: 70px; height: auto; margin-bottom: 15px; }
+    .login-box h2 { border: none; padding: 0; font-size: 1.3rem; margin-bottom: 20px; color: #3b3530; text-align: center; }
+    .remember-group { display: flex; align-items: center; justify-content: flex-start; gap: 8px; margin: 15px 0 20px; font-size: 0.88rem; color: #666; cursor: pointer; }
+    .remember-group input[type="checkbox"] { width: 16px; height: 16px; accent-color: #b39b7d; cursor: pointer; }
+    
+    /* ユーザーバー & PW変更エリア */
+    .user-bar { display: flex; justify-content: space-between; align-items: center; background: #faf8f5; border: 1px solid #e0dcd5; padding: 10px 18px; border-radius: 6px; margin-bottom: 20px; font-size: 0.9rem; flex-wrap: wrap; gap: 10px; }
+    .user-info strong { color: #b39b7d; }
+    .btn-logout { background: #888; color: #fff; border: none; padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; transition: 0.2s; }
+    .btn-logout:hover { background: #666; }
+
     /* タブ切り替えボタン */
     .tab-group { display: flex; margin-bottom: 25px; border-radius: 6px; overflow: hidden; border: 1px solid #b39b7d; }
     .tab-btn { flex: 1; padding: 12px 2px; background: #fff; color: #b39b7d; border: none; font-size: 0.82rem; font-weight: 500; cursor: pointer; transition: all 0.3s; white-space: nowrap; text-align: center; }
     .tab-btn.active { background: #b39b7d; color: #fff; }
     
-    /* マニュアル・スプレッドシートへの誘導リンクボタン */
+    /* マニュアル・各種リンクボタン */
     .manual-link-container { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
-    .manual-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 0.85rem; color: #b39b7d; text-decoration: none; background: #f8f6f2; padding: 6px 14px; border-radius: 20px; border: 1px solid #e0dcd5; transition: all 0.3s ease; font-weight: 500; }
+    .manual-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 0.85rem; color: #b39b7d; text-decoration: none; background: #f8f6f2; padding: 6px 14px; border-radius: 20px; border: 1px solid #e0dcd5; transition: all 0.3s ease; font-weight: 500; cursor: pointer; }
     .manual-btn:hover { background: #b39b7d; color: #fff; border-color: #b39b7d; }
 
     /* 見出しデザイン */
@@ -56,11 +69,10 @@
     .time-row input[type="text"] { flex: 1.5; padding: 8px; border: 1px solid #e0dcd5; border-radius: 4px; background: #fff; font-size: 0.9rem; }
 
     /* フォーム要素共通 */
-    .form-group { margin-bottom: 20px; }
+    .form-group { margin-bottom: 20px; text-align: left; }
     label { font-weight: 500; color: #555; display: block; margin-bottom: 8px; font-size: 0.95rem; }
     select, input[type="text"], input[type="password"], textarea { width: 100%; padding: 14px; box-sizing: border-box; border: 1px solid #e0dcd5; border-radius: 6px; font-size: 0.95rem; background: #fff; font-family: inherit; }
     select:focus, input:focus, textarea:focus { outline: none; border-color: #b39b7d; }
-    
     textarea { height: 160px; resize: vertical; line-height: 1.6; }
 
     /* ボタン類 */
@@ -69,8 +81,8 @@
     .btn-save:hover:not(:disabled) { background: #9c8263; }
     .btn-save:disabled { background: #ccc; cursor: not-allowed; }
 
-    /* 予約管理用カードスタイル */
-    .reservation-item { background: #fff; border: 1px solid #f0ede8; padding: 20px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+    /* カード要素 */
+    .reservation-item, .news-item, .account-item { background: #fff; border: 1px solid #f0ede8; padding: 20px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
     .reservation-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.85rem; color: #666; font-family: 'Montserrat', sans-serif; }
     .status-badge { padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; }
     .status-badge.pending { background: #FFF3E0; color: #E67E22; border: 1px solid #FFE0B2; }
@@ -78,10 +90,13 @@
     .status-badge.adjusting { background: #EBF5FB; color: #2980B9; border: 1px solid #AED6F1; }
     .status-badge.rejected { background: #FFD2D2; color: #C0392B; border: 1px solid #F5B7B1; }
     
-    .news-item { background: #fff; border: 1px solid #f0ede8; padding: 20px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
-    
     .toast-notice { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background-color: #27AE60; color: #fff; padding: 12px 28px; border-radius: 25px; font-weight: 500; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(0,0,0,0.15); z-index: 9999; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
     .toast-notice.show { opacity: 1; visibility: visible; }
+
+    /* クイックリンク */
+    .quick-link-box { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+    .quick-link-card { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 18px; background: #faf8f5; border: 1px solid #e0dcd5; border-radius: 8px; text-decoration: none; color: #3b3530; font-weight: 500; transition: 0.3s; }
+    .quick-link-card:hover { background: #b39b7d; color: #fff; border-color: #b39b7d; }
   </style>
 </head>
 <body>
@@ -100,7 +115,7 @@
         <li><a href="news.html">お知らせ</a></li>
         <li><a href="about.html">店舗概要</a></li>
         <li><a href="recruit.html">セラピスト募集</a></li>
-        <li><a href="javascript:void(0);" onclick="loginAdmin()" class="admin-link">🔒 管理者画面</a></li>
+        <li><a href="admin.html" class="admin-link">🔒 マイページ / 管理画面</a></li>
       </ul>
     </aside>
 
@@ -124,45 +139,100 @@
     </header>
 
     <div class="page-header">
-      <span class="section-en">Admin Panel</span>
-      <h1>管理者専用サイト</h1>
+      <span class="section-en">Member Portal</span>
+      <h1 id="pageTitleHeader">セラピスト・店舗マイページ</h1>
     </div>
 
+<!-- 1. ログイン画面エリア -->
+<div class="container" id="loginArea">
+  <div class="login-box">
+    <img src="logo.png" alt="Logo">
+    <h2>ログイン</h2>
+    <div class="form-group">
+      <label for="loginId">ID</label>
+      <input type="text" id="loginId" placeholder="IDを入力">
+    </div>
+    <div class="form-group">
+      <label for="loginPass">パスワード</label>
+      <input type="password" id="loginPass" placeholder="パスワードを入力">
+    </div>
+    <label class="remember-group">
+      <input type="checkbox" id="rememberMe" checked>
+      <span>ID・パスワードを保存する</span>
+    </label>
+    <button class="btn btn-save" id="loginSubmitBtn" onclick="performLogin()">ログイン</button>
+  </div>
+</div>
+
+<!-- 2. マイページ（ログイン後）エリア -->
 <div class="container" id="adminApp" style="display:none;">
-  <!-- マニュアルへのリンクボタン -->
-  <div class="manual-link-container">
-    <a href="/admin/manual.html" target="_blank" rel="noopener noreferrer" class="manual-btn">
-      📖 セラピストマニュアルを見る
+  <!-- ログインユーザー表示バー -->
+  <div class="user-bar">
+    <div class="user-info">
+      ログイン中: <strong id="loggedInUserName">---</strong> （ID: <span id="loggedInUserId">---</span>）
+    </div>
+    <div style="display:flex; gap:8px;">
+      <button class="manual-btn" onclick="togglePasswordChangeForm()" style="font-size:0.8rem; padding:4px 12px;">🔒 PW変更</button>
+      <button class="btn-logout" onclick="performLogout()">ログアウト</button>
+    </div>
+  </div>
+
+  <!-- パスワード変更フォーム（初期状態は非表示） -->
+  <div id="passwordChangeBox" style="display:none; background:#faf8f5; border:1px solid #e0dcd5; padding:20px; border-radius:8px; margin-bottom:20px;">
+    <h3 style="margin-top:0; font-size:1rem; color:#3b3530; border-bottom:1px solid #e0dcd5; padding-bottom:8px;">🔒 パスワードの変更</h3>
+    <div class="form-group" style="margin-bottom:12px;">
+      <label for="currentPassInput" style="font-size:0.85rem;">現在のパスワード</label>
+      <input type="password" id="currentPassInput" placeholder="現在のパスワード">
+    </div>
+    <div class="form-group" style="margin-bottom:12px;">
+      <label for="newPassInput" style="font-size:0.85rem;">新しいパスワード</label>
+      <input type="password" id="newPassInput" placeholder="新しいパスワード">
+    </div>
+    <div class="form-group" style="margin-bottom:15px;">
+      <label for="confirmPassInput" style="font-size:0.85rem;">新しいパスワード（確認）</label>
+      <input type="password" id="confirmPassInput" placeholder="もう一度入力してください">
+    </div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-save" style="padding:10px; font-size:0.85rem;" onclick="submitOwnPasswordChange()">パスワードを更新する</button>
+      <button class="btn" style="background:#ccc; padding:10px; font-size:0.85rem;" onclick="togglePasswordChangeForm()">キャンセル</button>
+    </div>
+  </div>
+
+  <!-- クイックリンク（マニュアル・会計） -->
+  <div class="quick-link-box">
+    <a href="/admin/manual.html" target="_blank" rel="noopener noreferrer" class="quick-link-card">
+      📖 セラピストマニュアル
+    </a>
+    <a href="accounts.html" id="accountsLinkCard" class="quick-link-card admin-only" style="display:none;">
+      💰 会計システム
     </a>
   </div>
 
   <!-- タブグループ -->
-  <div class="tab-group">
-    <button onclick="switchTab('schedule')" id="tabSchedule" class="tab-btn active">📅 スケジュール</button>
-    <button onclick="switchTab('reservation')" id="tabReservation" class="tab-btn">📋 予約管理</button>
+  <div class="tab-group" id="mainTabGroup">
+    <button onclick="switchTab('schedule')" id="tabSchedule" class="tab-btn active">📅 シフト管理</button>
+    <button onclick="switchTab('reservation')" id="tabReservation" class="tab-btn admin-only">📋 予約管理</button>
     <button onclick="switchTab('news')" id="tabNews" class="tab-btn">📰 お知らせ</button>
+    <button onclick="switchTab('accounts')" id="tabAccounts" class="tab-btn admin-only">👤 アカウント管理</button>
   </div>
   
   <!-- スケジュールタブエリア -->
   <div id="scheduleArea">
-    <h2>セラピスト・週間スケジュール管理</h2>
-    <div class="form-group">
+    <h2>シフト・スケジュール管理</h2>
+    <div class="form-group" id="therapistSelectGroup">
       <label for="adminTherapistSelect">対象セラピストを選択</label>
       <select id="adminTherapistSelect" onchange="onAdminTherapistChange()">
       </select>
     </div>
 
-    <!-- 選択中セラピストのスプレッドシートリンク ＆ デフォルト時間設定ボタン（横並び） -->
-    <div style="margin-top: -10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+    <!-- デフォルト時間設定ボタン -->
+    <div style="margin-top: -10px; margin-bottom: 20px; display: flex; justify-content: flex-start; align-items: center; flex-wrap: wrap; gap: 10px;">
       <button id="defaultShiftToggleBtn" class="manual-btn" onclick="toggleDefaultShiftMode()" style="background: #f8f6f2; cursor: pointer;">
         ⚙️ デフォルト時間設定
       </button>
-      <a id="therapistSheetLink" href="#" target="_blank" rel="noopener noreferrer" class="manual-btn" style="display: inline-flex;">
-        📊 選択中のスプレッドシートを開く
-      </a>
     </div>
 
-    <!-- 週移動ナビゲーション（デフォルトモード時は非表示） -->
+    <!-- 週移動ナビゲーション -->
     <div class="week-nav" id="weekNavContainer">
       <button onclick="changeWeek(-1)">&lt; 前週</button>
       <span id="currentWeekRange">読み込み中...</span>
@@ -175,7 +245,7 @@
     <!-- 上部保存ボタン -->
     <button class="btn btn-save" id="saveTopBtn" onclick="saveCurrentData()" style="margin-bottom: 20px;">この週の内容をまとめて保存する</button>
 
-    <!-- 週間 / デフォルトスケジュールリスト表示エリア -->
+    <!-- 週間 / デフォルトスケジュールリスト -->
     <div id="weeklyScheduleList">
       <p style="text-align:center; color:#888;">読み込み中...</p>
     </div>
@@ -184,39 +254,70 @@
     <button class="btn btn-save" id="saveBottomBtn" onclick="saveCurrentData()" style="margin-top: 10px;">この週の内容をまとめて保存する</button>
   </div>
 
-  <!-- 予約管理タブエリア -->
-  <div id="reservationArea" style="display:none;" class="detail-area" style="background:#fdfbf9; padding:25px; border-radius:8px; border:1px solid #f0ede8;">
+  <!-- 予約管理タブエリア（店舗アカウント専用） -->
+  <div id="reservationArea" style="display:none;">
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
       <h2 style="margin-bottom: 0;">📋 予約リクエスト・管理</h2>
       <select id="reservationSortOrder" onchange="renderReservationList()" style="width: auto; padding: 6px 12px; font-size: 0.85rem;">
-        <option value="latest">新着順 (受付日時順・最新5件)</option>
+        <option value="latest">新着順 (最新5件)</option>
         <option value="upcoming">予約日時が近い順 (直近5件)</option>
       </select>
     </div>
-    <p style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">届いた予約リクエストの承認、却下、時間調整、および終了後のお礼メール送信を行います。</p>
+    <p style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">届いた予約リクエストの承認、却下、時間調整、およびお礼メール送信を行います。</p>
     <div id="reservationListAdmin">読み込み中...</div>
   </div>
 
-  <!-- お知らせ管理タブエリア -->
-  <div id="newsArea" style="display:none;" class="detail-area" style="background:#fdfbf9; padding:25px; border-radius:8px; border:1px solid #f0ede8;">
-    <h2>📰 新規お知らせ投稿</h2>
-    <div class="form-group">
-      <label for="newsSubject">件名</label>
-      <input type="text" id="newsSubject" placeholder="お知らせの件名を入力">
+  <!-- お知らせタブエリア -->
+  <div id="newsArea" style="display:none;">
+    <div id="newsPostForm" class="admin-only" style="margin-bottom: 30px;">
+      <h2>📰 セラピスト向けお知らせ投稿</h2>
+      <div class="form-group">
+        <label for="newsSubject">件名</label>
+        <input type="text" id="newsSubject" placeholder="お知らせの件名を入力">
+      </div>
+      <div class="form-group">
+        <label for="newsBody">本文</label>
+        <textarea id="newsBody" placeholder="お知らせの本文を入力してください"></textarea>
+      </div>
+      <button class="btn btn-save" id="postNewsBtn" onclick="submitNews()">お知らせを投稿する</button>
+      <hr style="margin: 30px 0; border: 0; border-top: 1px solid #f0ede8;">
     </div>
-    <div class="form-group">
-      <label for="newsBody">本文</label>
-      <textarea id="newsBody" placeholder="お知らせの本文を入力してください"></textarea>
-    </div>
-    <button class="btn btn-save" id="postNewsBtn" onclick="submitNews()">お知らせを投稿する</button>
     
-    <hr style="margin: 30px 0; border: 0; border-top: 1px solid #f0ede8;">
-    <h2>📝 投稿済み一覧・編集</h2>
+    <h2>📝 セラピスト向けお知らせ一覧</h2>
     <div id="newsListAdmin">読み込み中...</div>
+  </div>
+
+  <!-- セラピストアカウント管理タブエリア（店舗アカウント専用） -->
+  <div id="accountsArea" style="display:none;">
+    <h2>👤 セラピストアカウント登録・変更</h2>
+    <div class="form-group">
+      <label for="accName">セラピスト名</label>
+      <input type="text" id="accName" placeholder="例: そうた">
+    </div>
+    <div class="form-group">
+      <label for="accId">ログインID</label>
+      <input type="text" id="accId" placeholder="例: souta">
+    </div>
+    <div class="form-group">
+      <label for="accPass">パスワード</label>
+      <input type="text" id="accPass" placeholder="例: souta">
+    </div>
+    <div class="form-group">
+      <label for="accRole">アカウント権限</label>
+      <select id="accRole">
+        <option value="therapist">セラピスト (標準)</option>
+        <option value="admin">店舗管理者 (全権限)</option>
+      </select>
+    </div>
+    <button class="btn btn-save" onclick="submitAccountSave()">アカウントを登録・更新する</button>
+
+    <hr style="margin: 30px 0; border: 0; border-top: 1px solid #f0ede8;">
+    <h2>📋 登録済みアカウント一覧</h2>
+    <div id="accountListAdmin">読み込み中...</div>
   </div>
 </div>
 
-<div id="toastNotice" class="toast-notice">登録しました</div>
+<div id="toastNotice" class="toast-notice">処理が完了しました</div>
 
 <!-- フッター -->
 <footer>
@@ -234,73 +335,15 @@
     document.getElementById('overlay').classList.remove('is-active');
   }
 
-  // 管理者ログイン・認証関数
-  async function loginAdmin() {
-    if (sessionStorage.getItem("adminAuth") === "true") {
-      document.getElementById('adminApp').style.display = 'block';
-      initAdminData();
-      return;
-    }
-
-    const pass = prompt("管理者用パスワードを入力してください:");
-    if (pass === null) return;
-
-    try {
-      const res = await jsonp('verifyPassword', { pass: pass });
-      if (res === true || res.success === true || res === "true") {
-        sessionStorage.setItem("adminAuth", "true");
-        document.getElementById('adminApp').style.display = 'block';
-        initAdminData();
-      } else {
-        alert("パスワードが正しくありません。");
-        loginAdmin();
-      }
-    } catch (err) {
-      alert("認証通信エラーが発生しました: " + err.message);
-    }
-  }
-
   const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzINJ6cRRGnjW4n1n1zW42LDRqziMAkOKwDZrwMhMWnNdmO74K815ld_gbcnB94eh8/exec";
-  
-  const THERAPIST_SHEET_URLS = {
-    "そうた": "https://docs.google.com/spreadsheets/d/1BA9CMGEitNnrlTiotiSd5ciUUiA5Tq5RKik6j2VYQJs/edit?gid=1099326092#gid=1099326092",
-    "りょうすけ": "https://docs.google.com/spreadsheets/d/1BA9CMGEitNnrlTiotiSd5ciUUiA5Tq5RKik6j2VYQJs/edit?gid=1102718110#gid=1102718110"
-  };
 
+  let currentUser = null; 
   let scheduleCache = {}; 
   let defaultShiftsCache = [];
   let currentTherapist = "";
   let rawReservationList = [];
   let currentWeekStartDate = new Date();
   let isDefaultShiftMode = false;
-
-  function generateTimeOptions(selectedVal) {
-    let options = '<option value="">---</option>';
-    const hours = [
-      "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", 
-      "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", 
-      "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", 
-      "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", 
-      "22:00", "22:30", "23:00", "23:30", 
-      "24:00", "24:30", "25:00", "25:30", "26:00", "26:30", 
-      "27:00", "27:30", "28:00", "29:00"
-    ];
-    hours.forEach(h => {
-      const displayLabel = h.startsWith("2") && parseInt(h.split(":")[0]) >= 24 ? `翌${String(parseInt(h.split(":")[0])-24).padStart(2,'0')}:${h.split(":")[1]}` : h;
-      const isSel = (selectedVal === h || selectedVal === displayLabel) ? 'selected' : '';
-      options += `<option value="${h}" ${isSel}>${displayLabel}</option>`;
-    });
-    return options;
-  }
-
-  function showToast(msg) {
-    const toast = document.getElementById('toastNotice');
-    if (toast) {
-      toast.innerText = msg;
-      toast.classList.add('show');
-      setTimeout(() => { toast.classList.remove('show'); }, 2000);
-    }
-  }
 
   function jsonp(action, params = {}) {
     return new Promise((resolve, reject) => {
@@ -358,14 +401,195 @@
 
   window.onload = function() {
     resetToToday();
-
-    if (sessionStorage.getItem("adminAuth") === "true") {
-      document.getElementById('adminApp').style.display = 'block';
-      initAdminData();
-    } else {
-      loginAdmin();
+    
+    // 保存済み認証情報による自動ログインチェック
+    const savedId = localStorage.getItem("saved_login_id");
+    const savedPass = localStorage.getItem("saved_login_pass");
+    if (savedId && savedPass) {
+      document.getElementById('loginId').value = savedId;
+      document.getElementById('loginPass').value = savedPass;
+      performLogin(true);
     }
   };
+
+  // ログイン実行
+  async function performLogin(isAuto = false) {
+    const id = document.getElementById('loginId').value.trim();
+    const pass = document.getElementById('loginPass').value.trim();
+    const remember = document.getElementById('rememberMe').checked;
+    const btn = document.getElementById('loginSubmitBtn');
+
+    if (!id || !pass) {
+      if (!isAuto) alert("IDとパスワードを入力してください。");
+      return;
+    }
+
+    if (!isAuto) {
+      btn.disabled = true;
+      btn.innerText = "認証中...";
+    }
+
+    try {
+      const res = await jsonp('loginTherapist', { id, pass });
+      if (res && res.success) {
+        currentUser = res;
+        
+        if (remember) {
+          localStorage.setItem("saved_login_id", id);
+          localStorage.setItem("saved_login_pass", pass);
+        } else {
+          localStorage.removeItem("saved_login_id");
+          localStorage.removeItem("saved_login_pass");
+        }
+
+        document.getElementById('loginArea').style.display = 'none';
+        document.getElementById('adminApp').style.display = 'block';
+        document.getElementById('loggedInUserName').innerText = currentUser.therapistName;
+        document.getElementById('loggedInUserId').innerText = currentUser.id;
+
+        initAppViewByRole();
+      } else {
+        if (!isAuto) alert(res.message || "ログインに失敗しました。");
+      }
+    } catch (err) {
+      if (!isAuto) alert("認証エラー: " + err.message);
+    } finally {
+      if (!isAuto) {
+        btn.disabled = false;
+        btn.innerText = "ログイン";
+      }
+    }
+  }
+
+  function performLogout() {
+    currentUser = null;
+    document.getElementById('passwordChangeBox').style.display = 'none';
+    document.getElementById('adminApp').style.display = 'none';
+    document.getElementById('loginArea').style.display = 'block';
+  }
+
+  // パスワード変更フォームのトグル
+  function togglePasswordChangeForm() {
+    const box = document.getElementById('passwordChangeBox');
+    if (box.style.display === 'none' || !box.style.display) {
+      box.style.display = 'block';
+      document.getElementById('currentPassInput').value = '';
+      document.getElementById('newPassInput').value = '';
+      document.getElementById('confirmPassInput').value = '';
+    } else {
+      box.style.display = 'none';
+    }
+  }
+
+  // 自身のパスワード変更実行
+  function submitOwnPasswordChange() {
+    const oldPass = document.getElementById('currentPassInput').value.trim();
+    const newPass = document.getElementById('newPassInput').value.trim();
+    const confirmPass = document.getElementById('confirmPassInput').value.trim();
+
+    if (!oldPass || !newPass || !confirmPass) {
+      alert("すべての項目を入力してください。");
+      return;
+    }
+
+    if (newPass !== confirmPass) {
+      alert("新しいパスワードと確認用パスワードが一致しません。");
+      return;
+    }
+
+    if (newPass.length < 4) {
+      alert("パスワードは4文字以上で設定してください。");
+      return;
+    }
+
+    postApi({
+      action: 'changeOwnPassword',
+      id: currentUser.id,
+      oldPass: oldPass,
+      newPass: newPass
+    }).then(res => {
+      alert(res.message);
+      togglePasswordChangeForm();
+      
+      if (localStorage.getItem("saved_login_id") === currentUser.id) {
+        localStorage.setItem("saved_login_pass", newPass);
+      }
+    }).catch(err => {
+      alert("エラー: " + err.message);
+    });
+  }
+
+  // ロール（admin / therapist）に応じたビューの初期設定
+  function initAppViewByRole() {
+    const isAdmin = currentUser.role === 'admin';
+
+    document.querySelectorAll('.admin-only').forEach(el => {
+      el.style.display = isAdmin ? 'inline-block' : 'none';
+    });
+
+    const accCard = document.getElementById('accountsLinkCard');
+    if (accCard) accCard.style.display = isAdmin ? 'flex' : 'none';
+
+    jsonp('getTherapistList').then(therapists => {
+      const select = document.getElementById('adminTherapistSelect');
+      const selectGroup = document.getElementById('therapistSelectGroup');
+      select.innerHTML = "";
+
+      if (isAdmin) {
+        selectGroup.style.display = 'block';
+        if (therapists && therapists.length > 0) {
+          therapists.forEach(t => {
+            const opt = document.createElement('option');
+            opt.value = t; opt.innerText = t;
+            select.appendChild(opt);
+          });
+          currentTherapist = therapists[0];
+        }
+      } else {
+        selectGroup.style.display = 'none';
+        currentTherapist = currentUser.therapistName;
+        const opt = document.createElement('option');
+        opt.value = currentTherapist; opt.innerText = currentTherapist;
+        select.appendChild(opt);
+      }
+
+      if (isDefaultShiftMode) {
+        loadDefaultShifts(() => renderDefaultShiftView());
+      } else {
+        loadAllSchedules(() => renderWeeklyView());
+      }
+    });
+
+    loadNewsList();
+    if (isAdmin) {
+      loadReservationList();
+      loadAccountList();
+    }
+  }
+
+  function onAdminTherapistChange() {
+    currentTherapist = document.getElementById('adminTherapistSelect').value;
+    if (isDefaultShiftMode) {
+      loadDefaultShifts(() => renderDefaultShiftView());
+    } else {
+      loadAllSchedules(() => renderWeeklyView());
+    }
+  }
+
+  function switchTab(tabName) {
+    document.getElementById('scheduleArea').style.display = tabName === 'schedule' ? 'block' : 'none';
+    document.getElementById('reservationArea').style.display = tabName === 'reservation' ? 'block' : 'none';
+    document.getElementById('newsArea').style.display = tabName === 'news' ? 'block' : 'none';
+    document.getElementById('accountsArea').style.display = tabName === 'accounts' ? 'block' : 'none';
+    
+    document.getElementById('tabSchedule').className = tabName === 'schedule' ? 'tab-btn active' : 'tab-btn';
+    document.getElementById('tabReservation').className = tabName === 'reservation' ? 'tab-btn active' : 'tab-btn';
+    document.getElementById('tabNews').className = tabName === 'news' ? 'tab-btn active' : 'tab-btn';
+    document.getElementById('tabAccounts').className = tabName === 'accounts' ? 'tab-btn active' : 'tab-btn';
+
+    if (tabName === 'reservation') loadReservationList();
+    if (tabName === 'accounts') loadAccountList();
+  }
 
   function resetToToday() {
     const d = new Date();
@@ -390,96 +614,47 @@
     const saveBottom = document.getElementById('saveBottomBtn');
 
     if (isDefaultShiftMode) {
-      btn.style.background = '#b39b7d';
-      btn.style.color = '#fff';
+      btn.style.background = '#b39b7d'; btn.style.color = '#fff';
       btn.innerText = '📅 週間スケジュール管理に戻る';
-      weekNav.style.display = 'none';
-      todayReset.style.display = 'none';
+      weekNav.style.display = 'none'; todayReset.style.display = 'none';
       saveTop.innerText = '曜日別デフォルト時間を保存する';
       saveBottom.innerText = '曜日別デフォルト時間を保存する';
       loadDefaultShifts(() => renderDefaultShiftView());
     } else {
-      btn.style.background = '#f8f6f2';
-      btn.style.color = '#b39b7d';
+      btn.style.background = '#f8f6f2'; btn.style.color = '#b39b7d';
       btn.innerText = '⚙️ デフォルト時間設定';
-      weekNav.style.display = 'flex';
-      todayReset.style.display = 'block';
+      weekNav.style.display = 'flex'; todayReset.style.display = 'block';
       saveTop.innerText = 'この週の内容をまとめて保存する';
       saveBottom.innerText = 'この週の内容をまとめて保存する';
       loadAllSchedules(() => renderWeeklyView());
     }
   }
 
-  function initAdminData() {
-    Promise.all([
-      jsonp('getTherapistList'),
-      loadNewsList(),
-      loadReservationList()
-    ]).then(([therapists]) => {
-      const select = document.getElementById('adminTherapistSelect');
-      select.innerHTML = "";
-      if (therapists && therapists.length > 0) {
-        therapists.forEach(t => {
-          const opt = document.createElement('option');
-          opt.value = t;
-          opt.innerText = t;
-          select.appendChild(opt);
-        });
-        currentTherapist = therapists[0];
-      } else {
-        const opt = document.createElement('option');
-        opt.value = "そうた";
-        opt.innerText = "そうた";
-        select.appendChild(opt);
-        currentTherapist = "そうた";
-      }
-      
-      updateTherapistSheetLink();
-
-      if (isDefaultShiftMode) {
-        loadDefaultShifts(() => renderDefaultShiftView());
-      } else {
-        loadAllSchedules(() => renderWeeklyView());
-      }
-    }).catch(err => {
-      alert("データの取得に失敗しました: " + err.message);
+  function generateTimeOptions(selectedVal) {
+    let options = '<option value="">---</option>';
+    const hours = [
+      "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", 
+      "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", 
+      "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", 
+      "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", 
+      "22:00", "22:30", "23:00", "23:30", 
+      "24:00", "24:30", "25:00", "25:30", "26:00", "26:30", 
+      "27:00", "27:30", "28:00", "29:00"
+    ];
+    hours.forEach(h => {
+      const displayLabel = h.startsWith("2") && parseInt(h.split(":")[0]) >= 24 ? `翌${String(parseInt(h.split(":")[0])-24).padStart(2,'0')}:${h.split(":")[1]}` : h;
+      const isSel = (selectedVal === h || selectedVal === displayLabel) ? 'selected' : '';
+      options += `<option value="${h}" ${isSel}>${displayLabel}</option>`;
     });
+    return options;
   }
 
-  function updateTherapistSheetLink() {
-    const linkElem = document.getElementById('therapistSheetLink');
-    if (!linkElem) return;
-    const url = THERAPIST_SHEET_URLS[currentTherapist];
-    if (url) {
-      linkElem.href = url;
-      linkElem.style.display = 'inline-flex';
-      linkElem.innerText = `📊 ${currentTherapist} のスプレッドシートを開く`;
-    } else {
-      linkElem.style.display = 'none';
-    }
-  }
-
-  function onAdminTherapistChange() {
-    currentTherapist = document.getElementById('adminTherapistSelect').value;
-    updateTherapistSheetLink();
-    if (isDefaultShiftMode) {
-      loadDefaultShifts(() => renderDefaultShiftView());
-    } else {
-      loadAllSchedules(() => renderWeeklyView());
-    }
-  }
-
-  function switchTab(tabName) {
-    document.getElementById('scheduleArea').style.display = tabName === 'schedule' ? 'block' : 'none';
-    document.getElementById('reservationArea').style.display = tabName === 'reservation' ? 'block' : 'none';
-    document.getElementById('newsArea').style.display = tabName === 'news' ? 'block' : 'none';
-    
-    document.getElementById('tabSchedule').className = tabName === 'schedule' ? 'tab-btn active' : 'tab-btn';
-    document.getElementById('tabReservation').className = tabName === 'reservation' ? 'tab-btn active' : 'tab-btn';
-    document.getElementById('tabNews').className = tabName === 'news' ? 'tab-btn active' : 'tab-btn';
-
-    if (tabName === 'reservation') {
-      loadReservationList();
+  function showToast(msg) {
+    const toast = document.getElementById('toastNotice');
+    if (toast) {
+      toast.innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => { toast.classList.remove('show'); }, 2000);
     }
   }
 
@@ -487,21 +662,17 @@
     jsonp('getAllSchedules', { therapist: currentTherapist }).then(data => {
       scheduleCache = data || {}; 
       if (callback) callback(); 
-    }).catch(err => {
-      alert("スケジュールデータの取得に失敗しました: " + err.message);
-    });
+    }).catch(err => alert("スケジュール取得失敗: " + err.message));
   }
 
   function loadDefaultShifts(callback) {
     jsonp('getDefaultShifts', { therapist: currentTherapist }).then(data => {
       defaultShiftsCache = data || [];
       if (callback) callback();
-    }).catch(err => {
-      alert("デフォルトシフトの取得に失敗しました: " + err.message);
-    });
+    }).catch(err => alert("デフォルトシフト取得失敗: " + err.message));
   }
 
-function renderWeeklyView() {
+  function renderWeeklyView() {
     const startDate = new Date(currentWeekStartDate);
     const endDate = new Date(startDate);
     endDate.setDate(endDate.getDate() + 6);
@@ -536,8 +707,6 @@ function renderWeeklyView() {
       let holActive = status === 'hol' ? 'active-hol' : '';
       let pendingActive = status === 'pending' ? 'active-pending' : '';
 
-      // 曜日別の規定デフォルト時間（GASのH2:I8が空の場合のフォールバック）
-      // そうた用：日・土は10:00〜23:00、平日（月〜金）は20:00〜23:00
       let fallbackDefStart = (dayIdx === 0 || dayIdx === 6) ? '10:00' : '20:00';
       let fallbackDefEnd = '23:00';
 
@@ -556,25 +725,21 @@ function renderWeeklyView() {
             </div>
           </div>
           <div class="time-row" id="timerow_${dateKey}" style="${status !== 'work' ? 'display:none;' : 'display:flex;'}">
-            <select id="start_${dateKey}">
-              ${generateTimeOptions(status === 'work' ? sch.start : defStart)}
-            </select>
+            <select id="start_${dateKey}">${generateTimeOptions(status === 'work' ? sch.start : defStart)}</select>
             <span>〜</span>
-            <select id="end_${dateKey}">
-              ${generateTimeOptions(status === 'work' ? sch.end : defEnd)}
-            </select>
+            <select id="end_${dateKey}">${generateTimeOptions(status === 'work' ? sch.end : defEnd)}</select>
           </div>
           <div class="time-row">
-            <input type="text" id="notes_${dateKey}" value="${sch.notes || ''}" placeholder="備考（例: 出張のため など）">
+            <input type="text" id="notes_${dateKey}" value="${sch.notes || ''}" placeholder="備考（例: 出張可能 など）">
           </div>
         </div>
       `;
     }
     document.getElementById('weeklyScheduleList').innerHTML = html;
   }
+
   function renderDefaultShiftView() {
-    let html = '<p style="font-size:0.9rem; color:#666; margin-bottom:15px;">曜日ごとのデフォルト営業時間を設定します。個別設定がない日はこの設定が自動適用されます。</p>';
-    
+    let html = '<p style="font-size:0.9rem; color:#666; margin-bottom:15px;">曜日ごとのデフォルト営業時間を設定します。</p>';
     defaultShiftsCache.forEach(item => {
       const isHol = item.isHoliday;
       let workActive = !isHol ? 'active-work' : '';
@@ -590,13 +755,9 @@ function renderWeeklyView() {
             </div>
           </div>
           <div class="time-row" id="timerow_day_${item.dayIndex}" style="${isHol ? 'display:none;' : 'display:flex;'}">
-            <select id="def_start_${item.dayIndex}">
-              ${generateTimeOptions(item.start || '10:00')}
-            </select>
+            <select id="def_start_${item.dayIndex}">${generateTimeOptions(item.start || '10:00')}</select>
             <span>〜</span>
-            <select id="def_end_${item.dayIndex}">
-              ${generateTimeOptions(item.end || '19:00')}
-            </select>
+            <select id="def_end_${item.dayIndex}">${generateTimeOptions(item.end || '19:00')}</select>
           </div>
         </div>
       `;
@@ -622,12 +783,9 @@ function renderWeeklyView() {
 
     if (type === 'work') {
       timeRow.style.display = 'flex';
-      // 出勤に切り替えた際は、常にカードが保持しているデフォルト時間（曜日ごとの設定）を自動セット
       const defStart = card.getAttribute('data-def-start') || '10:00';
       const defEnd = card.getAttribute('data-def-end') || '19:00';
-      
-      startSelect.value = defStart;
-      endSelect.value = defEnd;
+      startSelect.value = defStart; endSelect.value = defEnd;
     } else {
       timeRow.style.display = 'none';
     }
@@ -640,21 +798,16 @@ function renderWeeklyView() {
 
     if (type === 'work') {
       timeRow.style.display = 'flex';
-      workBtn.className = 's-btn active-work';
-      holBtn.className = 's-btn';
+      workBtn.className = 's-btn active-work'; holBtn.className = 's-btn';
     } else {
       timeRow.style.display = 'none';
-      workBtn.className = 's-btn';
-      holBtn.className = 's-btn active-hol';
+      workBtn.className = 's-btn'; holBtn.className = 's-btn active-hol';
     }
   }
 
   function saveCurrentData() {
-    if (isDefaultShiftMode) {
-      saveDefaultShiftData();
-    } else {
-      saveWeeklyData();
-    }
+    if (isDefaultShiftMode) saveDefaultShiftData();
+    else saveWeeklyData();
   }
 
   function saveDefaultShiftData() {
@@ -667,15 +820,11 @@ function renderWeeklyView() {
     for (let i = 0; i < 7; i++) {
       const card = document.getElementById(`card_day_${i}`);
       if (!card) continue;
-
       const isHoliday = card.querySelector('.s-btn:nth-child(2)').classList.contains('active-hol');
-      const startVal = document.getElementById(`def_start_${i}`).value;
-      const endVal = document.getElementById(`def_end_${i}`).value;
-
       shiftsToSave.push({
         dayIndex: i,
-        start: startVal,
-        end: endVal,
+        start: document.getElementById(`def_start_${i}`).value,
+        end: document.getElementById(`def_end_${i}`).value,
         isHoliday: isHoliday
       });
     }
@@ -687,10 +836,10 @@ function renderWeeklyView() {
     }).then(() => {
       btnTop.disabled = false; btnTop.innerText = "曜日別デフォルト時間を保存する";
       btnBottom.disabled = false; btnBottom.innerText = "曜日別デフォルト時間を保存する";
-      showToast("曜日別デフォルト時間を保存しました！");
+      showToast("デフォルト時間を保存しました！");
       loadDefaultShifts(() => renderDefaultShiftView());
     }).catch(err => {
-      alert("保存に失敗しました: " + err.message);
+      alert("保存失敗: " + err.message);
       btnTop.disabled = false; btnTop.innerText = "曜日別デフォルト時間を保存する";
       btnBottom.disabled = false; btnBottom.innerText = "曜日別デフォルト時間を保存する";
     });
@@ -748,7 +897,7 @@ function renderWeeklyView() {
       showToast("今週のスケジュールを保存しました！");
       loadAllSchedules(() => renderWeeklyView());
     }).catch(err => {
-      alert("保存に失敗しました: " + err.message);
+      alert("保存失敗: " + err.message);
       btnTop.disabled = false; btnTop.innerText = "この週の内容をまとめて保存する";
       btnBottom.disabled = false; btnBottom.innerText = "この週の内容をまとめて保存する";
     });
@@ -758,9 +907,7 @@ function renderWeeklyView() {
     return jsonp('getReservationList').then(list => {
       rawReservationList = list || [];
       renderReservationList();
-    }).catch(err => {
-      document.getElementById('reservationListAdmin').innerHTML = '<p style="text-align:center; color:red;">予約リストの読み込みに失敗しました</p>';
-    });
+    }).catch(err => {});
   }
 
   function renderReservationList() {
@@ -790,19 +937,6 @@ function renderWeeklyView() {
         else if (r.status === '時間調整中') { badgeClass = 'adjusting'; }
         else if (r.status === '却下') { badgeClass = 'rejected'; }
 
-        let displayDt = r.datetime;
-        try {
-          const dObj = new Date(r.datetime);
-          if (!isNaN(dObj.getTime())) {
-            const y = dObj.getFullYear();
-            const m = String(dObj.getMonth() + 1).padStart(2, '0');
-            const day = String(dObj.getDate()).padStart(2, '0');
-            const hh = String(dObj.getHours()).padStart(2, '0');
-            const mm = String(dObj.getMinutes()).padStart(2, '0');
-            displayDt = `${y}-${m}-${day} ${hh}:${mm}`;
-          }
-        } catch(e) {}
-
         html += `
           <div class="reservation-item">
             <div class="reservation-meta">
@@ -810,17 +944,17 @@ function renderWeeklyView() {
               <span class="status-badge ${badgeClass}">${badgeText}</span>
             </div>
             <p style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: bold; color: #3b3530;">${r.name} 様 (${r.course})</p>
-            <p style="margin: 0 0 6px 0; font-size: 0.9rem; color: #555;"><strong>予約日時:</strong> ${displayDt}</p>
+            <p style="margin: 0 0 6px 0; font-size: 0.9rem; color: #555;"><strong>予約日時:</strong> ${r.datetime}</p>
             <p style="margin: 0 0 6px 0; font-size: 0.88rem; color: #666;"><strong>指名:</strong> ${r.therapist} / <strong>連絡先:</strong> ${r.tel} (${r.email})</p>
             
             <div style="margin: 12px 0; padding: 10px; background: #f8f6f2; border-radius: 6px; border: 1px solid #e0dcd5;">
-              <label style="font-size: 0.85rem; margin-bottom: 4px; color: #b39b7d;">▼ 調整日時（この日時を指定して「承認する」と、その変更後日時で予約確定できます）</label>
+              <label style="font-size: 0.85rem; margin-bottom: 4px; color: #b39b7d;">▼ 調整日時</label>
               <input type="datetime-local" id="newDt_${r.id}" style="margin-bottom: 8px; padding: 8px; font-size: 0.9rem; width:100%; box-sizing:border-box;">
               <button class="btn" style="background: #2980B9; padding: 10px; font-size: 0.85rem; margin-bottom: 0;" onclick="sendTimeAdjustment('${r.id}')">時間調整依頼メールを送信</button>
             </div>
 
             <div style="display: flex; gap: 10px; margin-top: 10px;">
-              <button class="btn" style="background: #b39b7d; width: 48%; padding: 10px; font-size: 0.85rem; margin-bottom: 0;" onclick="approveReservation('${r.id}')">承認する（調整日時で確定も可）</button>
+              <button class="btn" style="background: #b39b7d; width: 48%; padding: 10px; font-size: 0.85rem; margin-bottom: 0;" onclick="approveReservation('${r.id}')">承認する</button>
               <button class="btn" style="background: #E74C3C; width: 48%; padding: 10px; font-size: 0.85rem; margin-bottom: 0;" onclick="rejectReservation('${r.id}')">却下する</button>
             </div>
 
@@ -834,11 +968,9 @@ function renderWeeklyView() {
 
   function approveReservation(id) {
     const newDtVal = document.getElementById('newDt_' + id) ? document.getElementById('newDt_' + id).value : "";
-    const msg = newDtVal ? '指定された調整日時（' + newDtVal.replace('T', ' ') + '）に変更して予約を承認・確定しますか？' : 'この予約を承認しますか？';
-    if (confirm(msg)) {
+    if (confirm('この予約を承認しますか？')) {
       postApi({ action: 'approve', id: id, newDatetime: newDtVal }).then(res => {
-        alert(res.message);
-        loadReservationList();
+        alert(res.message); loadReservationList();
       }).catch(err => alert("エラー: " + err.message));
     }
   }
@@ -846,82 +978,147 @@ function renderWeeklyView() {
   function rejectReservation(id) {
     if (confirm('この予約を却下しますか？')) {
       postApi({ action: 'reject', id: id }).then(res => {
-        alert(res.message);
-        loadReservationList();
+        alert(res.message); loadReservationList();
       }).catch(err => alert("エラー: " + err.message));
     }
   }
 
   function sendTimeAdjustment(id) {
     const newDtVal = document.getElementById('newDt_' + id).value;
-    if (!newDtVal) { alert('変更ご提案日時を入力してください。'); return; }
+    if (!newDtVal) return alert('変更ご提案日時を入力してください。');
     if (confirm('時間調整依頼メールを送信しますか？')) {
       postApi({ action: 'sendTimeAdjustment', id: id, newDatetime: newDtVal }).then(res => {
-        alert(res.message);
-        loadReservationList();
+        alert(res.message); loadReservationList();
       }).catch(err => alert("エラー: " + err.message));
     }
   }
 
   function sendThankYouEmail(id) {
     if (confirm('ご来店お礼メールを送信しますか？')) {
-      postApi({ action: 'sendThankYouEmail', id: id }).then(res => {
-        alert(res.message);
-      }).catch(err => alert("エラー: " + err.message));
+      postApi({ action: 'sendThankYouEmail', id: id }).then(res => alert(res.message)).catch(err => alert("エラー: " + err.message));
     }
   }
 
+  // セラピスト向けお知らせ投稿
   function submitNews() {
     const sub = document.getElementById('newsSubject').value;
     const bod = document.getElementById('newsBody').value;
     if(!sub || !bod) return alert('件名と本文を入力してください');
     
-    postApi({ action: 'postNews', subject: sub, body: bod }).then(() => {
-      alert("投稿しました！");
+    postApi({ action: 'postTherapistNews', subject: sub, body: bod }).then(() => {
+      showToast("セラピスト向けお知らせを投稿しました！");
       document.getElementById('newsSubject').value = ""; document.getElementById('newsBody').value = "";
       loadNewsList();
     }).catch(err => alert("投稿失敗: " + err.message));
   }
 
+  // セラピスト向けお知らせ一覧取得
   function loadNewsList() {
-    return jsonp('getNewsList').then(list => {
+    return jsonp('getTherapistNewsList').then(list => {
       let html = '';
+      const isAdmin = currentUser && currentUser.role === 'admin';
       if (list && list.length > 0) {
         list.forEach(n => {
-          html += `
-            <div class="news-item">
-              <p style="margin: 0 0 8px 0; font-size:0.8rem; color:#666;">投稿日: ${n.date}</p>
-              <div class="form-group" style="margin-bottom:10px;">
-                <input type="text" id="sub_${n.index}" value="${n.subject}">
+          if (isAdmin) {
+            html += `
+              <div class="news-item">
+                <p style="margin: 0 0 8px 0; font-size:0.8rem; color:#666;">投稿日: ${n.date}</p>
+                <div class="form-group" style="margin-bottom:10px;">
+                  <input type="text" id="sub_${n.index}" value="${n.subject}">
+                </div>
+                <div class="form-group" style="margin-bottom:10px;">
+                  <textarea id="bod_${n.index}" style="height:100px;">${n.body}</textarea>
+                </div>
+                <div style="display:flex; gap: 10px;">
+                  <button class="btn" style="background:#b39b7d; width:48%; padding:10px; font-size:0.85rem;" onclick="updateNews(${n.index})">更新</button>
+                  <button class="btn" style="background:#E74C3C; width:48%; padding:10px; font-size:0.85rem;" onclick="delNews(${n.index})">削除</button>
+                </div>
               </div>
-              <div class="form-group" style="margin-bottom:10px;">
-                <textarea id="bod_${n.index}" style="height:100px;">${n.body}</textarea>
+            `;
+          } else {
+            html += `
+              <div class="news-item">
+                <p style="margin:0 0 6px 0; font-size:0.8rem; color:#b39b7d; font-weight:bold;">${n.date}</p>
+                <h3 style="margin:0 0 10px 0; font-size:1.05rem; color:#3b3530;">${n.subject}</h3>
+                <p style="margin:0; font-size:0.92rem; color:#555; white-space:pre-wrap; line-height:1.6;">${n.body}</p>
               </div>
-              <div style="display:flex; gap: 10px;">
-                <button class="btn" style="background:#b39b7d; width:48%; padding:10px; font-size:0.85rem;" onclick="updateNews(${n.index})">内容を更新</button>
-                <button class="btn" style="background:#E74C3C; width:48%; padding:10px; font-size:0.85rem;" onclick="delNews(${n.index})">削除する</button>
-              </div>
-            </div>
-          `;
+            `;
+          }
         });
       }
-      document.getElementById('newsListAdmin').innerHTML = html || '<p style="text-align:center; color:#888;">お知らせがありません</p>';
+      document.getElementById('newsListAdmin').innerHTML = html || '<p style="text-align:center; color:#888;">お知らせはありません</p>';
     }).catch(err => {});
   }
 
   function delNews(idx) {
     if(confirm('本当に削除しますか？')) {
-      postApi({ action: 'deleteNews', index: idx }).then(loadNewsList).catch(err => alert("削除失敗: " + err.message));
+      postApi({ action: 'deleteTherapistNews', index: idx }).then(loadNewsList).catch(err => alert("削除失敗: " + err.message));
     }
   }
 
   function updateNews(idx) {
     const sub = document.getElementById('sub_'+idx).value;
     const bod = document.getElementById('bod_'+idx).value;
-    postApi({ action: 'updateNews', index: idx, subject: sub, body: bod }).then(() => {
-      alert('更新しました');
-      loadNewsList();
+    postApi({ action: 'updateTherapistNews', index: idx, subject: sub, body: bod }).then(() => {
+      showToast('更新しました'); loadNewsList();
     }).catch(err => alert("更新失敗: " + err.message));
+  }
+
+  // アカウント管理機能（店舗専用）
+  function loadAccountList() {
+    if (!currentUser || currentUser.role !== 'admin') return;
+    jsonp('getTherapistAccounts', { requesterId: currentUser.id }).then(list => {
+      let html = '';
+      if (list && list.length > 0) {
+        list.forEach(acc => {
+          html += `
+            <div class="account-item" style="display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <strong>${acc.name}</strong> (${acc.role === 'admin' ? '店舗管理者' : 'セラピスト'})<br>
+                <span style="font-size:0.85rem; color:#666;">ID: ${acc.id} / PW: ${acc.pass}</span>
+              </div>
+              <button class="s-btn" onclick="fillAccountEdit('${acc.name}', '${acc.id}', '${acc.pass}', '${acc.role}')">編集</button>
+            </div>
+          `;
+        });
+      }
+      document.getElementById('accountListAdmin').innerHTML = html || '<p style="text-align:center; color:#888;">登録アカウントはありません</p>';
+    });
+  }
+
+  function fillAccountEdit(name, id, pass, role) {
+    document.getElementById('accName').value = name;
+    document.getElementById('accId').value = id;
+    document.getElementById('accPass').value = pass;
+    document.getElementById('accRole').value = role || 'therapist';
+  }
+
+  function submitAccountSave() {
+    if (!currentUser || currentUser.role !== 'admin') {
+      return alert("アカウントの登録・変更権限がありません（店舗管理者専用）。");
+    }
+
+    const name = document.getElementById('accName').value.trim();
+    const id = document.getElementById('accId').value.trim();
+    const pass = document.getElementById('accPass').value.trim();
+    const role = document.getElementById('accRole').value;
+
+    if (!name || !id || !pass) return alert("すべての項目を入力してください。");
+
+    postApi({
+      action: 'saveTherapistAccount',
+      name: name,
+      id: id,
+      pass: pass,
+      role: role,
+      requesterId: currentUser.id
+    }).then(res => {
+      showToast(res.message);
+      document.getElementById('accName').value = '';
+      document.getElementById('accId').value = '';
+      document.getElementById('accPass').value = '';
+      loadAccountList();
+    }).catch(err => alert("保存エラー: " + err.message));
   }
 </script>
 </body>

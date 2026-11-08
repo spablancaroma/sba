@@ -371,7 +371,7 @@
             <span style="color: #b39b7d;">中文</span>
           </div>
         </li>
-        <li style="margin-top: 5px;"><a href="javascript:void(0);" onclick="loginAdmin()" class="admin-link">🔒 管理员登录</a></li>
+        <li style="margin-top: 5px;"><a href="admin.html" class="admin-link">🔒 管理员登录</a></li>
       </ul>
     </aside>
 
@@ -508,7 +508,7 @@
                 <p style="font-size: 14px; color: #555; line-height: 1.6;">
                     本店备有5种不同香型的按摩精油。<br>
                     请在您喜爱的芳香环绕中，享受至高无上的疗愈体验。<br>
-                    <small style="color: #888;">※同时也备有无香型按摩精油，如有需要请随时告知。</small>
+                    <small style="color: #888;">※体上也备有无香型按摩精油，如有需要请随时告知。</small>
                 </p>
                 <div class="aroma-tags">
                     <span class="aroma-tag">依兰依兰</span>
@@ -601,7 +601,7 @@
                 </li>
                 <li>
                     <h4>4. 淋浴与沟通</h4>
-                    <p>按摩前后可进行淋浴。沟通阶段可边享用迎宾饮料，边挑选您喜爱的精油香型。<br>⭐ 如有需要，我们可免费提供一次性纸内裤。</p>
+                    <p>按摩前後可进行淋浴。沟通阶段可边享用迎宾饮料，边挑选您喜爱的精油香型。<br>⭐ 如有需要，我们可免费提供一次性纸内裤。</p>
                 </li>
                 <li>
                     <h4>5. 按摩护理</h4>
@@ -765,29 +765,6 @@
       };
       document.body.appendChild(script);
     });
-  }
-
-  // 管理者ログイン関数
-  async function loginAdmin() {
-    if (sessionStorage.getItem("adminAuth") === "true") {
-      window.location.href = "admin.html";
-      return;
-    }
-
-    const pass = prompt("管理者用パスワードを入力してください:");
-    if (pass === null) return;
-
-    try {
-      const res = await jsonp('verifyPassword', { pass: pass });
-      if (res === true || res.success === true || res === "true") {
-        sessionStorage.setItem("adminAuth", "true");
-        window.location.href = "admin.html";
-      } else {
-        alert("パスワードが正しくありません。");
-      }
-    } catch (err) {
-      alert("認証通信エラーが発生しました: " + err.message);
-    }
   }
 </script>
 </body>

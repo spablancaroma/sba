@@ -254,12 +254,12 @@
       <ul class="sidebar-menu">
         <li><a href="index.html">トップ</a></li>
         <li><a href="reservation.html">予約・空き状況確認</a></li>
-<li><a href="schedule.html">週間スケジュール</a></li> <!-- ★ここを追加 -->
+        <li><a href="schedule.html">週間スケジュール</a></li>
         <li><a href="column.html">コラム一覧</a></li>
         <li><a href="news.html">お知らせ</a></li>
         <li><a href="about.html">店舗概要</a></li>
         <li><a href="recruit.html">セラピスト募集</a></li>
-        <li><a href="javascript:void(0);" onclick="loginAdmin()" class="admin-link">🔒 管理者画面</a></li>
+        <li><a href="admin.html" class="admin-link">🔒 管理者画面</a></li>
       </ul>
     </aside>
 
@@ -429,31 +429,6 @@
         document.getElementById('sidebar').classList.remove('is-active');
         document.getElementById('overlay').classList.remove('is-active');
       }
-
-async function loginAdmin() {
-    // sessionStorageに認証済みフラグがある場合は、パスワード入力をスキップして直接管理者画面へ遷移
-    if (sessionStorage.getItem("adminAuth") === "true") {
-      window.location.href = "admin.html";
-      return;
-    }
-
-    const pass = prompt("管理者用パスワードを入力してください:");
-    if (pass === null) return;
-
-    try {
-      // GASのAPI（verifyPassword）にパスワードを送信して検証（コード内にパスワードを残さない）
-      const res = await jsonp('verifyPassword', { pass: pass });
-      
-      if (res === true || res.success === true || res === "true") {
-        sessionStorage.setItem("adminAuth", "true");
-        window.location.href = "admin.html";
-      } else {
-        alert("パスワードが正しくありません。");
-      }
-    } catch (err) {
-      alert("認証通信エラーが発生しました: " + err.message);
-    }
-  }
     </script>
 </body>
 </html>

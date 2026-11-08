@@ -273,7 +273,7 @@
         <li><a href="news.html">お知らせ</a></li>
         <li><a href="about.html">店舗概要</a></li>
         <li><a href="recruit.html">セラピスト募集</a></li>
-        <li><a href="javascript:void(0);" onclick="loginAdmin()" class="admin-link">🔒 管理者画面</a></li>
+        <li><a href="admin.html" class="admin-link">🔒 管理者画面</a></li>
       </ul>
     </aside>
 
@@ -447,29 +447,6 @@
   function closeNav() {
     document.getElementById('sidebar').classList.remove('is-active');
     document.getElementById('overlay').classList.remove('is-active');
-  }
-
-  async function loginAdmin() {
-    if (sessionStorage.getItem("adminAuth") === "true") {
-      window.location.href = "admin.html";
-      return;
-    }
-
-    const pass = prompt("管理者用パスワードを入力してください:");
-    if (pass === null) return;
-
-    try {
-      const res = await jsonp('verifyPassword', { pass: pass });
-      
-      if (res === true || res.success === true || res === "true") {
-        sessionStorage.setItem("adminAuth", "true");
-        window.location.href = "admin.html";
-      } else {
-        alert("パスワードが正しくありません。");
-      }
-    } catch (err) {
-      alert("認証通信エラーが発生しました: " + err.message);
-    }
   }
 
   const API_URL = "https://script.google.com/macros/s/AKfycbzINJ6cRRGnjW4n1n1zW42LDRqziMAkOKwDZrwMhMWnNdmO74K815ld_gbcnB94eh8/exec";
