@@ -211,7 +211,7 @@
   <!-- タブグループ -->
   <div class="tab-group" id="mainTabGroup">
     <button onclick="switchTab('schedule')" id="tabSchedule" class="tab-btn active">📅 シフト管理</button>
-    <button onclick="switchTab('reservation')" id="tabReservation" class="tab-btn admin-only">📋 予約管理</button>
+    <button onclick="switchTab('reservation')" id="tabReservation" class="tab-btn">📋 予約管理</button>
     <button onclick="switchTab('news')" id="tabNews" class="tab-btn">📰 お知らせ</button>
     <button onclick="switchTab('accounts')" id="tabAccounts" class="tab-btn admin-only">👤 アカウント管理</button>
   </div>
@@ -254,7 +254,7 @@
     <button class="btn btn-save" id="saveBottomBtn" onclick="saveCurrentData()" style="margin-top: 10px;">この週の内容をまとめて保存する</button>
   </div>
 
-  <!-- 予約管理タブエリア（店舗アカウント専用） -->
+  <!-- 予約管理タブエリア -->
   <div id="reservationArea" style="display:none;">
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
       <h2 style="margin-bottom: 0;">📋 予約リクエスト・管理</h2>
@@ -561,8 +561,8 @@
     });
 
     loadNewsList();
+    loadReservationList(); // セラピスト・管理者問わず予約リストを読み込み
     if (isAdmin) {
-      loadReservationList();
       loadAccountList();
     }
   }
