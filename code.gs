@@ -1,7 +1,7 @@
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbzINJ6cRRGnjW4n1n1zW42LDRqziMAkOKwDZrwMhMWnNdmO74K815ld_gbcnB94eh8/exec';
-const SITE_URL = 'https://spa-blanc-aroma.com/approve.html'; // 承認画面URL
-const ADMIN_PANEL_URL = 'https://spa-blanc-aroma.com/admin.html'; // 管理者画面URL
-const ADMIN_EMAIL = 'spa.blanc.aroma@gmail.com'; // 管理者通知の宛先アドレス
+const SITE_URL = 'https://spa-blanc-aroma.com/approve.html';
+const ADMIN_PANEL_URL = 'https://spa-blanc-aroma.com/admin.html';
+const ADMIN_EMAIL = 'spa.blanc.aroma@gmail.com';
 
 function doGet(e) {
   const callback = e && e.parameter && e.parameter.callback;
@@ -28,6 +28,8 @@ function doGet(e) {
         result = getAllSchedules(e.parameter.therapist);
       } else if (action === 'getNewsList') {
         result = getNewsList();
+      } else if (action === 'getTherapistNewsList') {
+        result = getTherapistNewsList();
       } else if (action === 'verifyPassword') {
         result = verifyPassword(e.parameter.pass);
       } else if (action === 'getReservationList') {
@@ -36,6 +38,12 @@ function doGet(e) {
         result = getTodaySchedule();
       } else if (action === 'getDefaultShifts') {
         result = getDefaultShifts(e.parameter.therapist);
+      } else if (action === 'loginTherapist') {
+        result = loginTherapist(e.parameter.id, e.parameter.pass);
+      } else if (action === 'getTherapistAccounts') {
+        result = getTherapistAccounts(e.parameter.requesterId);
+      } else if (action === 'changeOwnPassword') {
+        result = changeOwnPassword(e.parameter.id, e.parameter.oldPass, e.parameter.newPass);
       }
     } catch (err) {
       result = { success: false, message: err.message };
@@ -70,6 +78,14 @@ function doPost(e) {
       result = deleteNews(postData.index);
     } else if (action === 'updateNews') {
       result = updateNews(postData.index, postData.subject, postData.body);
+    } else if (action === 'postTherapistNews') {
+      result = postTherapistNews(postData.subject, postData.body);
+    } else if (action === 'deleteTherapistNews') {
+      result = deleteTherapistNews(postData.index);
+    } else if (action === 'updateTherapistNews') {
+      result = updateTherapistNews(postData.index, postData.subject, postData.body);
+    } else if (action === 'getTherapistNewsList') {
+      result = getTherapistNewsList();
     } else if (action === 'getInitialDataForIndex') {
       result = getInitialDataForIndex();
     } else if (action === 'getLatestNews') {
@@ -98,6 +114,14 @@ function doPost(e) {
       result = getTodaySchedule();
     } else if (action === 'updateDefaultShifts') {
       result = updateDefaultShifts(postData.therapist, postData.shifts);
+    } else if (action === 'loginTherapist') {
+      result = loginTherapist(postData.id, postData.pass);
+    } else if (action === 'saveTherapistAccount') {
+      result = saveTherapistAccount(postData.name, postData.id, postData.pass, postData.role, postData.requesterId);
+    } else if (action === 'getTherapistAccounts') {
+      result = getTherapistAccounts(postData.requesterId);
+    } else if (action === 'changeOwnPassword') {
+      result = changeOwnPassword(postData.id, postData.oldPass, postData.newPass);
     }
   } catch (err) {
     result = { success: false, error: err.message };
@@ -107,6 +131,223 @@ function doPost(e) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
+// ----------------------------------------------------
+// アカウント認証・権限管理
+// ----------------------------------------------------
+function getAccountSheet() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName('セラピストアカウント');
+  if (!sheet) {
+    sheet = ss.insertSheet('セラピストアカウント');
+    sheet.appendRow(['セラピスト名', 'ID', 'PW', '権限']);
+    sheet.appendRow(['店舗アカウント', 'admin', 'blanc2025', 'admin']);
+    sheet.appendRow(['そうた', 'souta', 'souta', 'therapist']);
+    sheet.appendRow(['りょうすけ', 'ryosuke', 'ryosuke', 'therapist']);
+  }
+  return sheet;
+}
+
+function checkAdminPermission(requesterId) {
+  if (!requesterId) return false;
+  const sheet = getAccountSheet();
+  const values = sheet.getDataRange().getValues();
+  for (let i = 1; i < values.length; i++) {
+    if (String(values[i][1]).trim() === String(requesterId).trim()) {
+      return (values[i][3] || 'therapist') === 'admin';
+    }
+  }
+  return false;
+}
+
+function loginTherapist(id, pass) {
+  try {
+    const sheet = getAccountSheet();
+    const values = sheet.getDataRange().getValues();
+    const targetId = String(id || '').trim();
+    const targetPass = String(pass || '').trim();
+
+    for (let i = 1; i < values.length; i++) {
+      const name = String(values[i][0]).trim();
+      const accId = String(values[i][1]).trim();
+      const accPw = String(values[i][2]).trim();
+      const role = String(values[i][3] || 'therapist').trim();
+
+      if (accId === targetId && accPw === targetPass) {
+        return {
+          success: true,
+          therapistName: name,
+          id: accId,
+          role: role
+        };
+      }
+    }
+    return { success: false, message: 'IDまたはパスワードが正しくありません。' };
+  } catch(e) {
+    return { success: false, message: 'エラーが発生しました: ' + e.message };
+  }
+}
+
+function getTherapistAccounts(requesterId) {
+  try {
+    if (requesterId && !checkAdminPermission(requesterId)) {
+      return [];
+    }
+    const sheet = getAccountSheet();
+    const values = sheet.getDataRange().getValues();
+    const list = [];
+    for (let i = 1; i < values.length; i++) {
+      if (values[i][1]) {
+        list.push({
+          name: values[i][0],
+          id: values[i][1],
+          pass: values[i][2],
+          role: values[i][3] || 'therapist'
+        });
+      }
+    }
+    return list;
+  } catch(e) {
+    return [];
+  }
+}
+
+function saveTherapistAccount(name, id, pass, role, requesterId) {
+  try {
+    if (!checkAdminPermission(requesterId)) {
+      return { success: false, message: 'アカウント登録・更新は管理者（admin）のみ実行可能です。' };
+    }
+
+    const sheet = getAccountSheet();
+    const values = sheet.getDataRange().getValues();
+    let targetRow = -1;
+
+    for (let i = 1; i < values.length; i++) {
+      if (String(values[i][1]).trim() === String(id).trim()) {
+        targetRow = i + 1;
+        break;
+      }
+    }
+
+    if (targetRow > 0) {
+      sheet.getRange(targetRow, 1).setValue(name);
+      sheet.getRange(targetRow, 3).setValue(pass);
+      sheet.getRange(targetRow, 4).setValue(role || 'therapist');
+    } else {
+      sheet.appendRow([name, id, pass, role || 'therapist']);
+    }
+
+    if (name !== '店舗アカウント' && !SpreadsheetApp.getActiveSpreadsheet().getSheetByName(name)) {
+      const newSheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet(name);
+      newSheet.appendRow(['日付', '開始時間', '終了時間', '備考']);
+    }
+
+    clearAllAppInitCache();
+    return { success: true, message: 'アカウントを登録・更新しました。' };
+  } catch(e) {
+    return { success: false, message: '保存エラー: ' + e.message };
+  }
+}
+
+function changeOwnPassword(id, oldPass, newPass) {
+  try {
+    const sheet = getAccountSheet();
+    const values = sheet.getDataRange().getValues();
+    const targetId = String(id || '').trim();
+    const targetOldPass = String(oldPass || '').trim();
+    const targetNewPass = String(newPass || '').trim();
+
+    if (!targetNewPass) {
+      return { success: false, message: '新しいパスワードを入力してください。' };
+    }
+
+    let targetRow = -1;
+    for (let i = 1; i < values.length; i++) {
+      const accId = String(values[i][1]).trim();
+      const accPw = String(values[i][2]).trim();
+
+      if (accId === targetId) {
+        if (accPw !== targetOldPass) {
+          return { success: false, message: '現在のパスワードが正しくありません。' };
+        }
+        targetRow = i + 1;
+        break;
+      }
+    }
+
+    if (targetRow > 0) {
+      sheet.getRange(targetRow, 3).setValue(targetNewPass);
+      return { success: true, message: 'パスワードを正常に変更しました！次回から新しいパスワードでログインしてください。' };
+    } else {
+      return { success: false, message: '該当するアカウントが見つかりません。' };
+    }
+  } catch(e) {
+    return { success: false, message: '変更エラー: ' + e.message };
+  }
+}
+
+// ----------------------------------------------------
+// セラピスト向けお知らせ管理（「Th.お知らせ」シート）
+// ----------------------------------------------------
+function getTherapistNewsSheet() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName('Th.お知らせ');
+  if (!sheet) {
+    sheet = ss.insertSheet('Th.お知らせ');
+    sheet.appendRow(['投稿日時', '件名', '本文']);
+  }
+  return sheet;
+}
+
+function getTherapistNewsList() {
+  try {
+    const cache = CacheService.getScriptCache();
+    const cached = cache.get('therapist_news_list');
+    if (cached) return JSON.parse(cached);
+
+    const sheet = getTherapistNewsSheet();
+    const values = sheet.getDataRange().getValues();
+    if (values.length <= 1) return [];
+    const news = [];
+    for (let i = 1; i < values.length; i++) {
+      news.push({
+        index: i + 1,
+        date: normalizeDateStr(values[i][0]).replace(/-/g, '/'),
+        subject: values[i][1],
+        body: values[i][2]
+      });
+    }
+    const result = news.reverse();
+    cache.put('therapist_news_list', JSON.stringify(result), 300);
+    return result;
+  } catch(e) {
+    return [];
+  }
+}
+
+function postTherapistNews(subject, body) {
+  const sheet = getTherapistNewsSheet();
+  sheet.appendRow([new Date(), subject, body]);
+  try { CacheService.getScriptCache().remove('therapist_news_list'); } catch(e){}
+  return { success: true };
+}
+
+function deleteTherapistNews(index) {
+  getTherapistNewsSheet().deleteRow(index);
+  try { CacheService.getScriptCache().remove('therapist_news_list'); } catch(e){}
+  return { success: true };
+}
+
+function updateTherapistNews(index, subject, body) {
+  const sheet = getTherapistNewsSheet();
+  sheet.getRange(index, 2).setValue(subject);
+  sheet.getRange(index, 3).setValue(body);
+  try { CacheService.getScriptCache().remove('therapist_news_list'); } catch(e){}
+  return { success: true };
+}
+
+// ----------------------------------------------------
+// 既存コア機能
+// ----------------------------------------------------
 function getAppInitData(therapist) {
   const t = therapist || '指名なし';
   return {
@@ -131,30 +372,18 @@ function getTodaySchedule() {
       
       if (sched.exists && sched.start) {
         if (sched.start === "受付終了") {
-          status = "受付終了";
-          start = "受付終了";
-          end = "";
+          status = "受付終了"; start = "受付終了"; end = "";
         } else if (sched.start === "休み") {
-          status = "休み";
-          start = "休み";
-          end = "";
+          status = "休み"; start = "休み"; end = "";
         } else if (sched.start === "未定") {
-          status = "未定";
-          start = "未定";
-          end = "";
+          status = "未定"; start = "未定"; end = "";
         } else {
-          status = "出勤";
-          start = sched.start;
-          end = sched.end;
+          status = "出勤"; start = sched.start; end = sched.end;
         }
       }
       
       todaySchedules.push({
-        name: tName,
-        status: status,
-        start: start,
-        end: end,
-        notes: sched.notes || ""
+        name: tName, status: status, start: start, end: end, notes: sched.notes || ""
       });
     });
 
@@ -164,7 +393,6 @@ function getTodaySchedule() {
   }
 }
 
-// タイムゾーンのズレを完全に防ぐ日付フォーマット関数
 function normalizeDateStr(rawDate) {
   if (!rawDate) return "";
   if (rawDate instanceof Date) {
@@ -185,7 +413,7 @@ function normalizeDateStr(rawDate) {
 function clearAllAppInitCache() {
   try {
     const cache = CacheService.getScriptCache();
-    cache.removeAll(['news_list', 'therapist_list', 'reservation_list']);
+    cache.removeAll(['news_list', 'therapist_news_list', 'therapist_list', 'reservation_list']);
   } catch(e){}
 }
 
@@ -208,14 +436,11 @@ function getCourseDetails(course) {
   let text = min + "分";
   let price = "";
   if (min === 60) {
-    text = isOutcall ? "出張60分" : "60分";
-    price = isOutcall ? "10,000円〜 + 交通費" : "9,000円";
+    text = isOutcall ? "出張60分" : "60分"; price = isOutcall ? "10,000円〜 + 交通費" : "9,000円";
   } else if (min === 90) {
-    text = isOutcall ? "出張90分" : "90分";
-    price = isOutcall ? "13,000円〜 + 交通費" : "12,000円";
+    text = isOutcall ? "出張90分" : "90分"; price = isOutcall ? "13,000円〜 + 交通費" : "12,000円";
   } else if (min === 120) {
-    text = isOutcall ? "出張120分" : "120分";
-    price = isOutcall ? "15,000円〜 + 交通費" : "14,000円";
+    text = isOutcall ? "出張120分" : "120分"; price = isOutcall ? "15,000円〜 + 交通費" : "14,000円";
   }
   return { text, price, isOutcall };
 }
@@ -225,7 +450,6 @@ function checkBlacklist(email, tel) {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const sheet = ss.getSheetByName('ブラックリスト');
     if (!sheet) return false;
-
     const values = sheet.getDataRange().getValues();
     if (values.length < 2) return false;
 
@@ -235,7 +459,6 @@ function checkBlacklist(email, tel) {
     for (let i = 1; i < values.length; i++) {
       const blEmail = values[i][0] ? String(values[i][0]).trim().toLowerCase() : "";
       const blTel = values[i][1] ? String(values[i][1]).trim().replace(/[-\s]/g, '') : "";
-
       if ((blEmail && targetEmail && blEmail === targetEmail) || (blTel && targetTel && blTel === targetTel)) {
         return true;
       }
@@ -255,15 +478,9 @@ function getTherapistEmail(therapistName) {
     const sheet = ss.getSheetByName(therapistName);
     if (!sheet) return ADMIN_EMAIL;
     const b1 = sheet.getRange("B1").getValue();
-    if (b1 && String(b1).includes("@")) {
-      return String(b1).trim();
-    }
+    if (b1 && String(b1).includes("@")) return String(b1).trim();
   } catch(e) {}
   return ADMIN_EMAIL;
-}
-
-function getStartRowIndex(sheetName) {
-  return 1;
 }
 
 function getEmailFooterHtml() {
@@ -290,44 +507,56 @@ function sendAdminNotification(id, dt, course, name, email, tel, therapist, outc
   if (outcall) {
     const mapSearchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(outcall)}`;
     outcallMapHtml = `
-      <tr><th style="text-align: left; padding: 8px 0; border-bottom: 1px solid #f0ede8; color: #e74c3c;">出張先</th>
+      <tr><th style="text-align: left; padding: 8px 15px 8px 0; border-bottom: 1px solid #f0ede8; color: #e74c3c; white-space: nowrap;">出張先</th>
           <td style="padding: 8px 0; border-bottom: 1px solid #f0ede8; font-weight: bold;">
             ${outcall}<br>
-            <a href="${mapSearchUrl}" target="_blank" style="font-size: 12px; color: #b39b7d; text-decoration: underline;">Googleマップで場所を確認する</a>
+            <a href="${mapSearchUrl}" target="_blank" style="font-size: 12px; color: #b39b7d; text-decoration: underline;">Googleマップで確認する</a>
           </td>
       </tr>
     `;
   }
 
+  let remarksHtml = "";
+  if (remarks) {
+    remarksHtml = `<tr><th style="text-align: left; padding: 8px 15px 8px 0; white-space: nowrap;">備考</th><td style="padding: 8px 0;">${remarks}</td></tr>`;
+  }
+
   const htmlBody = `
-    <div style="max-width: 520px; margin: 0 auto; background-color: #ffffff; border: 1px solid #f0ede8; border-radius: 8px; font-family: 'Shippori Mincho', serif; color: #333333; overflow: hidden;">
+    <div style="max-width: 520px; margin: 0 auto; background-color: #ffffff; border: 1px solid #f0ede8; border-radius: 8px; font-family: 'Shippori Mincho', serif; color: #333333; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
       <div style="background-color: #f2ece4; padding: 25px 20px; text-align: center; border-bottom: 1px solid #e0dcd5;">
-        <h2 style="margin: 0; font-size: 18px; font-weight: 500; color: #3b3530;">【要確認】新規予約リクエスト</h2>
+        <span style="display:block; font-family: 'Montserrat', sans-serif; font-size: 11px; letter-spacing: 0.25em; color: #b39b7d; text-transform: uppercase; margin-bottom: 6px;">New Reservation</span>
+        <h2 style="margin: 0; font-size: 18px; font-weight: 500; color: #3b3530; letter-spacing: 0.05em;">【要確認】新規予約リクエスト</h2>
       </div>
-      <div style="padding: 30px 25px 0; font-size: 14px; line-height: 1.8;">
+      <div style="padding: 30px 25px 0; font-size: 14px; line-height: 1.8; color: #444;">
         <p style="margin-top: 0; margin-bottom: 15px; font-size: 13px; color: #666;">
-          ※スケジュール調整や詳細の確認・変更は<a href="${ADMIN_PANEL_URL}" target="_blank" style="color: #b39b7d; font-weight: bold; text-decoration: underline;">管理者画面（こちら）</a>からも行えます。
+          ※詳細・承認作業は<a href="${ADMIN_PANEL_URL}" target="_blank" style="color: #b39b7d; font-weight: bold; text-decoration: underline;">管理画面</a>からも行えます。
         </p>
-        <table style="width: 100%; border-collapse: collapse;">
-          <tr><th style="text-align: left; padding: 8px 0; border-bottom: 1px solid #f0ede8; width: 110px;">希望セラピスト</th><td style="padding: 8px 0; border-bottom: 1px solid #f0ede8; font-weight: bold; color: #b39b7d;">${therapistText}</td></tr>
-          <tr><th style="text-align: left; padding: 8px 0; border-bottom: 1px solid #f0ede8;">日時</th><td style="padding: 8px 0; border-bottom: 1px solid #f0ede8;">${displayDt}</td></tr>
-          <tr><th style="text-align: left; padding: 8px 0; border-bottom: 1px solid #f0ede8;">コース</th><td style="padding: 8px 0; border-bottom: 1px solid #f0ede8;">${courseInfo.text} (${courseInfo.price})</td></tr>
+        <table style="width: 100%; border-collapse: collapse; background: #faf8f5; border-radius: 6px; padding: 10px 15px; margin-bottom: 20px;">
+          <tr><th style="text-align: left; padding: 8px 15px 8px 0; border-bottom: 1px solid #f0ede8; width: 110px; white-space: nowrap;">希望セラピスト</th><td style="padding: 8px 0; border-bottom: 1px solid #f0ede8; font-weight: bold; color: #b39b7d;">${therapistText}</td></tr>
+          <tr><th style="text-align: left; padding: 8px 15px 8px 0; border-bottom: 1px solid #f0ede8; white-space: nowrap;">日時</th><td style="padding: 8px 0; border-bottom: 1px solid #f0ede8; font-weight: bold;">${displayDt}</td></tr>
+          <tr><th style="text-align: left; padding: 8px 15px 8px 0; border-bottom: 1px solid #f0ede8; white-space: nowrap;">コース</th><td style="padding: 8px 0; border-bottom: 1px solid #f0ede8;">${courseInfo.text} (${courseInfo.price})</td></tr>
           ${outcallMapHtml}
-          <tr><th style="text-align: left; padding: 8px 0; border-bottom: 1px solid #f0ede8;">お名前</th><td style="padding: 8px 0; border-bottom: 1px solid #f0ede8;">${name} 様</td></tr>
-          <tr><th style="text-align: left; padding: 8px 0; border-bottom: 1px solid #f0ede8;">電話番号</th><td style="padding: 8px 0; border-bottom: 1px solid #f0ede8;">${tel}</td></tr>
-          <tr><th style="text-align: left; padding: 8px 0;">メール</th><td style="padding: 8px 0;">${email}</td></tr>
+          <tr><th style="text-align: left; padding: 8px 15px 8px 0; border-bottom: 1px solid #f0ede8; white-space: nowrap;">お名前</th><td style="padding: 8px 0; border-bottom: 1px solid #f0ede8;">${name} 様</td></tr>
+          <tr><th style="text-align: left; padding: 8px 15px 8px 0; border-bottom: 1px solid #f0ede8; white-space: nowrap;">電話番号</th><td style="padding: 8px 0; border-bottom: 1px solid #f0ede8;">${tel}</td></tr>
+          <tr><th style="text-align: left; padding: 8px 15px 8px 0; border-bottom: ${remarks ? '1px solid #f0ede8' : 'none'}; white-space: nowrap;">メール</th><td style="padding: 8px 0; border-bottom: ${remarks ? '1px solid #f0ede8' : 'none'};">${email}</td></tr>
+          ${remarksHtml}
         </table>
         <div style="text-align: center; margin-top: 25px;">
-          <a href="${approveUrl}" style="background-color: #b39b7d; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 30px; margin-right: 8px;">承認する</a>
-          <a href="${rejectUrl}" style="background-color: #888888; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 30px;">却下する</a>
+          <a href="${approveUrl}" style="background-color: #b39b7d; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 30px; margin-right: 8px; display: inline-block;">承認する</a>
+          <a href="${rejectUrl}" style="background-color: #888888; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 30px; display: inline-block;">却下する</a>
         </div>
       </div>
       ${getEmailFooterHtml()}
     </div>
   `;
 
-  const textBody = `【要確認】新規予約リクエスト\n\n※予定調整・管理者画面: ${ADMIN_PANEL_URL}\n\n希望セラピスト: ${therapistText}\n内容: ${displayDt} ${courseInfo.text}(${courseInfo.price})\n${outcall ? '出張先: ' + outcall + '\n' : ''}お名前: ${name} 様 (電話: ${tel})\n\n承認: ${approveUrl}\n却下: ${rejectUrl}` + getEmailFooterText();
-  GmailApp.sendEmail(targetEmail, '【要確認】新規予約リクエスト', textBody, { htmlBody: htmlBody, name: "Spa Blanc Aroma" });
+  const textBody = `【要確認】新規予約リクエスト\n\n※管理画面: ${ADMIN_PANEL_URL}\n\n希望セラピスト: ${therapistText}\n内容: ${displayDt} ${courseInfo.text}(${courseInfo.price})\n${outcall ? '出張先: ' + outcall + '\n' : ''}お名前: ${name} 様 (電話: ${tel})\n\n承認: ${approveUrl}\n却下: ${rejectUrl}` + getEmailFooterText();
+  
+  const mailOptions = { htmlBody: htmlBody, name: "Spa Blanc Aroma" };
+  if (targetEmail !== ADMIN_EMAIL) {
+    mailOptions.bcc = ADMIN_EMAIL;
+  }
+  GmailApp.sendEmail(targetEmail, '【要確認】新規予約リクエスト', textBody, mailOptions);
 }
 
 function sendCustomerRequestReceived(email, name, dt, course, therapist, outcall) {
@@ -335,15 +564,27 @@ function sendCustomerRequestReceived(email, name, dt, course, therapist, outcall
   const courseInfo = getCourseDetails(course);
   const therapistText = therapist || "指名なし";
 
+  let outcallHtml = "";
+  if (outcall) {
+    outcallHtml = `<tr><th style="text-align: left; padding: 8px 15px 8px 0; white-space: nowrap;">出張先</th><td style="padding: 8px 0;">${outcall}</td></tr>`;
+  }
+
   const htmlBody = `
-    <div style="max-width: 520px; margin: 0 auto; background-color: #ffffff; border: 1px solid #f0ede8; border-radius: 8px; font-family: 'Shippori Mincho', serif; color: #333333; overflow: hidden;">
+    <div style="max-width: 520px; margin: 0 auto; background-color: #ffffff; border: 1px solid #f0ede8; border-radius: 8px; font-family: 'Shippori Mincho', serif; color: #333333; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
       <div style="background-color: #f2ece4; padding: 25px 20px; text-align: center; border-bottom: 1px solid #e0dcd5;">
-        <h2 style="margin: 0; font-size: 18px; font-weight: 500; color: #3b3530;">ご予約リクエストを承りました</h2>
+        <span style="display:block; font-family: 'Montserrat', sans-serif; font-size: 11px; letter-spacing: 0.25em; color: #b39b7d; text-transform: uppercase; margin-bottom: 6px;">Reservation Received</span>
+        <h2 style="margin: 0; font-size: 18px; font-weight: 500; color: #3b3530; letter-spacing: 0.05em;">ご予約リクエストを承りました</h2>
       </div>
-      <div style="padding: 30px 25px 0; font-size: 14px; line-height: 1.8;">
-        <p><strong>${name} 様</strong></p>
-        <p>ご予約リクエストを承りました。以下の内容で確認中です。</p>
-        <p>担当セラピスト： <strong>${therapistText}</strong><br>日時： <strong>${displayDt}</strong><br>コース： <strong>${courseInfo.text} (${courseInfo.price})</strong></p>
+      <div style="padding: 30px 25px 0; font-size: 14px; line-height: 1.8; color: #444;">
+        <p style="margin-top: 0;"><strong>${name} 様</strong></p>
+        <p>ご予約リクエストを承りました。現在スケジュールを確認しております。確定まで今しばらくお待ちください。</p>
+        
+        <table style="width: 100%; border-collapse: collapse; background: #faf8f5; border-radius: 6px; padding: 10px 15px; margin: 20px 0;">
+          <tr><th style="text-align: left; padding: 8px 15px 8px 0; border-bottom: 1px solid #f0ede8; width: 110px; white-space: nowrap;">担当セラピスト</th><td style="padding: 8px 0; border-bottom: 1px solid #f0ede8; font-weight: bold; color: #b39b7d;">${therapistText}</td></tr>
+          <tr><th style="text-align: left; padding: 8px 15px 8px 0; border-bottom: 1px solid #f0ede8; white-space: nowrap;">日時</th><td style="padding: 8px 0; border-bottom: 1px solid #f0ede8; font-weight: bold;">${displayDt}</td></tr>
+          <tr><th style="text-align: left; padding: 8px 15px 8px 0; border-bottom: ${outcall ? '1px solid #f0ede8' : 'none'}; white-space: nowrap;">コース</th><td style="padding: 8px 0; border-bottom: ${outcall ? '1px solid #f0ede8' : 'none'};">${courseInfo.text} (${courseInfo.price})</td></tr>
+          ${outcallHtml}
+        </table>
       </div>
       ${getEmailFooterHtml()}
     </div>
@@ -358,35 +599,79 @@ function sendCustomerConfirmation(email, name, dt, course, therapist, tel, outca
   const therapistText = therapist || "指名なし";
   const targetStaffEmail = getTherapistEmail(therapist);
 
-  const customerHtmlBody = `
-    <div style="max-width: 520px; margin: 0 auto; background-color: #ffffff; border: 1px solid #f0ede8; border-radius: 8px; font-family: 'Shippori Mincho', serif; color: #333333; overflow: hidden;">
-      <div style="background-color: #f2ece4; padding: 25px 20px; text-align: center; border-bottom: 1px solid #e0dcd5;">
-        <h2 style="margin: 0; font-size: 18px; font-weight: 500; color: #3b3530;">ご予約が確定いたしました</h2>
+  let outcallHtml = "";
+  if (outcall) {
+    outcallHtml = `<tr><th style="text-align: left; padding: 8px 15px 8px 0; white-space: nowrap;">出張先</th><td style="padding: 8px 0;">${outcall}</td></tr>`;
+  }
+
+  const accessMapHtml = !outcall ? `
+    <div style="margin-top: 20px; padding: 20px 15px; background: #faf8f5; border-radius: 6px; font-size: 14px; line-height: 1.8; color: #444; text-align: center;">
+      <p style="margin: 0 0 8px 0; color: #555;">お時間ちょうどに下記個室住所までお越しください。</p>
+      <p style="margin: 0 0 15px 0; font-weight: bold; color: #3b3530; line-height: 1.6;">
+        〒533-0023<br>
+        大阪市東淀川区東淡路4-24-35<br>
+        JPアパートメント東淀川Ⅶ102号室
+      </p>
+      <div>
+        <a href="https://maps.google.com/maps?q=${encodeURIComponent('大阪府大阪市東淀川区東淡路4-24-35 JPアパートメント東淀川Ⅶ 102号室')}" target="_blank" style="background-color: #b39b7d; color: #ffffff; padding: 10px 24px; text-decoration: none; border-radius: 25px; display: inline-block; font-size: 13px; font-weight: 500;">GoogleMapを開く</a>
       </div>
-      <div style="padding: 30px 25px 0; font-size: 14px; line-height: 1.8;">
-        <p><strong>${name} 様</strong></p>
-        <p>ご予約が<strong style="color: #b39b7d;">【確定】</strong>いたしました。</p>
-        <p>担当セラピスト： <strong>${therapistText}</strong><br>日時： <strong>${displayDt}</strong><br>コース： <strong>${courseInfo.text} (${courseInfo.price})</strong></p>
+    </div>
+  ` : '';
+
+  const customerHtmlBody = `
+    <div style="max-width: 520px; margin: 0 auto; background-color: #ffffff; border: 1px solid #f0ede8; border-radius: 8px; font-family: 'Shippori Mincho', serif; color: #333333; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+      <div style="background-color: #f2ece4; padding: 25px 20px; text-align: center; border-bottom: 1px solid #e0dcd5;">
+        <span style="display:block; font-family: 'Montserrat', sans-serif; font-size: 11px; letter-spacing: 0.25em; color: #b39b7d; text-transform: uppercase; margin-bottom: 6px;">Reservation Confirmed</span>
+        <h2 style="margin: 0; font-size: 18px; font-weight: 500; color: #3b3530; letter-spacing: 0.05em;">ご予約が確定いたしました</h2>
+      </div>
+      <div style="padding: 30px 25px 0; font-size: 14px; line-height: 1.8; color: #444;">
+        <p style="margin-top: 0;"><strong>${name} 様</strong></p>
+        <p>ご予約が<strong style="color: #b39b7d;">【確定】</strong>いたしました。ご来店を心よりお待ち申し上げております。</p>
+        
+        <table style="width: 100%; border-collapse: collapse; background: #faf8f5; border-radius: 6px; padding: 10px 15px; margin: 20px 0;">
+          <tr><th style="text-align: left; padding: 8px 15px 8px 0; border-bottom: 1px solid #f0ede8; width: 110px; white-space: nowrap;">担当セラピスト</th><td style="padding: 8px 0; border-bottom: 1px solid #f0ede8; font-weight: bold; color: #b39b7d;">${therapistText}</td></tr>
+          <tr><th style="text-align: left; padding: 8px 15px 8px 0; border-bottom: 1px solid #f0ede8; white-space: nowrap;">日時</th><td style="padding: 8px 0; border-bottom: 1px solid #f0ede8; font-weight: bold;">${displayDt}</td></tr>
+          <tr><th style="text-align: left; padding: 8px 15px 8px 0; border-bottom: ${outcall ? '1px solid #f0ede8' : 'none'}; white-space: nowrap;">コース</th><td style="padding: 8px 0; border-bottom: ${outcall ? '1px solid #f0ede8' : 'none'};">${courseInfo.text} (${courseInfo.price})</td></tr>
+          ${outcallHtml}
+        </table>
+
+        ${accessMapHtml}
       </div>
       ${getEmailFooterHtml()}
     </div>
   `;
-  const customerTextBody = `${name}様\n\nご予約が【確定】いたしました。\n担当: ${therapistText}\n日時: ${displayDt}\nコース: ${courseInfo.text}\n\nSpa Blanc Aroma` + getEmailFooterText();
+  
+  const mapText = !outcall ? `\n\nお時間ちょうどに下記個室住所までお越しください。\n〒533-0023\n大阪市東淀川区東淡路4-24-35\nJPアパートメント東淀川Ⅶ102号室\n\n▼ GoogleMapを開く\nhttps://maps.google.com/maps?q=${encodeURIComponent('大阪府大阪市東淀川区東淡路4-24-35 JPアパートメント東淀川Ⅶ 102号室')}` : '';
+
+  const customerTextBody = `${name}様\n\nご予約が【確定】いたしました。\n担当: ${therapistText}\n日時: ${displayDt}\nコース: ${courseInfo.text}${mapText}\n\nSpa Blanc Aroma` + getEmailFooterText();
   GmailApp.sendEmail(email, '【Spa Blanc Aroma】ご予約が確定いたしました', customerTextBody, { htmlBody: customerHtmlBody, name: "Spa Blanc Aroma"});
 
   const staffHtmlBody = `
-    <div style="max-width: 520px; margin: 0 auto; background-color: #ffffff; border: 1px solid #f0ede8; border-radius: 8px; font-family: 'Shippori Mincho', serif; color: #333333; overflow: hidden;">
-      <div style="background-color: #f2ece4; padding: 25px 20px; text-align: center;">
-        <h2 style="margin: 0; font-size: 18px; font-weight: 500; color: #3b3530;">【確定】予約が確定しました</h2>
+    <div style="max-width: 520px; margin: 0 auto; background-color: #ffffff; border: 1px solid #f0ede8; border-radius: 8px; font-family: 'Shippori Mincho', serif; color: #333333; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+      <div style="background-color: #f2ece4; padding: 25px 20px; text-align: center; border-bottom: 1px solid #e0dcd5;">
+        <span style="display:block; font-family: 'Montserrat', sans-serif; font-size: 11px; letter-spacing: 0.25em; color: #b39b7d; text-transform: uppercase; margin-bottom: 6px;">Reservation Notification</span>
+        <h2 style="margin: 0; font-size: 18px; font-weight: 500; color: #3b3530; letter-spacing: 0.05em;">【確定】予約が確定しました</h2>
       </div>
-      <div style="padding: 30px 25px 0; font-size: 14px; line-height: 1.8;">
-        <p>担当：<strong>${therapistText}</strong> / お名前：<strong>${name}様</strong><br>日時：${displayDt}<br>コース：${courseInfo.text} (${courseInfo.price})</p>
+      <div style="padding: 30px 25px 0; font-size: 14px; line-height: 1.8; color: #444;">
+        <p style="margin-top: 0;">予約の確定処理を行いました。</p>
+        <table style="width: 100%; border-collapse: collapse; background: #faf8f5; border-radius: 6px; padding: 10px 15px; margin: 20px 0;">
+          <tr><th style="text-align: left; padding: 8px 15px 8px 0; border-bottom: 1px solid #f0ede8; width: 110px; white-space: nowrap;">担当</th><td style="padding: 8px 0; border-bottom: 1px solid #f0ede8; font-weight: bold; color: #b39b7d;">${therapistText}</td></tr>
+          <tr><th style="text-align: left; padding: 8px 15px 8px 0; border-bottom: 1px solid #f0ede8; white-space: nowrap;">お名前</th><td style="padding: 8px 0; border-bottom: 1px solid #f0ede8;">${name} 様</td></tr>
+          <tr><th style="text-align: left; padding: 8px 15px 8px 0; border-bottom: 1px solid #f0ede8; white-space: nowrap;">日時</th><td style="padding: 8px 0; border-bottom: 1px solid #f0ede8; font-weight: bold;">${displayDt}</td></tr>
+          <tr><th style="text-align: left; padding: 8px 15px 8px 0; border-bottom: ${outcall ? '1px solid #f0ede8' : 'none'}; white-space: nowrap;">コース</th><td style="padding: 8px 0; border-bottom: ${outcall ? '1px solid #f0ede8' : 'none'};">${courseInfo.text} (${courseInfo.price})</td></tr>
+          ${outcallHtml}
+        </table>
       </div>
       ${getEmailFooterHtml()}
     </div>
   `;
   const staffTextBody = `下記予約を確定しました。\n担当: ${therapistText}\nお名前: ${name}様\n日時: ${displayDt}\nコース: ${courseInfo.text}` + getEmailFooterText();
-  GmailApp.sendEmail(targetStaffEmail, `【確定】予約確定のお知らせ (${name}様)`, staffTextBody, { htmlBody: staffHtmlBody, name: "Spa Blanc Aroma"});
+  
+  const staffMailOptions = { htmlBody: staffHtmlBody, name: "Spa Blanc Aroma" };
+  if (targetStaffEmail !== ADMIN_EMAIL) {
+    staffMailOptions.bcc = ADMIN_EMAIL;
+  }
+  GmailApp.sendEmail(targetStaffEmail, `【確定】予約確定のお知らせ (${name}様)`, staffTextBody, staffMailOptions);
 }
 
 function sendCustomerRejection(email, name) {
@@ -407,7 +692,6 @@ function sendCustomerRejection(email, name) {
     </div>
   `;
   const textBody = `${name}様\n\nせっかくリクエスト頂いたのに誠に申し訳ございませんが、ご希望の日時ではご予約を承ることができませんでした。\n\nまたの機会のご利用を心よりお待ちしております。\n\nSpa Blanc Aroma` + getEmailFooterText();
-  
   GmailApp.sendEmail(email, '【Spa Blanc Aroma】ご予約リクエストに関するお知らせ', textBody, { htmlBody: htmlBody, name: "Spa Blanc Aroma" });
 }
 
@@ -439,22 +723,32 @@ function sendThankYouEmail(id) {
         </div>
         <div style="padding: 30px 25px 0; font-size: 14px; line-height: 1.8; color: #444;">
           <p style="margin-top: 0;"><strong>${name} 様</strong></p>
-          <p>本日は Spa Blanc Aroma にお越しいただき、誠にありがとうございました。</p>
-          <p>もしよろしければ、今後のサービス向上のためアンケートへのご協力をお願いいたします。</p>
-          <p style="text-align: center; margin: 25px 0;">
-            <a href="${surveyUrl}" style="background-color: #b39b7d; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 30px; display: inline-block;">アンケートに協力する</a>
-          </p>
-          <p>公式LINEでもお得な情報やご予約を受け付けております。</p>
-          <p style="text-align: center; margin: 20px 0;">
-            <a href="${lineUrl}" style="background-color: #06C755; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 30px; display: inline-block;">公式LINEを追加する</a>
-          </p>
-          <p style="margin-bottom: 0;">またのご利用を心よりお待ちしております。</p>
+          <p style="margin-bottom: 25px;">本日は数あるサロンの中から Spa Blanc Aroma にお越しいただき、誠にありがとうございました。<br>お忙しい日常を忘れ、ゆったりとしたお時間をお過ごしいただけておりましたら幸いです。</p>
+
+          <!-- アンケート枠（独立カード） -->
+          <div style="background: #faf6f0; border: 1px solid #e8dfd5; border-radius: 10px; padding: 20px 15px; margin-bottom: 20px; text-align: center;">
+            <p style="margin: 0 0 8px 0; font-weight: bold; color: #3b3530; font-size: 14px;">■ お客様の声（アンケート）ご協力のお願い</p>
+            <p style="margin: 0 0 15px 0; color: #555; font-size: 13px; line-height: 1.6;">本日の施術のご感想やご意見をぜひお聞かせいただけますと幸いです。</p>
+            <div>
+              <a href="${surveyUrl}" style="background-color: #ad9579; color: #ffffff; padding: 10px 24px; text-decoration: none; border-radius: 25px; display: inline-block; font-size: 13px; font-weight: 500;">感想を送る（アンケートに回答）</a>
+            </div>
+          </div>
+
+          <!-- 公式LINE枠（独立カード） -->
+          <div style="background: #f4f9f6; border: 1px solid #d2e7dd; border-radius: 10px; padding: 20px 15px; margin-bottom: 10px; text-align: center;">
+            <p style="margin: 0 0 8px 0; font-weight: bold; color: #3b3530; font-size: 14px;">■ 公式LINEのご案内</p>
+            <p style="margin: 0 0 15px 0; color: #555; font-size: 13px; line-height: 1.6;">次回のご予約やお問合せは、公式LINEからも便利に行っていただけます。</p>
+            <div>
+              <a href="${lineUrl}" style="background-color: #06C755; color: #ffffff; padding: 10px 24px; text-decoration: none; border-radius: 25px; display: inline-block; font-size: 13px; font-weight: 500;">公式LINEで友だち追加する</a>
+            </div>
+          </div>
+
         </div>
         ${getEmailFooterHtml()}
       </div>
     `;
 
-    const textBody = `${name}様\n\n本日は Spa Blanc Aroma にお越しいただき、誠にありがとうございました。\n\n▼ アンケートご協力\n${surveyUrl}\n\n▼ 公式LINE\n${lineUrl}\n\nSpa Blanc Aroma` + getEmailFooterText();
+    const textBody = `${name}様\n\n本日は数あるサロンの中から Spa Blanc Aroma にお越しいただき、誠にありがとうございました。\nお忙しい日常を忘れ、ゆったりとしたお時間をお過ごしいただけておりましたら幸いです。\n\n■ お客様の声（アンケート）ご協力のお願い\n本日の施術のご感想やご意見をぜひお聞かせいただけますと幸いです。\n▼ 感想を送る（アンケートに回答）\n${surveyUrl}\n\n■ 公式LINEのご案内\n次回のご予約やお問合せは、公式LINEからも便利に行っていただけます。\n▼ 公式LINEで友だち追加する\n${lineUrl}\n\nSpa Blanc Aroma` + getEmailFooterText();
     GmailApp.sendEmail(email, '【Spa Blanc Aroma】ご来店ありがとうございました', textBody, { htmlBody: htmlBody, name: "Spa Blanc Aroma" });
     return { success: true, message: "ご来店お礼メールを送信しました。" };
   } catch(e) {
@@ -479,9 +773,31 @@ function sendTimeAdjustment(id, newDatetime) {
     if (targetRow === -1) return { success: false, message: "該当する予約が見つかりません。" };
 
     sheet.getRange(targetRow, 4).setValue('時間調整中');
+    if (newDatetime) {
+      sheet.getRange(targetRow, 3).setValue(newDatetime);
+    }
     clearAllAppInitCache();
 
     const name = resData[5];
+    const course = resData[1];
+    const therapist = resData[8] || "指名なし";
+    const eventId = resData[7];
+
+    if (eventId && newDatetime) {
+      try {
+        const event = CalendarApp.getDefaultCalendar().getEventById(eventId);
+        if (event) {
+          const start = new Date(String(newDatetime).replace(/-/g, '/'));
+          const courseMin = parseInt(String(course).replace(/[^0-9]/g, ''), 10) || 60;
+          const end = new Date(start.getTime() + courseMin * 60000);
+          
+          const isOutcall = String(course).startsWith('出張');
+          event.setTitle(isOutcall ? `★出張【調整中】${name}様 (${course} / ${therapist})` : `【調整中】${name}様 (${course} / ${therapist})`);
+          event.setTime(start, end);
+        }
+      } catch(err) {}
+    }
+
     const displayNewDt = formatDateTimeForEmail(newDatetime);
     const now = new Date().getTime();
 
@@ -494,7 +810,11 @@ function sendTimeAdjustment(id, newDatetime) {
         <div style="padding: 30px 25px 0; font-size: 14px; line-height: 1.8; color: #444;">
           <p style="margin-top: 0;"><strong>${name} 様</strong></p>
           <p>いつも Spa Blanc Aroma をご利用いただき誠にありがとうございます。ご予約いただきました日時について、スケジュール調整のお願いがございます。</p>
-          <p><strong>【ご提案日時】</strong><br><span style="color: #b39b7d; font-size: 16px; font-weight: bold;">${displayNewDt}</span></p>
+          
+          <table style="width: 100%; border-collapse: collapse; background: #faf8f5; border-radius: 6px; padding: 10px 15px; margin: 20px 0;">
+            <tr><th style="text-align: left; padding: 8px 15px 8px 0; width: 110px; white-space: nowrap;">ご提案日時</th><td style="padding: 8px 0; font-weight: bold; color: #b39b7d; font-size: 15px;">${displayNewDt}</td></tr>
+          </table>
+          
           <p>上記のお時間でのご調整が可能でしたら、ご返信または公式LINEにてお知らせいただけますと幸いです。</p>
           <p style="margin-bottom: 0;">ご不便をおかけし誠に恐れ入りますが、何卒よろしくお願い申し上げます。</p>
           <span style="opacity: 0; font-size: 0px; display: none;">${now}</span>
@@ -578,25 +898,45 @@ function processApprovalApi(id, newDatetime) {
     sheet.getRange(targetRow, 4).setValue('予約確定');
     clearAllAppInitCache();
 
-    const eventId = resData[7];
+    let eventId = resData[7];
     const therapist = resData[8] || "指名なし";
     const name = resData[5];
     const tel = resData[6];
+    const email = resData[4];
     const outcall = resData[9] || "";
     const course = resData[1];
 
+    const isOutcall = String(course).startsWith('出張');
+    const eventTitle = isOutcall ? `★出張【確定】${name}様 (${course} / ${therapist})` : `【確定】${name}様 (${course} / ${therapist})`;
+    const eventLocation = outcall ? outcall : "〒533-0023 大阪市東淀川区東淡路4丁目24-35 JPアパートメント東淀川Ⅶ 102号室";
+    const start = new Date(String(targetDatetime).replace(/-/g, '/'));
+    const courseMin = parseInt(String(course).replace(/[^0-9]/g, ''), 10) || 60;
+    const end = new Date(start.getTime() + courseMin * 60000);
+
+    let event = null;
     if (eventId) {
       try {
-        const event = CalendarApp.getDefaultCalendar().getEventById(eventId);
-        if (event) {
-          const isOutcall = String(course).startsWith('出張');
-          event.setTitle(isOutcall ? `★出張【確定】${name}様 (${course} / ${therapist})` : `【確定】${name}様 (${course} / ${therapist})`);
-          if (newDatetime) {
-            const start = new Date(String(newDatetime).replace(/-/g, '/'));
-            const courseMin = parseInt(String(course).replace(/[^0-9]/g, ''), 10) || 60;
-            event.setTime(start, new Date(start.getTime() + courseMin * 60000));
+        event = CalendarApp.getDefaultCalendar().getEventById(eventId);
+      } catch(err) {}
+    }
+
+    if (event) {
+      event.setTitle(eventTitle);
+      event.setTime(start, end);
+      event.setLocation(eventLocation);
+    } else {
+      try {
+        const newEvent = CalendarApp.getDefaultCalendar().createEvent(
+          eventTitle,
+          start,
+          end,
+          {
+            description: `ID: ${id}\nセラピスト: ${therapist}\nメール: ${email}\n電話: ${tel}\n出張先: ${outcall || 'なし'}`,
+            location: eventLocation
           }
-        }
+        );
+        eventId = newEvent.getId();
+        sheet.getRange(targetRow, 8).setValue(eventId);
       } catch(err) {}
     }
 
@@ -717,11 +1057,8 @@ function getDefaultShifts(therapistName) {
     
     const result = [];
     for (let i = 0; i < 7; i++) {
-      let start = values[i][0];
-      let end = values[i][1];
-      
-      let startStr = formatTimeString(start);
-      let endStr = formatTimeString(end);
+      let startStr = formatTimeString(values[i][0]);
+      let endStr = formatTimeString(values[i][1]);
       
       result.push({
         dayIndex: i,
@@ -765,7 +1102,7 @@ function getBusinessDays(therapistName, ssInstance) {
   try {
     const ss = ssInstance || SpreadsheetApp.getActiveSpreadsheet();
     let targetSheets = [];
-    const excludeNames = ['予約台帳', 'お知らせ', '設定', 'お問い合わせ内容', 'ブラックリスト', 'アンケート結果'];
+    const excludeNames = ['予約台帳', 'お知らせ', 'Th.お知らせ', '設定', 'お問い合わせ内容', 'ブラックリスト', 'アンケート結果', 'セラピストアカウント'];
 
     if (therapistName && therapistName !== '指名なし') {
       const sheet = ss.getSheetByName(therapistName);
@@ -891,7 +1228,7 @@ function getTherapistList(ssInstance) {
 
     const ss = ssInstance || SpreadsheetApp.getActiveSpreadsheet();
     const sheets = ss.getSheets();
-    const excludeNames = ['予約台帳', 'お知らせ', '設定', 'お問い合わせ内容', 'ブラックリスト','アンケート結果'];
+    const excludeNames = ['予約台帳', 'お知らせ', 'Th.お知らせ', '設定', 'お問い合わせ内容', 'ブラックリスト', 'アンケート結果', 'セラピストアカウント'];
     const therapists = [];
 
     sheets.forEach(sheet => {
@@ -915,7 +1252,6 @@ function getInitialDataForIndex() {
   };
 }
 
-// 全スケジュール取得（デフォルト時間補完＆情報保持機能付き）
 function getAllSchedules(therapistName) {
   if (!therapistName) return {};
   try {
@@ -928,7 +1264,6 @@ function getAllSchedules(therapistName) {
     const schedules = {};
     const defaultMap = {};
 
-    // 1. デフォルト時間設定（H2:I8）を取得
     try {
       const range = sheet.getRange("H2:I8").getValues();
       for (let i = 0; i < 7; i++) {
@@ -938,12 +1273,11 @@ function getAllSchedules(therapistName) {
       }
     } catch(err) {}
 
-    // 2. 個別日付データの解析
     for (let i = 1; i < values.length; i++) {
       const row = values[i];
       if (!row[0]) continue;
       let d = normalizeDateStr(row[0]);
-      if (!d || !d.startsWith('202')) continue; // 有効な日付のみ処理
+      if (!d || !d.startsWith('202')) continue;
 
       let startStr = formatTimeString(row[1]);
       let endStr = formatTimeString(row[2]);
@@ -958,7 +1292,6 @@ function getAllSchedules(therapistName) {
       };
     }
 
-    // 3. 今後14日間の未設定日にデフォルト時間を自動適用（なければ「未定」）
     const today = new Date();
     for (let i = 0; i < 14; i++) {
       const targetDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + i);
@@ -1018,7 +1351,6 @@ function updateSchedule(therapistName, targetDate, start, end, isHoliday, notes)
       sheet.appendRow(['日付', '開始時間', '終了時間', '備考']);
     }
     
-    // 既存の日付行を検索
     const current = getScheduleForDate(therapistName, targetDate);
 
     let writeStart = start;
@@ -1028,13 +1360,11 @@ function updateSchedule(therapistName, targetDate, start, end, isHoliday, notes)
       writeEnd = "休み";
     }
 
-    // rowIndexが1より大きい有効な数字である場合のみ直接上書き更新
     if (current && current.exists && current.rowIndex && current.rowIndex > 1) {
       sheet.getRange(current.rowIndex, 2).setValue(writeStart);
       sheet.getRange(current.rowIndex, 3).setValue(writeEnd);
       sheet.getRange(current.rowIndex, 4).setValue(notes || "");
     } else {
-      // 個別行が存在しない（rowIndex <= 1 または -1）場合は、シートの末尾に新規追加
       sheet.appendRow([targetDate, writeStart, writeEnd, notes || ""]);
     }
 
@@ -1066,7 +1396,6 @@ function getScheduleForDate(therapistName, targetDate) {
       }
     }
 
-    // 個別入力が無い場合はデフォルト時間をチェック
     try {
       const dtObj = new Date(normalizedTarget.replace(/-/g, '/'));
       if (!isNaN(dtObj.getTime())) {

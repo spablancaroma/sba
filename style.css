@@ -86,7 +86,7 @@ ul {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    overflow-y: auto; /* ★ 画面に収まらない場合に縦スクロール可能へ変更 */
+    overflow-y: auto;
 }
 .sidebar.is-active {
     right: 0;
@@ -113,7 +113,7 @@ ul {
 }
 .sidebar-menu a {
     display: block;
-    padding: 9px 20px; /* ★ 上下余白を 12px から 9px に詰めてコンパクト化 */
+    padding: 9px 20px;
     color: #3b3530;
     text-decoration: none;
     font-size: 13.5px;
@@ -204,24 +204,24 @@ ul {
 /* ヒーローセクション */
 .hero {
     height: 100vh;
-    background-image: url('https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1600&q=80');
-    background-size: cover;
-    background-position: center;
+    min-height: 650px;
+    background-image: url('mv.png');
+    background-size: contain;           
+    /* 背景画像を真ん中（center center）に配置し、ヘッダー分の余白を取りつつバランスを調整 */
+    background-position: center center; 
+    background-repeat: no-repeat;
+    background-color: #fbf9f6;          
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
-    color: #ffffff;
+    color: #3b3530;
+    padding-top: 60px; /* 上部にスペースを確保 */
 }
 
 .hero-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5));
+    display: none;
 }
 
 .hero-content {
@@ -238,22 +238,24 @@ ul {
     letter-spacing: 0.3em;
     text-transform: uppercase;
     margin-bottom: 20px;
-    color: #e0d5c8;
+    color: #8c7860;
 }
 
 .hero h1 {
+    font-family: 'Avenir', 'Montserrat', sans-serif;
     font-size: 2.8rem;
     font-weight: 500;
     line-height: 1.4;
     margin-bottom: 20px;
     letter-spacing: 0.08em;
+    color: #3b3530;
 }
 
 .hero p {
     font-size: 1.05rem;
     font-weight: 300;
     margin-bottom: 40px;
-    color: #f0ece6;
+    color: #554f49;
 }
 
 /* 共通レイアウト */
