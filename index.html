@@ -108,7 +108,7 @@
               "name": "どのような店ですか？",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Spa Blanc Aromaは, 男性（ゲイ・バイセクシャル等）向けのリラクゼーションサロンです。指圧と選べるアロマオイルによるトリートメントを提供しています。"
+                "text": "Spa Blanc Aromaは、男性（ゲイ・バイセクシャル等）向けのリラクゼーションサロンです。指圧と選べるアロマオイルによるトリートメントを提供しています。"
               }
             },
             {
@@ -341,6 +341,98 @@
       .service-item h4 { margin-top: 0; color: #2C3E50; border-bottom: 2px solid #2C3E50; padding-bottom: 8px; }
       .aroma-tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 15px 0; }
       .aroma-tag { background: #E8F8F5; color: #16A085; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; }
+
+      .service-en-label {
+        display: block;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 0.72rem;
+        letter-spacing: 0.18em;
+        color: #b39b7d;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+      }
+      .drink-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 14px 0 18px;
+      }
+      .drink-tag {
+        background: #faf8f5;
+        color: #6e5d49;
+        border: 1px solid #e3dcd2;
+        padding: 3px 10px;
+        border-radius: 4px;
+        font-size: 11.5px;
+        letter-spacing: 0.03em;
+      }
+      .column-detail-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.82rem;
+        color: #3b3530;
+        background: transparent;
+        border: 1px solid #b39b7d;
+        padding: 8px 18px;
+        border-radius: 25px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        letter-spacing: 0.04em;
+      }
+      .column-detail-btn:hover {
+        background: #b39b7d;
+        color: #fff;
+      }
+
+      /* サービスセクション内 画像付きフィーチャーボックス */
+      .service-feature-box {
+        margin-top: 30px;
+        background: #fff;
+        padding: 25px;
+        border-radius: 12px;
+        border: 1px solid #eae5df;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        display: flex;
+        gap: 28px;
+        align-items: center;
+      }
+      .service-feature-box.is-reverse {
+        flex-direction: row-reverse;
+      }
+      .service-feature-img {
+        flex: 0 0 42%;
+        max-width: 360px;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      }
+      .service-feature-img img {
+        width: 100%;
+        height: 230px;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.4s ease;
+      }
+      .service-feature-box:hover .service-feature-img img {
+        transform: scale(1.03);
+      }
+      .service-feature-body {
+        flex: 1;
+      }
+      .service-feature-body h3 {
+        margin-top: 0;
+        margin-bottom: 10px;
+        color: #3b3530;
+        font-size: 1.15rem;
+        font-weight: 600;
+      }
+      .service-feature-body p {
+        font-size: 0.9rem;
+        color: #555;
+        line-height: 1.75;
+        margin-bottom: 12px;
+      }
       
       /* --- メニュー・料金カード専用スタイル --- */
       .menu-grid { 
@@ -412,6 +504,23 @@
       .hero-line-btn:hover { transform: scale(1.05); opacity: 0.9; }
 
       /* スマホ対応 */
+      @media (max-width: 768px) {
+        .service-feature-box,
+        .service-feature-box.is-reverse {
+          flex-direction: column;
+          gap: 18px;
+          padding: 20px;
+        }
+        .service-feature-img {
+          flex: none;
+          width: 100%;
+          max-width: none;
+        }
+        .service-feature-img img {
+          height: 200px;
+        }
+      }
+
       @media (max-width: 750px) {
         .therapist-main-row { flex-direction: column; align-items: center; text-align: center; }
         .therapist-img-wrapper { width: 130px; height: 130px; margin: 0 auto; }
@@ -635,25 +744,57 @@
                 </div>
                 <div class="service-item">
                     <h4>Shower</h4>
-                    <p style="font-size: 14px; color: #555;">シャンプー等完備<br>シャンプー・ボディーソープ・ドライヤー等個室に完備. ご自由にご利用頂けます。</p>
+                    <p style="font-size: 14px; color: #555;">シャンプー等完備<br>シャンプー・ボディーソープ・ドライヤー等個室に完備。ご自由にご利用頂けます。</p>
                 </div>
             </div>
 
-            <!-- アロマ詳細 -->
-            <div style="margin-top: 40px; background: #fafafa; padding: 25px; border-radius: 12px; border: 1px solid #eee;">
-                <h3 style="margin-top: 0; color: #2C3E50; font-size: 18px;">お好きな香りをお選びいただけます</h3>
-                <p style="font-size: 14px; color: #555; line-height: 1.6;">
-                    当店では５種類の香りのマッサージオイルをご用意しています。<br>
-                    お好きな香りに包まれながら極上のリラクゼーションをお楽しみください。<br>
-                    <small style="color: #888;">※無香料のマッサージオイルもご用意しております。ご希望の方はお申し付けください。</small>
-                </p>
-                <div class="aroma-tags">
-                    <span class="aroma-tag">イランイラン</span>
-                    <span class="aroma-tag">ラベンダー</span>
-                    <span class="aroma-tag">金木犀</span>
-                    <span class="aroma-tag">ホワイトサボン</span>
-                    <span class="aroma-tag">オレンジスイート</span>
-                    <span class="aroma-tag" style="background: #eee; color: #666;">etc...</span>
+            <!-- アロマ詳細（画像付き） -->
+            <div class="service-feature-box">
+                <div class="service-feature-img">
+                    <img src="oil-1.jpg" alt="5種類から選べるボタニカルアロマオイル">
+                </div>
+                <div class="service-feature-body">
+                    <span class="service-en-label">Aroma Oil</span>
+                    <h3>お好きな香りをお選びいただけます</h3>
+                    <p>
+                        当店では5種類の香りのマッサージオイルをご用意しています。<br>
+                        その日の気分や体調に合わせてお好きな香りに包まれながら、極上のリラクゼーションをお楽しみください。<br>
+                        <small style="color: #888;">※無香料のマッサージオイルもご用意しております。ご希望の方はお申し付けください。</small>
+                    </p>
+                    <div class="aroma-tags" style="margin-bottom: 0;">
+                        <span class="aroma-tag">イランイラン</span>
+                        <span class="aroma-tag">ラベンダー</span>
+                        <span class="aroma-tag">金木犀</span>
+                        <span class="aroma-tag">ホワイトサボン</span>
+                        <span class="aroma-tag">オレンジスイート</span>
+                        <span class="aroma-tag" style="background: #eee; color: #666;">etc...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ウェルカムドリンク詳細（洗練版） -->
+            <div class="service-feature-box is-reverse">
+                <div class="service-feature-img">
+                    <img src="drink.jpg" alt="豊富な紅茶とコーヒーのウェルカムドリンク">
+                </div>
+                <div class="service-feature-body">
+                    <span class="service-en-label">Welcome Drink</span>
+                    <h3>10種類以上から選べるウェルカムドリンク</h3>
+                    <p>
+                        施術前のひとときをゆったりお過ごしいただけるよう、ICED・HOT合わせて10種類以上のドリンクをご用意しています。<br>
+                        1杯ずつ抽出する「ネスカフェ ドルチェ グスト」の本格コーヒーや、英国老舗「TWININGS」の香り高い紅茶など、お好みの1杯をお選びください。
+                    </p>
+                    <div class="drink-tags">
+                        <span class="drink-tag">本格コーヒー・ラテ</span>
+                        <span class="drink-tag">TWININGS紅茶</span>
+                        <span class="drink-tag">ロイヤルミルクティー</span>
+                        <span class="drink-tag">緑茶・ほうじ茶</span>
+                        <span class="drink-tag">麦茶・烏龍茶・天然水</span>
+                    </div>
+                    <a href="column/welcome-drink.html" class="column-detail-btn">
+                        <span>メニュー詳細・こだわりを見る</span>
+                        <span>→</span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -706,7 +847,7 @@
             </div>
 
             <div class="price-note">
-                <p style="margin: 5px 0;">※出張の場合は +¥1,000 頂きます. （往復交通費が超過する場合は別途実費）</p>
+                <p style="margin: 5px 0;">※出張の場合は +¥1,000 頂きます。（往復交通費が超過する場合は別途実費）</p>
                 <p style="margin: 5px 0; font-weight: bold;">※性的なサービスはありません。</p>
             </div>
         </div>
@@ -770,7 +911,7 @@
                 </div>
                 <div class="faq-item">
                     <div class="faq-q">予約や問い合わせはどのようにすればよいですか？</div>
-                    <div class="faq-a">Webサイト内の「ご予約」ページから空き枠を選んでご予約いただけます。また, 公式LINEやお問合せフォームからもお気軽にご連絡いただけます。</div>
+                    <div class="faq-a">Webサイト内の「ご予約」ページから空き枠を選んでご予約いただけます。また、公式LINEやお問合せフォームからもお気軽にご連絡いただけます。</div>
                 </div>
             </div>
         </div>
@@ -784,7 +925,7 @@
                 <h2>注意事項</h2>
             </div>
             <div class="notice-list">
-                <p style="margin-top: 0;">※当店は癒しを目的としたリラクゼーションサロンであり、治療を目的とした医療行為ではありません。<br>また, 料金は予告なく変更となる場合があります。予めご了承ください。</p>
+                <p style="margin-top: 0;">※当店は癒しを目的としたリラクゼーションサロンであり、治療を目的とした医療行為ではありません。<br>また、料金は予告なく変更となる場合があります。予めご了承ください。</p>
                 <p style="margin-bottom: 0;">※過度のサービスの要求はご遠慮ください。<br>20歳未満の方、女性の方のご利用は受付しておりません。<br>撮影、録音は一切禁止とさせて頂きます。<br>感染の恐れのある病気の方、泥酔状態の方のご利用はご遠慮ください。</p>
             </div>
         </div>
@@ -809,6 +950,24 @@
                     <img src="https://scdn.line-apps.com/n/line_add_friends/btn/ja.png" alt="LINE友だち追加" height="42" border="0">
                 </a>
             </div>
+
+            <!-- 姉妹ブランド BlancCraft 紹介バナー -->
+            <div class="blanccraft-promo-section" style="margin-top: 45px; margin-bottom: 0; padding: 0;">
+                <a href="https://blanc-craft.com" target="_blank" rel="noopener noreferrer" class="blanccraft-promo-card">
+                    <div class="blanccraft-promo-img-wrap">
+                        <img src="ogp-blanccraft.png" alt="BlancCraft OGP画像" class="blanccraft-promo-img">
+                    </div>
+                    <div class="blanccraft-promo-content">
+                        <span class="blanccraft-promo-tag">Sister Studio</span>
+                        <h3 class="blanccraft-promo-title">BLANC CRAFT</h3>
+                        <p class="blanccraft-promo-desc">
+                            店舗・サロン特化のWeb制作＆クラウド自動化スタジオ。撮影・多言語・X自動連携まで初期5万円から構築。
+                        </p>
+                        <span class="blanccraft-promo-linktext">公式サイトを見る →</span>
+                    </div>
+                </a>
+            </div>
+
         </div>
     </section>
 
@@ -943,8 +1102,19 @@
         script.src = `${API_URL}?action=getTodaySchedule&callback=${callbackName}`;
         script.onerror = function() {
           ["souta", "ryosuke"].forEach(name => {
+            const badgeEl = document.getElementById(`status-badge-${name}`);
             const timeEl = document.getElementById(`today-time-${name}`);
-            if (timeEl) timeEl.innerText = "取得失敗";
+            const btnEl = document.getElementById(`reserve-btn-${name}`);
+            if (badgeEl) {
+              badgeEl.innerText = "要確認";
+              badgeEl.className = "status-badge status-pending";
+            }
+            if (timeEl) timeEl.innerText = "週間スケジュールをご確認ください";
+            if (btnEl) {
+              btnEl.innerText = "スケジュールを見る";
+              btnEl.className = "therapist-action-btn btn-secondary";
+              btnEl.href = "schedule.html";
+            }
           });
         };
         document.body.appendChild(script);
