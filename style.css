@@ -206,9 +206,8 @@ ul {
     height: 100vh;
     min-height: 650px;
     background-image: url('mv.png');
-    background-size: contain;           
-    /* 背景画像を真ん中（center center）に配置し、ヘッダー分の余白を取りつつバランスを調整 */
-    background-position: center center; 
+    background-size: cover;             /* 画面全体を覆うように拡大縮小（上下の隙間を解消） */
+    background-position: center center;  /* 画像を中央に配置 */
     background-repeat: no-repeat;
     background-color: #fbf9f6;          
     position: relative;
@@ -217,7 +216,7 @@ ul {
     justify-content: center;
     text-align: center;
     color: #3b3530;
-    padding-top: 60px; /* 上部にスペースを確保 */
+    padding-top: 60px;
 }
 
 .hero-overlay {
@@ -614,184 +613,4 @@ footer {
     color: #e0d5c8;
     white-space: nowrap;
     text-align: center;
-}
-
-/* --- BlancCraft プロモーションバナー (Spa BlancAromaフッター用) --- */
-.blanccraft-promo-section {
-    max-width: 700px;
-    margin: 0 auto 40px auto;
-    padding: 0 20px;
-    box-sizing: border-box;
-}
-
-.blanccraft-promo-card {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    background: #252321;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 12px;
-    overflow: hidden;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-}
-
-.blanccraft-promo-card:hover {
-    border-color: #b39b7d;
-    transform: translateY(-3px);
-    box-shadow: 0 6px 25px rgba(179, 155, 125, 0.2);
-}
-
-.blanccraft-promo-img-wrap {
-    flex: 0 0 45%;
-    max-width: 280px;
-    overflow: hidden;
-    background: #1a1816;
-}
-
-.blanccraft-promo-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    transition: transform 0.5s ease;
-}
-
-.blanccraft-promo-card:hover .blanccraft-promo-img {
-    transform: scale(1.04);
-}
-
-.blanccraft-promo-content {
-    flex: 1;
-    padding: 24px 25px;
-    text-align: left;
-}
-
-.blanccraft-promo-tag {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 0.7rem;
-    letter-spacing: 0.2em;
-    color: #b39b7d;
-    text-transform: uppercase;
-    display: block;
-    margin-bottom: 6px;
-}
-
-.blanccraft-promo-title {
-    font-size: 1.15rem;
-    color: #f2efe9;
-    margin-bottom: 8px;
-    font-weight: 500;
-    letter-spacing: 0.05em;
-}
-
-.blanccraft-promo-desc {
-    font-size: 0.82rem;
-    color: #aaa;
-    line-height: 1.6;
-    margin-bottom: 12px;
-}
-
-.blanccraft-promo-linktext {
-    font-size: 0.8rem;
-    color: #b39b7d;
-    font-family: 'Montserrat', sans-serif;
-    letter-spacing: 0.05em;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-}
-
-/* スマホ表示対応 */
-@media (max-width: 650px) {
-    .blanccraft-promo-card {
-        flex-direction: column;
-    }
-    .blanccraft-promo-img-wrap {
-        flex: none;
-        width: 100%;
-        max-width: none;
-        height: 160px;
-    }
-    .blanccraft-promo-content {
-        padding: 20px;
-        text-align: center;
-    }
-    .blanccraft-promo-linktext {
-        justify-content: center;
-    }
-}
-
-/* --- サービスセクション内 画像付きフィーチャーボックス --- */
-.service-feature-box {
-    margin-top: 30px;
-    background: #fff;
-    padding: 25px;
-    border-radius: 12px;
-    border: 1px solid #eae5df;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-    display: flex;
-    gap: 28px;
-    align-items: center;
-}
-
-.service-feature-box.is-reverse {
-    flex-direction: row-reverse;
-}
-
-.service-feature-img {
-    flex: 0 0 42%;
-    max-width: 360px;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-}
-
-.service-feature-img img {
-    width: 100%;
-    height: 230px;
-    object-fit: cover;
-    display: block;
-    transition: transform 0.4s ease;
-}
-
-.service-feature-box:hover .service-feature-img img {
-    transform: scale(1.03);
-}
-
-.service-feature-body {
-    flex: 1;
-}
-
-.service-feature-body h3 {
-    margin-top: 0;
-    margin-bottom: 10px;
-    color: #3b3530;
-    font-size: 1.15rem;
-    font-weight: 600;
-}
-
-.service-feature-body p {
-    font-size: 0.9rem;
-    color: #555;
-    line-height: 1.75;
-    margin-bottom: 12px;
-}
-
-@media (max-width: 768px) {
-    .service-feature-box,
-    .service-feature-box.is-reverse {
-        flex-direction: column;
-        gap: 18px;
-        padding: 20px;
-    }
-    .service-feature-img {
-        flex: none;
-        width: 100%;
-        max-width: none;
-    }
-    .service-feature-img img {
-        height: 200px;
-    }
 }
