@@ -33,8 +33,11 @@
 
     /* タブ切り替えボタン */
     .tab-group { display: flex; margin-bottom: 25px; border-radius: 6px; overflow: hidden; border: 1px solid #b39b7d; }
-    .tab-btn { flex: 1; padding: 12px 2px; background: #fff; color: #b39b7d; border: none; font-size: 0.82rem; font-weight: 500; cursor: pointer; transition: all 0.3s; white-space: nowrap; text-align: center; }
+    .tab-btn { flex: 1; padding: 12px 2px; background: #fff; color: #b39b7d; border: none; font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: all 0.3s; white-space: nowrap; text-align: center; }
     .tab-btn.active { background: #b39b7d; color: #fff; }
+    @media (max-width: 480px) {
+      .tab-btn { font-size: 0.7rem; padding: 10px 1px; }
+    }
     
     /* マニュアル・各種リンクボタン */
     .manual-link-container { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
@@ -80,6 +83,9 @@
     .btn-save { background: #b39b7d; }
     .btn-save:hover:not(:disabled) { background: #9c8263; }
     .btn-save:disabled { background: #ccc; cursor: not-allowed; }
+    .btn-x { background: #1d1d1f; }
+    .btn-x:hover:not(:disabled) { background: #3a3a3c; }
+    .btn-x:disabled { background: #ccc; cursor: not-allowed; }
 
     /* カード要素 */
     .reservation-item, .news-item, .account-item { background: #fff; border: 1px solid #f0ede8; padding: 20px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
@@ -97,6 +103,11 @@
     .quick-link-box { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
     .quick-link-card { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 18px; background: #faf8f5; border: 1px solid #e0dcd5; border-radius: 8px; text-decoration: none; color: #3b3530; font-weight: 500; transition: 0.3s; }
     .quick-link-card:hover { background: #b39b7d; color: #fff; border-color: #b39b7d; }
+
+    /* X投稿エリア装飾 */
+    .x-info-banner { background: #faf8f5; border: 1px solid #e0dcd5; border-radius: 8px; padding: 14px 16px; margin-bottom: 20px; font-size: 0.86rem; color: #555; line-height: 1.65; }
+    .x-result-box { display: none; margin-top: 18px; padding: 16px; background: #E8F8F5; border: 1px solid #A3E4D7; border-radius: 8px; font-size: 0.9rem; color: #16A085; line-height: 1.6; }
+    .x-result-box a { display: inline-block; margin-top: 8px; color: #0e6251; font-weight: bold; text-decoration: underline; word-break: break-all; }
   </style>
 </head>
 <body>
@@ -213,7 +224,8 @@
     <button onclick="switchTab('schedule')" id="tabSchedule" class="tab-btn active">📅 シフト管理</button>
     <button onclick="switchTab('reservation')" id="tabReservation" class="tab-btn">📋 予約管理</button>
     <button onclick="switchTab('news')" id="tabNews" class="tab-btn">📰 お知らせ</button>
-    <button onclick="switchTab('accounts')" id="tabAccounts" class="tab-btn admin-only">👤 アカウント管理</button>
+    <button onclick="switchTab('xpost')" id="tabXpost" class="tab-btn admin-only" style="display:none;">𝕏 X投稿</button>
+    <button onclick="switchTab('accounts')" id="tabAccounts" class="tab-btn admin-only" style="display:none;">👤 アカウント</button>
   </div>
   
   <!-- スケジュールタブエリア -->
@@ -285,6 +297,43 @@
     
     <h2>📝 セラピスト向けお知らせ一覧</h2>
     <div id="newsListAdmin">読み込み中...</div>
+  </div>
+
+  <!-- X（旧Twitter）投稿管理タブエリア（店舗アカウント専用） -->
+  <div id="xpostArea" style="display:none;">
+    <h2>𝕏 X（@spa_blancaroma）出勤情報投稿</h2>
+    <div class="x-info-banner">
+      本日のシフト表から自動生成された文面を編集して、<strong>@spa_blancaroma</strong> へ手動投稿できます。<br>
+      ※定時自動投稿はGASトリガー（<code>autoPostDailyShiftToX</code>）で出勤セラピストがいる日に自動実行されます。
+    </div>
+
+    <div class="form-group">
+      <label for="xCustomComment">ひとこと追記（任意・再生成時に本文へ反映）</label>
+      <input type="text" id="xCustomComment" placeholder="例: 本日夕方以降まだ空き枠ございます！お気軽にお問い合わせください✨">
+      <div style="margin-top: 10px; text-align: right;">
+        <button type="button" class="manual-btn" id="reloadXDraftBtn" onclick="loadXPostDraft()">🔄 本日の出勤から下書きを再生成</button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="xMainText" style="display:flex; justify-content:space-between; align-items:center;">
+        <span>親ポスト本文</span>
+        <span id="xCharCount" style="font-size:0.82rem; color:#666; font-family:'Montserrat', sans-serif;">0 / 140文字</span>
+      </label>
+      <textarea id="xMainText" style="height: 240px;" oninput="updateXCharCount()" placeholder="読み込み中..."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="xReplyText">
+        リプ欄（返信ポスト・URL誘導）
+        <span style="display:block; font-size:0.78rem; color:#888; font-weight:normal; margin-top:2px;">※空欄にすると親ポストのみ単発投稿します</span>
+      </label>
+      <textarea id="xReplyText" style="height: 115px;" placeholder="読み込み中..."></textarea>
+    </div>
+
+    <button class="btn btn-x" id="postToXBtn" onclick="submitPostToX()">𝕏 この内容でXに今すぐ投稿する</button>
+
+    <div id="xPostResultBox" class="x-result-box"></div>
   </div>
 
   <!-- セラピストアカウント管理タブエリア（店舗アカウント専用） -->
@@ -561,9 +610,10 @@
     });
 
     loadNewsList();
-    loadReservationList(); // セラピスト・管理者問わず予約リストを読み込み
+    loadReservationList();
     if (isAdmin) {
       loadAccountList();
+      loadXPostDraft();
     }
   }
 
@@ -580,14 +630,17 @@
     document.getElementById('scheduleArea').style.display = tabName === 'schedule' ? 'block' : 'none';
     document.getElementById('reservationArea').style.display = tabName === 'reservation' ? 'block' : 'none';
     document.getElementById('newsArea').style.display = tabName === 'news' ? 'block' : 'none';
+    document.getElementById('xpostArea').style.display = tabName === 'xpost' ? 'block' : 'none';
     document.getElementById('accountsArea').style.display = tabName === 'accounts' ? 'block' : 'none';
     
     document.getElementById('tabSchedule').className = tabName === 'schedule' ? 'tab-btn active' : 'tab-btn';
     document.getElementById('tabReservation').className = tabName === 'reservation' ? 'tab-btn active' : 'tab-btn';
     document.getElementById('tabNews').className = tabName === 'news' ? 'tab-btn active' : 'tab-btn';
-    document.getElementById('tabAccounts').className = tabName === 'accounts' ? 'tab-btn active' : 'tab-btn';
+    document.getElementById('tabXpost').className = tabName === 'xpost' ? 'tab-btn admin-only active' : 'tab-btn admin-only';
+    document.getElementById('tabAccounts').className = tabName === 'accounts' ? 'tab-btn admin-only active' : 'tab-btn admin-only';
 
     if (tabName === 'reservation') loadReservationList();
+    if (tabName === 'xpost') loadXPostDraft();
     if (tabName === 'accounts') loadAccountList();
   }
 
@@ -654,7 +707,7 @@
     if (toast) {
       toast.innerText = msg;
       toast.classList.add('show');
-      setTimeout(() => { toast.classList.remove('show'); }, 2000);
+      setTimeout(() => { toast.classList.remove('show'); }, 2500);
     }
   }
 
@@ -1062,6 +1115,95 @@
     postApi({ action: 'updateTherapistNews', index: idx, subject: sub, body: bod }).then(() => {
       showToast('更新しました'); loadNewsList();
     }).catch(err => alert("更新失敗: " + err.message));
+  }
+
+  // ----------------------------------------------------
+  // X（旧Twitter）投稿機能（店舗アカウント専用）
+  // ----------------------------------------------------
+  function loadXPostDraft() {
+    if (!currentUser || currentUser.role !== 'admin') return;
+    const comment = document.getElementById('xCustomComment').value.trim();
+    const reloadBtn = document.getElementById('reloadXDraftBtn');
+    if (reloadBtn) {
+      reloadBtn.disabled = true;
+      reloadBtn.innerText = '生成中...';
+    }
+
+    jsonp('getXPostDraft', { comment: comment }).then(res => {
+      if (res && res.success) {
+        document.getElementById('xMainText').value = res.mainText || '';
+        document.getElementById('xReplyText').value = res.replyText || '';
+        updateXCharCount();
+      }
+    }).catch(err => {
+      alert('X投稿下書きの取得に失敗しました: ' + err.message);
+    }).finally(() => {
+      if (reloadBtn) {
+        reloadBtn.disabled = false;
+        reloadBtn.innerText = '🔄 本日の出勤から下書きを再生成';
+      }
+    });
+  }
+
+  function updateXCharCount() {
+    const text = document.getElementById('xMainText').value || '';
+    // Xのウェイト計算（全角=2、半角=1として280上限 → 全角140文字相当）
+    let weighted = 0;
+    for (let i = 0; i < text.length; i++) {
+      const code = text.charCodeAt(i);
+      weighted += (code >= 0x00 && code <= 0x7f) ? 1 : 2;
+    }
+    const equivChars = Math.ceil(weighted / 2);
+    const counterEl = document.getElementById('xCharCount');
+    if (counterEl) {
+      counterEl.innerText = `${equivChars} / 140文字`;
+      counterEl.style.color = weighted > 280 ? '#d9534f' : '#666';
+      counterEl.style.fontWeight = weighted > 280 ? 'bold' : 'normal';
+    }
+  }
+
+  function submitPostToX() {
+    if (!currentUser || currentUser.role !== 'admin') {
+      return alert('Xへの投稿権限がありません（店舗管理者専用）。');
+    }
+
+    const mainText = document.getElementById('xMainText').value.trim();
+    const replyText = document.getElementById('xReplyText').value.trim();
+
+    if (!mainText) {
+      return alert('親ポストの本文を入力してください。');
+    }
+
+    const confirmMsg = replyText
+      ? 'X（@spa_blancaroma）に「親ポスト」と「リプ欄リンク」を今すぐ投稿しますか？'
+      : 'X（@spa_blancaroma）に「親ポストのみ」を今すぐ投稿しますか？';
+
+    if (!confirm(confirmMsg)) return;
+
+    const btn = document.getElementById('postToXBtn');
+    const resultBox = document.getElementById('xPostResultBox');
+    btn.disabled = true;
+    btn.innerText = 'Xへ投稿中...';
+    resultBox.style.display = 'none';
+
+    postApi({
+      action: 'postToX',
+      mainText: mainText,
+      replyText: replyText,
+      requesterId: currentUser.id
+    }, 0).then(res => {
+      showToast('Xへ投稿しました！');
+      resultBox.style.display = 'block';
+      resultBox.innerHTML = `
+        <strong>✅ ${res.message}</strong><br>
+        ${res.tweetUrl ? `<a href="${res.tweetUrl}" target="_blank" rel="noopener noreferrer">実際のポストを確認する（${res.tweetUrl}）</a>` : ''}
+      `;
+    }).catch(err => {
+      alert('X投稿エラー: ' + err.message);
+    }).finally(() => {
+      btn.disabled = false;
+      btn.innerText = '𝕏 この内容でXに今すぐ投稿する';
+    });
   }
 
   // アカウント管理機能（店舗専用）
