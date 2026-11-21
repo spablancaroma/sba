@@ -44,6 +44,8 @@ function doGet(e) {
         result = getTherapistAccounts(e.parameter.requesterId);
       } else if (action === 'changeOwnPassword') {
         result = changeOwnPassword(e.parameter.id, e.parameter.oldPass, e.parameter.newPass);
+      } else if (action === 'getXPostDraft') {
+        result = buildTodayShiftTweetData(e.parameter.comment || '');
       }
     } catch (err) {
       result = { success: false, message: err.message };
@@ -122,6 +124,10 @@ function doPost(e) {
       result = getTherapistAccounts(postData.requesterId);
     } else if (action === 'changeOwnPassword') {
       result = changeOwnPassword(postData.id, postData.oldPass, postData.newPass);
+    } else if (action === 'getXPostDraft') {
+      result = buildTodayShiftTweetData(postData.comment || '');
+    } else if (action === 'postToX') {
+      result = executePostToX(postData.mainText, postData.replyText, postData.requesterId);
     }
   } catch (err) {
     result = { success: false, error: err.message };
@@ -1480,4 +1486,241 @@ function keepAlive() {
   try {
     getAppInitData('指名なし');
   } catch(e) {}
+}
+
+// ====================================================
+// X（旧Twitter）自動投稿機能（OAuth 1.0a / API v2）
+// ====================================================
+
+/**
+ * スプレッドシートの「設定」シートからX投稿用の設定値を取得する
+ */
+function getXPostSettingsFromSheet() {
+  const defaults = {
+    SHOP_NAME: 'Spa Blanc Aroma',
+    RESERVE_URL: 'https://spa-blanc-aroma.com/reservation.html',
+    SCHEDULE_URL: 'https://spa-blanc-aroma.com/schedule.html',
+    HASHTAGS: '#大阪 #淡路 #新大阪 #ゲイマッサージ #アロマトリートメント'
+  };
+
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getSheetByName('設定');
+    if (!sheet) return defaults;
+
+    const values = sheet.getDataRange().getValues();
+    for (let i = 0; i < values.length; i++) {
+      const key = String(values[i][0] || '').trim().toUpperCase();
+      const val = String(values[i][1] || '').trim();
+      if (key && val !== '') {
+        defaults[key] = val;
+      }
+    }
+  } catch (e) {
+    Logger.log('設定シート読み込みエラー: ' + e.message);
+  }
+
+  return defaults;
+}
+
+/**
+ * 本日の出勤状況と「設定」シートを取得して、X投稿用の親ポスト・リプライ案を自動生成する
+ */
+function buildTodayShiftTweetData(customComment) {
+  const settings = getXPostSettingsFromSheet();
+  const today = new Date();
+  const days = ["日", "月", "火", "水", "木", "金", "土"];
+  const dateLabel = `${today.getMonth() + 1}/${today.getDate()}(${days[today.getDay()]})`;
+
+  const schedules = getTodaySchedule();
+  const workingStaff = schedules.filter(s => s.status === "出勤");
+
+  let mainText = "";
+  const commentBlock = customComment && customComment.trim() ? `\n${customComment.trim()}\n` : "";
+
+  if (workingStaff.length > 0) {
+    const shiftLines = workingStaff.map(s => {
+      const notePart = (s.notes && s.notes !== "デフォルト" && s.notes !== "デフォルト時間") ? ` ※${s.notes}` : "";
+      return `・${s.name}（${s.start}〜${s.end}）${notePart}`;
+    }).join("\n");
+
+    mainText =
+      `【本日 ${dateLabel} のご案内】\n\n` +
+      `大阪・淡路の完全個室ゲイマッサージ\n` +
+      `${settings.SHOP_NAME} です🌿\n\n` +
+      `本日の出勤セラピスト：\n` +
+      `${shiftLines}\n` +
+      `${commentBlock}\n` +
+      `新大阪駅からJRで2駅・淡路駅徒歩5分。\n` +
+      `5種のアロマオイルと指圧で、心ほどけるひとときをお過ごしください。\n\n` +
+      `${settings.HASHTAGS}`;
+  } else {
+    mainText =
+      `【${dateLabel} のご案内】\n\n` +
+      `大阪・淡路の完全個室ゲイマッサージ\n` +
+      `${settings.SHOP_NAME} です🌿\n` +
+      `${commentBlock}\n` +
+      `本日のご予約受付は終了しております。\n` +
+      `明日以降の出勤スケジュール・空き枠はリプ欄のリンクよりご確認いただけます。\n\n` +
+      `${settings.HASHTAGS}`;
+  }
+
+  const replyText =
+    `▼ 空き状況の確認・ご予約はこちら\n` +
+    `${settings.RESERVE_URL}\n\n` +
+    `▼ 週間スケジュール\n` +
+    `${settings.SCHEDULE_URL}`;
+
+  return {
+    success: true,
+    hasWorkingStaff: workingStaff.length > 0,
+    mainText: mainText,
+    replyText: replyText
+  };
+}
+
+/**
+ * 管理画面からのX投稿実行（親ポスト＋任意でリプライぶら下げ）
+ */
+function executePostToX(mainText, replyText, requesterId) {
+  if (requesterId && !checkAdminPermission(requesterId)) {
+    return { success: false, message: 'Xへの投稿は店舗管理者（admin）のみ実行可能です。' };
+  }
+
+  const cleanMain = String(mainText || '').trim();
+  const cleanReply = String(replyText || '').trim();
+
+  if (!cleanMain) {
+    return { success: false, message: '投稿本文が空です。' };
+  }
+
+  try {
+    const parentRes = sendSingleTweet(cleanMain, null);
+    const tweetUrl = `https://x.com/spa_blancaroma/status/${parentRes.id}`;
+
+    if (cleanReply) {
+      Utilities.sleep(1500);
+      try {
+        sendSingleTweet(cleanReply, parentRes.id);
+      } catch (replyErr) {
+        return {
+          success: true,
+          tweetUrl: tweetUrl,
+          message: `親ポストは投稿しましたが、リプ欄の投稿でエラーが発生しました: ${replyErr.message}`
+        };
+      }
+    }
+
+    return {
+      success: true,
+      tweetUrl: tweetUrl,
+      message: cleanReply
+        ? 'X（@spa_blancaroma）に親ポスト＋リプ欄リンクを投稿しました！'
+        : 'X（@spa_blancaroma）にポストを投稿しました！'
+    };
+  } catch (err) {
+    return { success: false, message: err.message };
+  }
+}
+
+/**
+ * 【トリガー用】毎日定時に本日の出勤情報をXへ自動投稿する関数
+ */
+function autoPostDailyShiftToX() {
+  const draft = buildTodayShiftTweetData('');
+  if (!draft.hasWorkingStaff) {
+    Logger.log('本日出勤のセラピストがいないため、X自動投稿をスキップしました。');
+    return;
+  }
+  const res = executePostToX(draft.mainText, draft.replyText, null);
+  Logger.log(JSON.stringify(res));
+}
+
+/**
+ * X API v2 単発ツイート送信（replyToTweetId指定時はリプライ投稿）
+ */
+function sendSingleTweet(text, replyToTweetId) {
+  const url = 'https://api.twitter.com/2/tweets';
+  const payloadObj = { text: text };
+  if (replyToTweetId) {
+    payloadObj.reply = { in_reply_to_tweet_id: String(replyToTweetId) };
+  }
+
+  const authHeader = buildOAuth1Header('POST', url);
+  const options = {
+    method: 'post',
+    contentType: 'application/json',
+    headers: {
+      Authorization: authHeader
+    },
+    payload: JSON.stringify(payloadObj),
+    muteHttpExceptions: true
+  };
+
+  const response = UrlFetchApp.fetch(url, options);
+  const code = response.getResponseCode();
+  const body = response.getContentText();
+  let json = {};
+  try {
+    json = JSON.parse(body);
+  } catch (e) {}
+
+  if (code === 201 && json.data && json.data.id) {
+    return { success: true, id: json.data.id };
+  } else {
+    const detail = json.detail || json.title || body;
+    throw new Error(`X APIエラー (HTTP ${code}): ${detail}`);
+  }
+}
+
+/**
+ * OAuth 1.0a 署名ヘッダー生成（外部ライブラリ不要）
+ */
+function buildOAuth1Header(method, url) {
+  const props = PropertiesService.getScriptProperties();
+  const apiKey = props.getProperty('X_API_KEY');
+  const apiSecret = props.getProperty('X_API_SECRET');
+  const accessToken = props.getProperty('X_ACCESS_TOKEN');
+  const accessTokenSecret = props.getProperty('X_ACCESS_TOKEN_SECRET');
+
+  if (!apiKey || !apiSecret || !accessToken || !accessTokenSecret) {
+    throw new Error('GASのスクリプトプロパティにXのAPIキー（4種）が設定されていません。');
+  }
+
+  const nonce = Utilities.getUuid().replace(/-/g, '');
+  const timestamp = Math.floor(Date.now() / 1000).toString();
+
+  const oauthParams = {
+    oauth_consumer_key: apiKey,
+    oauth_nonce: nonce,
+    oauth_signature_method: 'HMAC-SHA1',
+    oauth_timestamp: timestamp,
+    oauth_token: accessToken,
+    oauth_version: '1.0'
+  };
+
+  const paramString = Object.keys(oauthParams)
+    .sort()
+    .map(k => `${rfc3986Encode(k)}=${rfc3986Encode(oauthParams[k])}`)
+    .join('&');
+
+  const signatureBase = `${method.toUpperCase()}&${rfc3986Encode(url)}&${rfc3986Encode(paramString)}`;
+  const signingKey = `${rfc3986Encode(apiSecret)}&${rfc3986Encode(accessTokenSecret)}`;
+  const rawSig = Utilities.computeHmacSignature(Utilities.MacAlgorithm.HMAC_SHA_1, signatureBase, signingKey);
+  const signature = Utilities.base64Encode(rawSig);
+
+  oauthParams.oauth_signature = signature;
+
+  const headerParts = Object.keys(oauthParams)
+    .sort()
+    .map(k => `${rfc3986Encode(k)}="${rfc3986Encode(oauthParams[k])}"`)
+    .join(', ');
+
+  return `OAuth ${headerParts}`;
+}
+
+function rfc3986Encode(str) {
+  return encodeURIComponent(String(str)).replace(/[!'()*]/g, function(c) {
+    return '%' + c.charCodeAt(0).toString(16).toUpperCase();
+  });
 }

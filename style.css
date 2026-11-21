@@ -23,6 +23,11 @@ ul {
     list-style: none;
 }
 
+img {
+    max-width: 100%;
+    height: auto;
+}
+
 /* ハンバーガーメニュー・サイドバー設定 */
 .menu-toggle-btn {
     position: fixed;
@@ -203,8 +208,7 @@ ul {
 
 /* ヒーローセクション */
 .hero {
-    height: 100vh;
-    min-height: 650px;
+    min-height: 100svh;
     background-image: url('mv.png');
     background-size: cover;             /* 画面全体を覆うように拡大縮小（上下の隙間を解消） */
     background-position: center center;  /* 画像を中央に配置 */
@@ -216,7 +220,7 @@ ul {
     justify-content: center;
     text-align: center;
     color: #3b3530;
-    padding-top: 60px;
+    padding: 110px 20px 60px;
 }
 
 .hero-overlay {
@@ -242,7 +246,7 @@ ul {
 
 .hero h1 {
     font-family: 'Avenir', 'Montserrat', sans-serif;
-    font-size: 2.8rem;
+    font-size: clamp(1.9rem, 5vw, 2.8rem);
     font-weight: 500;
     line-height: 1.4;
     margin-bottom: 20px;
@@ -295,7 +299,7 @@ ul {
 }
 
 .section-title-area h2 {
-    font-size: 2rem;
+    font-size: clamp(1.5rem, 4vw, 2rem);
     font-weight: 500;
     color: #3b3530;
     letter-spacing: 0.05em;
@@ -324,7 +328,7 @@ ul {
 /* セラピストセクション (複数カード対応グリッド配置) */
 .therapist-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
     gap: 25px;
     margin-top: 20px;
 }

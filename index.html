@@ -336,7 +336,7 @@
         color: #9c8263;
       }
 
-      .service-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-top: 20px; }
+      .service-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 20px; margin-top: 20px; }
       .service-item { background: #fff; border-radius: 8px; padding: 20px; border: 1px solid #eee; }
       .service-item h4 { margin-top: 0; color: #2C3E50; border-bottom: 2px solid #2C3E50; padding-bottom: 8px; }
       .aroma-tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 15px 0; }
@@ -437,7 +437,7 @@
       /* --- メニュー・料金カード専用スタイル --- */
       .menu-grid { 
         display: grid !important; 
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)) !important; 
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)) !important; 
         gap: 25px !important; 
         margin-top: 25px !important; 
       }
@@ -497,11 +497,51 @@
       .header-logo-img { height: 36px; width: auto; object-fit: contain; opacity: 0.85; transition: opacity 0.3s ease, transform 0.3s ease; }
       .site-header .logo a:hover .header-logo-img { opacity: 1; transform: scale(1.03); }
       
-      .hero-logo-img { width: 130px; height: 130px; object-fit: contain; margin-bottom: 20px; opacity: 0.88; filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.35)); transition: opacity 0.4s ease, transform 0.4s ease; }
+      .hero-logo-img { width: clamp(95px, 24vw, 130px); height: auto; aspect-ratio: 1 / 1; object-fit: contain; margin-bottom: 20px; opacity: 0.88; filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.35)); transition: opacity 0.4s ease, transform 0.4s ease; }
       .hero-logo-img:hover { opacity: 0.98; transform: scale(1.02); }
 
       .hero-line-btn { position: absolute; top: 90px; right: 25px; z-index: 10; transition: transform 0.3s ease, opacity 0.3s ease; }
       .hero-line-btn:hover { transform: scale(1.05); opacity: 0.9; }
+
+      /* 姉妹ブランド BlancCraft バナーのフレキシブル対応 */
+      .blanccraft-promo-card {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 12px;
+        padding: 18px;
+        text-align: left;
+        max-width: 720px;
+        margin: 0 auto;
+        transition: all 0.3s ease;
+      }
+      .blanccraft-promo-card:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: #b39b7d;
+      }
+      .blanccraft-promo-img-wrap {
+        flex: 0 0 220px;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .blanccraft-promo-img {
+        width: 100%;
+        height: auto;
+        display: block;
+        object-fit: cover;
+      }
+      .blanccraft-promo-content { flex: 1; }
+      .blanccraft-promo-tag { font-size: 0.72rem; color: #c9b49b; letter-spacing: 0.15em; text-transform: uppercase; }
+      .blanccraft-promo-title { font-size: 1.15rem; color: #fff; margin: 4px 0 8px; }
+      .blanccraft-promo-desc { font-size: 0.85rem; color: #dcd6ce; line-height: 1.6; margin-bottom: 8px; }
+      .blanccraft-promo-linktext { font-size: 0.82rem; color: #b39b7d; font-weight: bold; }
+
+      @media (max-width: 650px) {
+        .blanccraft-promo-card { flex-direction: column; text-align: center; }
+        .blanccraft-promo-img-wrap { flex: none; width: 100%; max-width: 320px; }
+      }
 
       /* スマホ対応 */
       @media (max-width: 768px) {
@@ -646,7 +686,7 @@
                             <img src="souta.jpg" alt="セラピスト そうたの写真">
                         </div>
                         <div class="therapist-info-col">
-                            <h3 style="margin: 0; color: #8E44AD; font-size: 0.85rem; white-space: nowrap;">九州出身のゲイ</h3>
+                            <h3 style="margin: 0; color: #8E44AD; font-size: 0.85rem; line-height: 1.4;">九州出身のゲイ</h3>
                             <div class="therapist-profile">そうた <span style="font-size: 0.95rem; font-weight: normal; color: #666;">(25歳)</span></div>
                             <div class="therapist-spec">176cm / 62kg / P17cm</div>
                             <p style="margin: 0; color: #444; line-height: 1.6; font-size: 0.95rem;">
@@ -689,7 +729,7 @@
                             <img src="ryosuke.jpg" alt="セラピスト りょうすけの写真">
                         </div>
                         <div class="therapist-info-col">
-                            <h3 style="margin: 0; color: #8E44AD; font-size: 0.85rem; white-space: nowrap;">水泳で鍛えたしなやかボディのゲイ</h3>
+                            <h3 style="margin: 0; color: #8E44AD; font-size: 0.85rem; line-height: 1.4;">水泳で鍛えたしなやかボディのゲイ</h3>
                             <div class="therapist-profile">りょうすけ <span style="font-size: 0.95rem; font-weight: normal; color: #666;">(20歳)</span></div>
                             <div class="therapist-spec">173cm / 56kg / P15cm</div>
                             <p style="margin: 0; color: #444; line-height: 1.6; font-size: 0.95rem;">
